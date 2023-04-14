@@ -1,7 +1,27 @@
-import '../styles/globals.css'
+import "../styles/globals.css";
+import { ThemeProvider } from "@mui/material";
+import { theme } from "../styles/theme";
+import createEmotionCache from "../styles/createEmotionCache";
+import { CacheProvider } from "@emotion/react";
+import { store } from "../app/store";
+import { Provider } from "react-redux";
 
-function MyApp({ Component, pageProps }) {
-  return <Component {...pageProps} />
+const clientSideEmotionCache = createEmotionCache();
+
+function MyApp({
+	Component,
+	emotionCache = clientSideEmotionCache,
+	pageProps,
+}) {
+	return (
+		<CacheProvider value={emotionCache}>
+			<ThemeProvider theme={theme}>
+				<Provider store={store}>
+					<Component {...pageProps} />
+				</Provider>
+			</ThemeProvider>
+		</CacheProvider>
+	);
 }
 
-export default MyApp
+export default MyApp;
