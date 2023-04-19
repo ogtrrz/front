@@ -1,4 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import useLocalStorageState from "use-local-storage-state";
+import { useRouter } from "next/router";
+import _ from "lodash";
 import * as yup from "yup";
 import { Formik, Form, Field } from "formik";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -26,6 +30,7 @@ import {
 	Paper,
 	Typography,
 	MenuItem,
+	BootstrapInput
 } from "@mui/material";
 
 const kind = [
@@ -44,7 +49,86 @@ const kind = [
 ];
 
 const Requirents = () => {
+	const postForm = async (values) => {
+		const data = {
+			id2Course: courseIo.id,
+			code: values.requirements_code,
+			expirationInMonth: values.requirements_expiration,
+			kind: kindState,
+			description: values.requirements_description,
+		};
+
+		console.log("data", data);
+
+		let url = `${process.env.NEXT_PUBLIC_API_REST}requirents`
+		let method = 'post'
+		if(router.query.Course && router.query.Requirent) {
+			url = url+'/'+router.query.Requirent
+			method = 'patch'
+			data.id = router.query.Requirent
+		}
+
+
+		const config = {
+			method: method,
+			url: url, 
+			headers: {
+				"Content-Type": "application/json",
+			},
+			data: data,
+		};
+		await axios(config)
+			.then(async function (response) {
+				console.log(response.data);
+
+				let course = _.cloneDeep(courseIo);
+				console.log("course", course);
+				let arrayRequirents = course.requirents;
+				arrayRequirents = [...arrayRequirents, response.data];
+				course.requirents = arrayRequirents;
+				console.log("course2", course);
+				const data = JSON.stringify(course);
+				const config = {
+					method: "patch",
+					url: `${process.env.NEXT_PUBLIC_API_REST}/courses/${course.id}`,
+					headers: {
+						"Content-Type": "application/json",
+					},
+					data: data,
+				};
+				await axios(config)
+					.then(function (response) {
+						console.log(response.data);
+						setCourseIo(response.data);
+						router.push(`/secure/view/course/${course.id}`);
+					})
+					.catch(function (error) {
+						console.log(error);
+					});
+			})
+			.catch(function (error) {
+				console.log(error);
+			});
+	};
+
 	const [kindState, setKindState] = useState();
+	const [courseIo, setCourseIo] = useLocalStorageState("course", {
+		defaultValue: [],
+	});
+	const [requirentIo, setRequirentIo] = useLocalStorageState("requirent", {
+		defaultValue: [],
+	});
+	const router = useRouter();
+
+	useEffect(() => {
+		console.log("courseIo", courseIo);
+		console.log("query", router.query);
+		if (router.query.Course && router.query.Requirent) {
+			console.log("Contiene Query ", requirentIo);
+			
+		}
+	}, []);
+
 	const handleChange = (event) => {
 		const {
 			target: { value },
@@ -54,11 +138,12 @@ const Requirents = () => {
 	};
 	return (
 		<Formik
+			enableReinitialize
 			initialValues={{
-				requirements_code: "",
-				kind: "",
-				requirements_expiration: "",
-				requirements_description: "",
+				requirements_code: requirentIo?.code ? requirentIo?.code : "",
+				kind: requirentIo?.kind ? kind[requirentIo.kind] : "",
+				requirements_expiration: requirentIo?.expirationInMonth ? requirentIo?.expirationInMonth : "",
+				requirements_description: requirentIo?.description ? requirentIo?.description : "",
 			}}
 			validationSchema={yup.object({
 				requirements_code: yup
@@ -69,9 +154,12 @@ const Requirents = () => {
 					.required("Es requerido"),
 			})}
 			onSubmit={(values, { setSubmitting }) => {
+				//event.preventDefault();
+
 				setSubmitting(false);
 				console.log("Values", values);
 				console.log("Rol", kindState);
+				postForm(values);
 			}}>
 			{({ submitForm, isSubmitting }) => (
 				<LocalizationProvider
@@ -101,7 +189,9 @@ const Requirents = () => {
 										name='kind'
 										multiple={false}
 										value={kindState}
-										onChange={handleChange}>
+										onChange={handleChange}
+										
+										>
 										{kind.map((item) => (
 											<MenuItem key={item} value={item}>
 												{item.value}

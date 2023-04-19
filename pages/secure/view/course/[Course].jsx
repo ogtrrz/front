@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import useLocalStorageState from "use-local-storage-state";
 import { useRouter } from "next/router";
-import FlagCircleIcon from "@mui/icons-material/FlagCircle";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
 import {
 	Button,
 	LinearProgress,
@@ -10,6 +17,7 @@ import {
 	Paper,
 	Typography,
 	MenuItem,
+	ButtonGroup,
 } from "@mui/material";
 
 const Course = () => {
@@ -18,7 +26,7 @@ const Course = () => {
 	async function getCourses() {
 		const config = {
 			method: "get",
-			url: "http://localhost:8080/api/courses/" + Course,
+			url: `${process.env.NEXT_PUBLIC_API_REST}courses/${Course}`,
 			headers: {},
 		};
 
@@ -26,6 +34,7 @@ const Course = () => {
 			.then(function (response) {
 				console.log(response.data);
 				setCourseState(response.data);
+				setCourseIo(response.data);
 			})
 			.catch(function (error) {
 				console.log(error);
@@ -37,6 +46,17 @@ const Course = () => {
 			getCourses();
 		}
 	}, [Course]);
+
+	const [courseIo, setCourseIo, { isPersistent }] = useLocalStorageState(
+		"course",
+		{
+			defaultValue: [],
+		}
+	);
+
+	const handleNewRequirement = () => {
+		router.push(`/secure/form/Requirents`);
+	};
 	return (
 		<>
 			<Typography variant='h6' color='primary'>
@@ -46,7 +66,13 @@ const Course = () => {
 				{courseState?.code}
 			</Typography>
 			<Typography variant='body1' color='text'>
-				{courseState?.typeCourse}
+				{courseState?.typeCourse === "PRESENT"
+					? "Presente"
+					: courseState?.typeCourse === "REMOTE"
+					? "Remoto"
+					: courseState?.typeCourse === "ONLINE"
+					? "Online"
+					: courseState?.typeCourse}
 			</Typography>
 			<Typography variant='body1' color='text'>
 				{courseState?.expirationInMonth}
@@ -60,6 +86,58 @@ const Course = () => {
 			<Typography variant='body1' color='text'>
 				{courseState?.durationAuthorizationInMonth}
 			</Typography>
+			<Typography variant='h6' color='primary'>
+				Requerimientos
+			</Typography>
+			<Button
+				variant='outlined'
+				endIcon={<AddCircleIcon />}
+				onClick={handleNewRequirement}>
+				Nuevo Requerimiento
+			</Button>
+			<TableContainer component={Paper}>
+				<Table sx={{ minWidth: 650 }} aria-label='courses table'>
+					<TableHead>
+						<TableRow>
+							<TableCell align='left'><b>Código</b></TableCell>
+							<TableCell align='left'><b>Tipo</b></TableCell>
+							<TableCell align='left'><b>Descripción</b></TableCell>
+							<TableCell align='left'><b>Expira&nbsp;(Meses)</b></TableCell>
+						</TableRow>
+					</TableHead>
+					<TableBody>
+						{courseState?.requirents?.map((requirent) => (
+							<TableRow
+								key={requirent.id}
+								sx={{
+									"&:last-child td, &:last-child th": { border: 0 },
+									":hover": {
+										bgcolor: "#A43357",
+									},
+								}}
+								style={{ cursor: "pointer" }}
+								onClick={() => {
+									router.push(`/secure/view/requirent/${requirent.id}?Course=${courseIo.id}`);
+								}}>
+								<TableCell align='left'>{requirent?.code}</TableCell>
+								<TableCell align='left'>
+									{requirent?.kind === "CERTIFICATE"
+										? "Certificado"
+										: requirent.kind === "ONTHEJOB"
+										? "On the job"
+										: requirent.kind === "COURSE"
+										? "Curso"
+										: requirent.kind}
+								</TableCell>
+								<TableCell align='left'>{requirent?.description}</TableCell>
+								<TableCell align='left' color='text'>
+									{requirent?.expirationInMonth}
+								</TableCell>
+							</TableRow>
+						))}
+					</TableBody>
+				</Table>
+			</TableContainer>
 		</>
 	);
 };

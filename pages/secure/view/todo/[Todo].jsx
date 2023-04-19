@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import useLocalStorageState from "use-local-storage-state";
 import { useRouter } from "next/router";
 import FlagCircleIcon from "@mui/icons-material/FlagCircle";
 import {
@@ -15,26 +16,36 @@ import {
 const Todo = () => {
 	const router = useRouter();
 	const { Todo } = router.query;
-	async function getTodo() {
-		const config = {
-			method: "get",
-			url: "http://localhost:8080/api/to-dos/" + Todo,
-			headers: {},
-		};
+	// async function getTodo() {
+	// 	const config = {
+	// 		method: "get",
+	// 		url: "http://localhost:8080/api/to-dos/" + Todo,
+	// 		headers: {},
+	// 	};
 
-		await axios(config)
-			.then(function (response) {
-				console.log(response.data);
-				setTodoState(response.data);
-			})
-			.catch(function (error) {
-				console.log(error);
-			});
-	}
+	// 	await axios(config)
+	// 		.then(function (response) {
+	// 			console.log(response.data);
+	// 			setTodoState(response.data);
+	// 		})
+	// 		.catch(function (error) {
+	// 			console.log(error);
+	// 		});
+	// }
+	const [employeeIo, setEmployeeIo, { isPersistent }] = useLocalStorageState(
+		"employee",
+		{
+			defaultValue: [],
+		}
+	);
 	const [todoState, setTodoState] = useState();
 	useEffect(() => {
 		if (Todo) {
-			getTodo();
+			const dataio = employeeIo.todos.find((obj) => {
+				return obj.id == Todo;
+			});
+			setTodoState(dataio)
+			// getTodo();
 		}
 	}, [Todo]);
 	return (

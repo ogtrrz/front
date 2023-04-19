@@ -130,7 +130,7 @@ const HistoricData = () => {
 						Subir Archivo
 						<input
 							hidden
-							accept='image/*'
+							accept='*'
 							multiple
 							type='file'
 							// value={selectedFile}
