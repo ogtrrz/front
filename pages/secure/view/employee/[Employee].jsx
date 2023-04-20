@@ -50,12 +50,16 @@ const Employee = () => {
 			getEmployees();
 		}
 	}, [Employee]);
-	const [employeeIo, setEmployeeIo, { isPersistent }] = useLocalStorageState(
-		"employee",
-		{
-			defaultValue: [],
-		}
-	);
+	const [employeeIo, setEmployeeIo] = useLocalStorageState("employee", {
+		defaultValue: [],
+	});
+
+	const handleNewTraining = () => {
+		console.log("New Training");
+		router.push(
+			`/secure/form/TrainingCourseSelection?Employee=${employeeState.id}`
+		);
+	};
 
 	//TODO errores ux color del titulo titulo color de los datos de la tabla en celular no existe el hover, call to action no es consistente
 	return (
@@ -107,7 +111,10 @@ const Employee = () => {
 					</Typography>
 				</AccordionSummary>
 				<AccordionDetails>
-					<Button variant='outlined' endIcon={<AddCircleIcon />}>
+					<Button
+						variant='outlined'
+						endIcon={<AddCircleIcon />}
+						onClick={handleNewTraining}>
 						Nuevo Entrenamiento
 					</Button>
 					<TableContainer component={Paper}>

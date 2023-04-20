@@ -25,6 +25,8 @@ import {
 	Box,
 	Paper,
 	Typography,
+	FormControl,
+	FormHelperText,
 } from "@mui/material";
 
 const Training = () => {
@@ -32,40 +34,42 @@ const Training = () => {
 		<Formik>
 			<LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={"es-mx"}>
 				<Form>
-					<Stack justifyContent='center' alignItems='center'>
-						<Paper elevation={3}>
-							<Stack
-								spacing={{ xs: 1, sm: 2, md: 4 }}
-								alignItems='left'
-								justifyContent='left'
-								paddingX={{ xs: 1, sm: 2, md: 4 }}
-								paddingY={{ xs: 1, sm: 1, md: 2 }}>
-								<Typography variant='h6' color='primary'>Mi Entrenamiento</Typography>
-								<Field
-									component={TextField}
-									type='text'
-									label='Código'
-									name='requirements_code'
-								/>
-								<Box margin={1}>
-									<Field
-										component={DatePicker}
-										name='birthdate'
-										label='Fecha del Entrenamiento'
-										ampm={true}
-									/>
-								</Box>
-								<Box margin={1}>
-									<Field
-										component={DatePicker}
-										name='hire_date'
-										label='Fecha de Expiración'
-										ampm={true}
-									/>
-								</Box>
-							</Stack>
-						</Paper>
-					</Stack>
+					<Typography variant='h6' color='primary'>
+						Mi Entrenamiento
+					</Typography>
+					<FormControl fullWidth>
+						<Field
+							component={TextField}
+							name='requirements_code'
+							label='Código'
+							type='text'
+						/>
+						<FormHelperText id='help-code'>
+							Ingrese el Código
+						</FormHelperText>
+					</FormControl>
+					<FormControl fullWidth>
+						<Field
+							component={DatePicker}
+							name='date'
+							label='Fecha del Entrenamiento'
+							ampm={true}
+						/>
+						<FormHelperText id='my-helper-text'>
+							Fecha del Entrenamiento
+						</FormHelperText>
+					</FormControl>
+					<FormControl fullWidth>
+						<Field
+							component={DatePicker}
+							name='expiry'
+							label='Fecha de Expiración'
+							ampm={true}
+						/>
+						<FormHelperText id='my-helper-text'>
+							Fecha de Expiración
+						</FormHelperText>
+					</FormControl>
 				</Form>
 			</LocalizationProvider>
 		</Formik>

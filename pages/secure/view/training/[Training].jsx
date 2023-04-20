@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import useLocalStorageState from "use-local-storage-state";
+import moment from "moment";
 import { useRouter } from "next/router";
 import FlagCircleIcon from "@mui/icons-material/FlagCircle";
+import ReqTrainEvidence from "../../../../models/ReqTrainEvidence";
 import {
 	Button,
 	LinearProgress,
@@ -12,7 +14,6 @@ import {
 	Typography,
 	MenuItem,
 } from "@mui/material";
-import { set } from "date-fns";
 
 const Training = () => {
 	const router = useRouter();
@@ -43,7 +44,7 @@ const Training = () => {
 
 		await axios(config)
 			.then(function (response) {
-				console.log('curso',response.data);
+				console.log("curso", response.data);
 				setCourseState(response.data);
 			})
 			.catch(function (error) {
@@ -64,9 +65,10 @@ const Training = () => {
 			} else {
 				setTraningState(dataio);
 			}
-			console.log('dataio',dataio);
-			getCourses(dataio.id)
+			console.log("dataio", dataio);
+			getCourses(dataio.id);
 			console.log("Curso", courseState);
+			console.log("Employee", employeeIo);
 		}
 	}, [Training]);
 
@@ -83,14 +85,15 @@ const Training = () => {
 				{traningState?.code}
 			</Typography>
 			<Typography variant='body1' color='text'>
-				{traningState?.date}
+				{moment(traningState?.date).format("DD/MM/yyyy")}
 			</Typography>
 			<Typography variant='body1' color='text'>
-				{traningState?.expiry}
+				{moment(traningState?.expiry).format("DD/MM/yyyy")}
 			</Typography>
 			<Typography variant='body1' color='text'>
 				{traningState?.course?.code}
 			</Typography>
+			<ReqTrainEvidence evidences={traningState?.evidences} />
 		</>
 	);
 };

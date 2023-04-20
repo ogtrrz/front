@@ -10,7 +10,7 @@ import {
 	Paper,
 	Typography,
 	MenuItem,
-	Link
+	Link,
 } from "@mui/material";
 
 import Table from "@mui/material/Table";
@@ -20,7 +20,7 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 
-const Courses = () => {
+const Courses = ({ training, setCourse }) => {
 	const router = useRouter();
 	async function getCourses() {
 		const config = {
@@ -44,6 +44,14 @@ const Courses = () => {
 		getCourses();
 	}, []);
 
+	const handleClickCourse = (param) => {
+		if(training) {
+			console.log("param", param);
+			return setCourse(param)
+		}
+		return router.push(`course/${param.id}`)
+	};
+
 	return (
 		<>
 			<Typography variant='h6' color='primary'>
@@ -66,13 +74,14 @@ const Courses = () => {
 						{courses?.map((course) => (
 							<TableRow
 								key={course.code}
-								sx={{ "&:last-child td, &:last-child th": { border: 0 }, 
-								":hover": {
-									bgcolor: "#A43357"
-								  }}}
-								style={{ cursor: 'pointer' }}
-								onClick={() => { router.push(`course/${course.id}`) }}
-								>
+								sx={{
+									"&:last-child td, &:last-child th": { border: 0 },
+									":hover": {
+										bgcolor: "#A43357",
+									},
+								}}
+								style={{ cursor: "pointer" }}
+								onClick={(event) => handleClickCourse(course)}>
 								<TableCell align='left'>{course.code}</TableCell>
 								<TableCell align='center'>
 									{course.autorizationBy ? (
