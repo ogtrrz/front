@@ -6,6 +6,7 @@ const poppins = Poppins({
 	weight: ["300", "400"],
 	style: ["normal", "italic"],
 	subsets: ["latin"],
+	preload: ["true"],
 });
 
 export const theme = createTheme({
@@ -18,7 +19,7 @@ export const theme = createTheme({
 			main: "#4277FF",
 		},
 		text: {
-			main: "#37474f",
+			main: blueGrey,
 		},
 		error: { main: "#6E353A" },
 		warning: { main: "#F5EE9E" },
