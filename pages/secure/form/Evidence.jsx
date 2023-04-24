@@ -2,12 +2,13 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import useLocalStorageState from "use-local-storage-state";
 import moment from "moment";
+import dayjs from "dayjs";
+import "dayjs/locale/es-mx";
+import { get, patch, URL_EVIDENCES, URL_EMPLOYEES } from "data/ApiData";
 import { useRouter } from "next/router";
 import * as yup from "yup";
 import { Formik, Form, Field } from "formik";
 import CircularProgress from "@mui/material/CircularProgress";
-import dayjs from "dayjs";
-import "dayjs/locale/es-mx";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import {
@@ -69,59 +70,29 @@ const Training = () => {
 		const date = fechaExpiracion.format("YYYY-MM-DD") + "T00:00:00.01Z";
 		let formData = new FormData();
 		formData.append("files", selectedFile);
-		await axios({
+		const responseFile = await axios({
 			method: "post",
 			url: `${process.env.NEXT_PUBLIC_API_IMAGES}api/upload`,
 			data: formData,
-		})
-			.then((responseFile) => {
-				console.log("Upload Response", responseFile.data);
-				const postValues = {
-					id: Evidence,
-					note: values.evidence_description,
-					extra3: date,
-					link: responseFile.data[0].url,
-					id2Trining: Training,
-					state: "CHECK",
-				};
-				console.log("postValues", postValues);
-				const config = {
-					method: "patch",
-					url: `${process.env.NEXT_PUBLIC_API_REST}evidences/${Evidence}`, //"http://localhost:8080/api/evidences",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					data: postValues,
-				};
-
-				axios(config)
-					.then(function (response) {
-						console.log("Response DATOS 2", response.data);
-						const config = {
-							method: "get",
-							url: `${process.env.NEXT_PUBLIC_API_REST}employees/${employeeIo.id}`,
-							headers: {},
-						};
-
-						axios(config)
-							.then(function (response) {
-								console.log(response.data);
-								setEmployeeIo(response.data);
-								router.push(`/secure/view/training/${Training}`);
-							})
-							.catch(function (error) {
-								console.log(error);
-							});
-					})
-					.catch(function (error) {
-						console.log("Error-2", error);
-					});
-			})
-			.catch(function (error) {
-				console.log("Error-1", error);
-			});
+		});
+		console.log("Upload Response", responseFile.data);
+		const postValues = {
+			id: Evidence,
+			note: values.evidence_description,
+			extra3: date,
+			link: responseFile.data[0].url,
+			id2Trining: Training,
+			state: "CHECK",
+		};
+		console.log("postValues", postValues);
+		const response = await patch(URL_EVIDENCES, postValues);
+		console.log(response);
+		const emploes = await get(URL_EMPLOYEES, employeeIo.id);
+		console.log("emploes", emploes);
+		setEmployeeIo(emploes);
+		router.push(`/secure/view/training/${Training}`);
 	}
-	//TODO debemos actualizar el cache
+
 	return (
 		<Paper elevation={3}>
 			<Typography variant='h6' color='primary'>
