@@ -1,5 +1,8 @@
 import React, { useState } from "react";
+import { useRouter } from "next/router";
 import axios from "axios";
+import _ from "lodash";
+import useLocalStorageState from "use-local-storage-state";
 import * as yup from "yup";
 import { Formik, Form, Field } from "formik";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -32,21 +35,25 @@ import {
 } from "@mui/material";
 
 const Todo = () => {
+	const router = useRouter();
 	const [selectedFile, setSelectedFile] = useState(null);
 
 	const [fechaExpiracion, setFechaExpiracion] = useState();
+	const [employeeIo, setEmployeeIo] = useLocalStorageState("employee", {
+		defaultValue: [],
+	});
+
 	const handlerChangueExpirationDate = (fecha) => {
 		setFechaExpiracion(fecha);
 	};
-
 	async function postForm(values) {
 		console.log("Values post-0", values);
-		const date = fechaExpiracion.format("YYYY-MM-DD") + "T00:00:00.000Z";
+		const date = fechaExpiracion.format("YYYY-MM-DD") + "T00:00:00.001Z";
 		let formData = new FormData();
 		formData.append("files", selectedFile);
 		await axios({
 			method: "post",
-			url: "http://localhost:1337/api/upload",
+			url: `${process.env.NEXT_PUBLIC_API_IMAGES}api/upload`,
 			data: formData,
 		})
 			.then((responseFile) => {
@@ -56,13 +63,12 @@ const Todo = () => {
 					description: values.todo_description,
 					state: values.is_complete ? "CHECK" : "NEW",
 					link: responseFile.data[0].url,
-					employee: {
-						id: 10,
-					},
+					id2Employee: employeeIo.id,
+					
 				});
 				const config = {
 					method: "post",
-					url: "http://localhost:8080/api/to-dos",
+					url: `${process.env.NEXT_PUBLIC_API_REST}/to-dos`,
 					headers: {
 						"Content-Type": "application/json",
 					},
@@ -71,7 +77,32 @@ const Todo = () => {
 
 				axios(config)
 					.then(function (response) {
-						console.log("Response DATOS 2", response);
+						console.log("Response DATOS 2", response.data);
+
+						let employeeNew = _.cloneDeep(employeeIo);
+						console.log("employeeNew", employeeNew);
+						let arraytodos= employeeNew.todos;
+						arraytodos = [...arraytodos, response.data];
+						employeeNew.todos = arraytodos;
+						console.log("employeeNew2", employeeNew);
+						const data = JSON.stringify(employeeNew);
+						const config = {
+							method: "patch",
+							url: `${process.env.NEXT_PUBLIC_API_REST}/employees/${employeeNew.id}`,
+							headers: {
+								"Content-Type": "application/json",
+							},
+							data: data,
+						};
+						axios(config)
+							.then(function (response) {
+								console.log(response.data);
+								setEmployeeIo(response.data);
+								router.push(`/secure/view/employee/${employeeNew.id}`);
+							})
+							.catch(function (error) {
+								console.log(error);
+							});
 					})
 					.catch(function (error) {
 						console.log("Error-2", error);
@@ -149,12 +180,7 @@ const Todo = () => {
 											label='Descripción'
 											name='todo_description'
 										/>
-										<Field
-											component={TextField}
-											type='text'
-											label='Link'
-											name='todo_link'
-										/>
+										
 									</Form>
 								</LocalizationProvider>
 								<Button

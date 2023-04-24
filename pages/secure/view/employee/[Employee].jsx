@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import useLocalStorageState from "use-local-storage-state";
+import moment from "moment";
 import { useRouter } from "next/router";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -61,6 +62,16 @@ const Employee = () => {
 		);
 	};
 
+	const handleNewTodo = () => {
+		console.log("New ToDo");
+		router.push(`/secure/form/Todo?Employee=${employeeState.id}`);
+	};
+
+	const handleNewFile = () => {
+		console.log("New File");
+		router.push(`/secure/form/HistoricData?Employee=${employeeState.id}`);
+	};
+
 	//TODO errores ux color del titulo titulo color de los datos de la tabla en celular no existe el hover, call to action no es consistente
 	return (
 		<>
@@ -112,7 +123,7 @@ const Employee = () => {
 				</AccordionSummary>
 				<AccordionDetails>
 					<Button
-						variant='outlined'
+						variant='contained'
 						endIcon={<AddCircleIcon />}
 						onClick={handleNewTraining}>
 						Nuevo Entrenamiento
@@ -141,9 +152,11 @@ const Employee = () => {
 										}}
 										style={{ cursor: "pointer" }}>
 										<TableCell align='left'>{item?.code}</TableCell>
-										<TableCell align='left'>{item?.date}</TableCell>
+										<TableCell align='left'>
+											{item ? moment(item.date).format("M/YYYY") : ""}
+										</TableCell>
 										<TableCell align='left' color='text'>
-											{item?.expiry}
+											{item ? moment(item.expiry).format("M/YYYY") : ""}
 										</TableCell>
 									</TableRow>
 								))}
@@ -162,7 +175,10 @@ const Employee = () => {
 					</Typography>
 				</AccordionSummary>
 				<AccordionDetails>
-					<Button variant='outlined' endIcon={<AddCircleIcon />}>
+					<Button
+						variant='contained'
+						endIcon={<AddCircleIcon />}
+						onClick={handleNewTodo}>
 						Nueva Tarea
 					</Button>
 					<TableContainer component={Paper}>
@@ -189,7 +205,9 @@ const Employee = () => {
 										}}
 										style={{ cursor: "pointer" }}>
 										<TableCell align='left'>{item?.state}</TableCell>
-										<TableCell align='left'>{item?.date}</TableCell>
+										<TableCell align='left'>
+											{item ? moment(item.date).format("M/YYYY") : ""}
+										</TableCell>
 										<TableCell align='left'>{item?.description}</TableCell>
 									</TableRow>
 								))}
@@ -208,14 +226,18 @@ const Employee = () => {
 					</Typography>
 				</AccordionSummary>
 				<AccordionDetails>
-					<Button variant='outlined' endIcon={<AddCircleIcon />}>
+					<Button
+						variant='contained'
+						endIcon={<AddCircleIcon />}
+						onClick={handleNewFile}>
 						Nuevo Archivo
 					</Button>
 					<TableContainer component={Paper}>
 						<Table sx={{ minWidth: 650 }} aria-label='courses table'>
 							<TableHead>
 								<TableRow>
-									<TableCell align='left'>Código</TableCell>
+									<TableCell align='left'>Nombre</TableCell>
+									<TableCell align='left'>Creado</TableCell>
 								</TableRow>
 							</TableHead>
 							<TableBody>
@@ -228,8 +250,16 @@ const Employee = () => {
 												bgcolor: "#A43357",
 											},
 										}}
+										onClick={() => {
+											router.push(
+												`${process.env.NEXT_PUBLIC_API_IMAGES}${item.link}`
+											);
+										}}
 										style={{ cursor: "pointer" }}>
 										<TableCell align='left'>{item?.name}</TableCell>
+										<TableCell align='left'>
+											{item ? moment(item.createdAt).format("DD/MM/YYYY") : ""}
+										</TableCell>
 									</TableRow>
 								))}
 							</TableBody>

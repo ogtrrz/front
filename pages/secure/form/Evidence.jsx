@@ -1,5 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
+import useLocalStorageState from "use-local-storage-state";
+import moment from "moment";
+import { useRouter } from "next/router";
 import * as yup from "yup";
 import { Formik, Form, Field } from "formik";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -29,39 +32,62 @@ import {
 } from "@mui/material";
 
 const Training = () => {
+	const [employeeIo, setEmployeeIo] = useLocalStorageState("employee", {
+		defaultValue: [],
+	});
+	const router = useRouter();
+	const { Evidence, Training } = router.query;
 	const [selectedFile, setSelectedFile] = useState(null);
 
+	const [evidenceState, setEvidenceState] = useState();
+
 	const [fechaExpiracion, setFechaExpiracion] = useState();
-	const handlerChangueExpirationDate = (fecha) => {
+	const handlerChangueDate = (fecha) => {
 		setFechaExpiracion(fecha);
 	};
 
+	useEffect(() => {
+		if (Evidence) {
+			console.log("employeeIo", employeeIo);
+			console.log("Evidence", Evidence);
+			console.log("Traning", Training);
+			const TrainingIo = employeeIo?.trainings.find((obj) => {
+				return obj.id == Training;
+			});
+			const EvidenceIo = TrainingIo?.evidences.find((obj) => {
+				return obj.id == Evidence;
+			});
+			setEvidenceState(EvidenceIo);
+
+			console.log("TrainingIo", TrainingIo);
+			console.log("EvidenceIo", EvidenceIo);
+		}
+	}, [Evidence, Training]);
+
 	async function postForm(values) {
 		console.log("Values post-0", values);
-		const date = fechaExpiracion.format("YYYY-MM-DD") + "T00:00:00.000Z";
+		const date = fechaExpiracion.format("YYYY-MM-DD") + "T00:00:00.01Z";
 		let formData = new FormData();
 		formData.append("files", selectedFile);
 		await axios({
 			method: "post",
-			url: "http://localhost:1337/api/upload",
+			url: `${process.env.NEXT_PUBLIC_API_IMAGES}api/upload`,
 			data: formData,
 		})
 			.then((responseFile) => {
-				console.log("Sumited-1", responseFile);
-				const postValues = JSON.stringify({
-					description: values.evidence_description,
-					expiration: date,
+				console.log("Upload Response", responseFile.data);
+				const postValues = {
+					id: Evidence,
+					note: values.evidence_description,
+					extra3: date,
 					link: responseFile.data[0].url,
-					training: {
-						id: 10,
-					},
-					employee: {
-						id: 10,
-					},
-				});
+					id2Trining: Training,
+					state: "CHECK",
+				};
+				console.log("postValues", postValues);
 				const config = {
-					method: "post",
-					url: "http://localhost:8080/api/evidences",
+					method: "patch",
+					url: `${process.env.NEXT_PUBLIC_API_REST}evidences/${Evidence}`, //"http://localhost:8080/api/evidences",
 					headers: {
 						"Content-Type": "application/json",
 					},
@@ -70,7 +96,22 @@ const Training = () => {
 
 				axios(config)
 					.then(function (response) {
-						console.log("Response DATOS 2", response);
+						console.log("Response DATOS 2", response.data);
+						const config = {
+							method: "get",
+							url: `${process.env.NEXT_PUBLIC_API_REST}employees/${employeeIo.id}`,
+							headers: {},
+						};
+
+						axios(config)
+							.then(function (response) {
+								console.log(response.data);
+								setEmployeeIo(response.data);
+								router.push(`/secure/view/training/${Training}`);
+							})
+							.catch(function (error) {
+								console.log(error);
+							});
 					})
 					.catch(function (error) {
 						console.log("Error-2", error);
@@ -80,17 +121,20 @@ const Training = () => {
 				console.log("Error-1", error);
 			});
 	}
-
+	//TODO debemos actualizar el cache
 	return (
 		<Paper elevation={3}>
 			<Typography variant='h6' color='primary'>
-				Mis Evidencias
+				{`Mis Evidencias ${evidenceState?.description}`}
+			</Typography>
+			<Typography variant='body2'>{`${evidenceState?.state}`}</Typography>
+			<Typography variant='body2'>
+				{`Expira dentro de ${evidenceState?.extra1} meses, de tipo ${evidenceState?.kind}`}
 			</Typography>
 			<Formik
 				initialValues={{
 					is_complete: false,
-					todo_description: "",
-					todo_link: "",
+					evidence_description: "",
 				}}
 				onSubmit={(values, { setSubmitting }) => {
 					setSubmitting(false);
@@ -113,28 +157,22 @@ const Training = () => {
 									<Field
 										component={TextField}
 										type='text'
-										label='Descripción'
+										label='Notas'
 										name='evidence_description'
 									/>
 									<Box>
 										<Field
 											component={DatePicker}
-											name='evidence_expiration_date'
-											label='Fecha de Expiración'
+											name='evidence_date'
+											label='Fecha'
 											value={fechaExpiracion}
-											onChange={handlerChangueExpirationDate}
+											onChange={handlerChangueDate}
 											ampm={true}
 										/>
 										<Typography variant='body2' color='primary'>
-											Fecha de expiración
+											Fecha de la Evidencia
 										</Typography>
 									</Box>
-									<Field
-										component={TextField}
-										type='text'
-										label='Link'
-										name='evidence_link'
-									/>
 								</Stack>
 							</Form>
 						</LocalizationProvider>

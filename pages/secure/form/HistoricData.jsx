@@ -1,5 +1,8 @@
 import React, { useState } from "react";
+import { useRouter } from "next/router";
 import axios from "axios";
+import _ from "lodash";
+import useLocalStorageState from "use-local-storage-state";
 import * as yup from "yup";
 import { Formik, Form, Field } from "formik";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -29,7 +32,11 @@ import {
 } from "@mui/material";
 
 const HistoricData = () => {
+	const router = useRouter();
 	const [selectedFile, setSelectedFile] = useState(null);
+	const [employeeIo, setEmployeeIo] = useLocalStorageState("employee", {
+		defaultValue: [],
+	});
 
 	async function postForm(values) {
 		console.log("Values post-0", values);
@@ -37,7 +44,7 @@ const HistoricData = () => {
 		formData.append("files", selectedFile);
 		await axios({
 			method: "post",
-			url: "http://localhost:1337/api/upload",
+			url: `${process.env.NEXT_PUBLIC_API_IMAGES}api/upload`,
 			data: formData,
 		})
 			.then((responseFile) => {
@@ -51,7 +58,7 @@ const HistoricData = () => {
 				});
 				const config = {
 					method: "post",
-					url: "http://localhost:8080/api/historic-data",
+					url: `${process.env.NEXT_PUBLIC_API_REST}historic-data`,
 					headers: {
 						"Content-Type": "application/json",
 					},
@@ -61,6 +68,31 @@ const HistoricData = () => {
 				axios(config)
 					.then(function (response) {
 						console.log("Response DATOS 2", response);
+
+						let employeeNew = _.cloneDeep(employeeIo);
+						console.log("employeeNew", employeeNew);
+						let array = employeeNew.historicData;
+						array = [...array, response.data];
+						employeeNew.historicData = array;
+						console.log("employeeNew2", employeeNew);
+						const data = JSON.stringify(employeeNew);
+						const config = {
+							method: "patch",
+							url: `${process.env.NEXT_PUBLIC_API_REST}/employees/${employeeNew.id}`,
+							headers: {
+								"Content-Type": "application/json",
+							},
+							data: data,
+						};
+						axios(config)
+							.then(function (response) {
+								console.log(response.data);
+								setEmployeeIo(response.data);
+								router.push(`/secure/view/employee/${employeeNew.id}`);
+							})
+							.catch(function (error) {
+								console.log(error);
+							});
 					})
 					.catch(function (error) {
 						console.log("Error-2", error);

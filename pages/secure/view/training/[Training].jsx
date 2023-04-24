@@ -3,6 +3,7 @@ import axios from "axios";
 import useLocalStorageState from "use-local-storage-state";
 import moment from "moment";
 import { useRouter } from "next/router";
+import { blueGrey } from '@mui/material/colors';
 import FlagCircleIcon from "@mui/icons-material/FlagCircle";
 import ReqTrainEvidence from "../../../../models/ReqTrainEvidence";
 import {
@@ -18,6 +19,7 @@ import {
 const Training = () => {
 	const router = useRouter();
 	const { Training } = router.query;
+	/*
 	async function getTraning() {
 		const config = {
 			method: "get",
@@ -34,6 +36,8 @@ const Training = () => {
 				console.log(error);
 			});
 	}
+	*/
+	/*
 	async function getCourses(idCourse) {
 		console.log("idCourse", idCourse);
 		const config = {
@@ -51,49 +55,61 @@ const Training = () => {
 				console.log(error);
 			});
 	}
-
+	*/
 	const [traningState, setTraningState] = useState();
-	const [courseState, setCourseState] = useState();
-	//TODO fetch employee siempre
 	useEffect(() => {
 		if (Training) {
 			const dataio = employeeIo.trainings.find((obj) => {
 				return obj.id == Training;
 			});
-			if (dataio == null) {
-				getTraning();
-			} else {
-				setTraningState(dataio);
-			}
+			setTraningState(dataio);
 			console.log("dataio", dataio);
-			getCourses(dataio.id);
-			console.log("Curso", courseState);
 			console.log("Employee", employeeIo);
 		}
 	}, [Training]);
 
-	const [employeeIo, setEmployeeIo, { isPersistent }] = useLocalStorageState(
+	const [employeeIo, setEmployeeIo] = useLocalStorageState(
 		"employee",
 		{
 			defaultValue: [],
 		}
 	);
 
+	//TODO valor de expira en la tabla
 	return (
 		<>
 			<Typography variant='h6' color='primary'>
-				{traningState?.code}
+				{`Curso ${traningState?.code}`}
 			</Typography>
-			<Typography variant='body1' color='text'>
-				{moment(traningState?.date).format("DD/MM/yyyy")}
+			<Typography variant='body1' color={blueGrey['A700']}>
+				{`Nombre: ${traningState?.extra1}`}
 			</Typography>
-			<Typography variant='body1' color='text'>
-				{moment(traningState?.expiry).format("DD/MM/yyyy")}
+			<Typography variant='body1' color={blueGrey['A700']}>
+				{`Descripción: ${traningState?.extra2}`}
 			</Typography>
-			<Typography variant='body1' color='text'>
+			<Typography variant='body1' color={blueGrey['A700']}>
+				{`Tipo: ${traningState?.extra3}`}
+			</Typography>
+			<Typography variant='body1' color={blueGrey['A700']}>
+				{`Autorizado por: ${traningState?.extra4}`}
+			</Typography>
+			<Typography variant='body1' color={blueGrey['A700']}>
+				{`Link ${traningState?.extra5}`}
+			</Typography>
+
+			<Typography variant='body1' color={blueGrey['A700']}>
+				{`Tomado el: ${moment(traningState?.date).format("M/yyyy")}`}
+			</Typography>
+			<Typography variant='body1' color={blueGrey['A700']}>
+				{`Expira el ${moment(traningState?.expiry).format("M/yyyy")}`}
+			</Typography>
+			<Typography variant='body1' color={blueGrey['A700']}>
 				{traningState?.course?.code}
 			</Typography>
-			<ReqTrainEvidence evidences={traningState?.evidences} />
+			<ReqTrainEvidence
+				evidences={traningState?.evidences}
+				training={traningState?.id}
+			/>
 		</>
 	);
 };
