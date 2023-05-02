@@ -9,20 +9,24 @@ export const URL_EVIDENCES = `${process.env.NEXT_PUBLIC_API_REST}evidences/`;
 export const URL_EMPLOYEES = `${process.env.NEXT_PUBLIC_API_REST}employees/`;
 export const URL_COURSES = `${process.env.NEXT_PUBLIC_API_REST}courses/`;
 
+//TODO queries http://localhost:8080/api/evidences?page=1&size=50&state.equals=NEW
+// http://localhost:8080/api/evidences?page=1&size=50&sort=state
+//https://www.jhipster.tech/entities-filtering/
+// http://localhost:8080/api/courses?page=0&size=5&sort=id&desc
 
-export const gets = async (url) => {
-	// console.log("entro al llamado");
+export const gets = async (url, page = 0, size = 10, sort = "id") => {
+	// console.log("entro al get", `${url}?page=${page}&size=${size}&sort=${sort}`);
 	let res = {};
 	const config = {
 		method: "get",
-		url: url,
+		url: `${url}?page=${page}&size=${size}&sort=${sort}`,
 		headers: { "Content-Type": "application/json" },
 	};
 
 	await axios(config)
 		.then(function (response) {
-			// console.log(response.data);
-			res = response.data;
+			// console.log("response", response.data);
+			res = response;
 		})
 		.catch(function (error) {
 			// console.log(error);
@@ -55,8 +59,8 @@ export const get = async (url, entityId) => {
 export const post = async (url, entity) => {
 	let res = {};
 	const config = {
-		method: "put",
-		url: `${url}${entity.id}`,
+		method: "post",
+		url: `${url}`,
 		headers: { "Content-Type": "application/json" },
 		data: entity,
 	};
@@ -69,6 +73,7 @@ export const post = async (url, entity) => {
 			// console.log(error);
 			res = error;
 		});
+	console.log("response post", res);
 	return res;
 };
 

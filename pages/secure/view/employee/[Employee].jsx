@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import useLocalStorageState from "use-local-storage-state";
 import moment from "moment";
 import { useRouter } from "next/router";
+import { get, URL_EMPLOYEES } from "data/ApiData";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -28,32 +28,22 @@ import {
 const Employee = () => {
 	const router = useRouter();
 	const { Employee } = router.query;
-	async function getEmployees() {
-		const config = {
-			method: "get",
-			url: `${process.env.NEXT_PUBLIC_API_REST}employees/${Employee}`,
-			headers: {},
-		};
-
-		await axios(config)
-			.then(function (response) {
-				console.log(response.data);
-				setEmployeeState(response.data);
-				setEmployeeIo(response.data);
-			})
-			.catch(function (error) {
-				console.log(error);
-			});
-	}
+	const [employeeIo, setEmployeeIo] = useLocalStorageState("employee", {
+		defaultValue: [],
+	});
+	
+	const getEmployees = async () => {
+		const res = await get(URL_EMPLOYEES, Employee);
+		console.log("employee", res);
+		setEmployeeState(res);
+		setEmployeeIo(res);
+	};
 	const [employeeState, setEmployeeState] = useState();
 	useEffect(() => {
 		if (Employee) {
 			getEmployees();
 		}
 	}, [Employee]);
-	const [employeeIo, setEmployeeIo] = useLocalStorageState("employee", {
-		defaultValue: [],
-	});
 
 	const handleNewTraining = () => {
 		console.log("New Training");

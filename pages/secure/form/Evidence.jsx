@@ -43,10 +43,7 @@ const Training = () => {
 	const [evidenceState, setEvidenceState] = useState();
 
 	const [fechaExpiracion, setFechaExpiracion] = useState();
-	const handlerChangueDate = (fecha) => {
-		setFechaExpiracion(fecha);
-	};
-
+	
 	useEffect(() => {
 		if (Evidence) {
 			console.log("employeeIo", employeeIo);
@@ -59,12 +56,15 @@ const Training = () => {
 				return obj.id == Evidence;
 			});
 			setEvidenceState(EvidenceIo);
-
+			
 			console.log("TrainingIo", TrainingIo);
 			console.log("EvidenceIo", EvidenceIo);
 		}
-	}, [Evidence, Training]);
-
+	}, [Evidence, Training, employeeIo]);
+	const handlerChangueDate = (fecha) => {
+		setFechaExpiracion(fecha);
+	};
+	
 	async function postForm(values) {
 		console.log("Values post-0", values);
 		const date = fechaExpiracion.format("YYYY-MM-DD") + "T00:00:00.01Z";

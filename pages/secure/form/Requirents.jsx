@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import useLocalStorageState from "use-local-storage-state";
 import { useRouter } from "next/router";
+import { post, patch, URL_REQUIRENTS, URL_COURSES } from "data/ApiData";
 import _ from "lodash";
 import * as yup from "yup";
 import { Formik, Form, Field } from "formik";
@@ -22,6 +22,9 @@ import {
 	DatePicker,
 	DateTimePicker,
 } from "formik-mui-x-date-pickers";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CancelIcon from "@mui/icons-material/Cancel";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import {
 	Button,
 	LinearProgress,
@@ -30,7 +33,11 @@ import {
 	Paper,
 	Typography,
 	MenuItem,
-	BootstrapInput
+	Link,
+	Pagination,
+	Breadcrumbs,
+	FormControl,
+	InputLabel,
 } from "@mui/material";
 
 const kind = [
@@ -49,69 +56,11 @@ const kind = [
 ];
 
 const Requirents = () => {
-	const postForm = async (values) => {
-		const data = {
-			id2Course: courseIo.id,
-			code: values.requirements_code,
-			expirationInMonth: values.requirements_expiration,
-			kind: kindState,
-			description: values.requirements_description,
-		};
-
-		console.log("data", data);
-
-		let url = `${process.env.NEXT_PUBLIC_API_REST}requirents`
-		let method = 'post'
-		if(router.query.Course && router.query.Requirent) {
-			url = url+'/'+router.query.Requirent
-			method = 'patch'
-			data.id = router.query.Requirent
-		}
-
-
-		const config = {
-			method: method,
-			url: url, 
-			headers: {
-				"Content-Type": "application/json",
-			},
-			data: data,
-		};
-		await axios(config)
-			.then(async function (response) {
-				console.log(response.data);
-
-				let course = _.cloneDeep(courseIo);
-				console.log("course", course);
-				let arrayRequirents = course.requirents;
-				arrayRequirents = [...arrayRequirents, response.data];
-				course.requirents = arrayRequirents;
-				console.log("course2", course);
-				const data = JSON.stringify(course);
-				const config = {
-					method: "patch",
-					url: `${process.env.NEXT_PUBLIC_API_REST}/courses/${course.id}`,
-					headers: {
-						"Content-Type": "application/json",
-					},
-					data: data,
-				};
-				await axios(config)
-					.then(function (response) {
-						console.log(response.data);
-						setCourseIo(response.data);
-						router.push(`/secure/view/course/${course.id}`);
-					})
-					.catch(function (error) {
-						console.log(error);
-					});
-			})
-			.catch(function (error) {
-				console.log(error);
-			});
-	};
-
 	const [kindState, setKindState] = useState();
+
+	const [coursesIo, setCoursesIo] = useLocalStorageState("courses", {
+		defaultValue: [],
+	});
 	const [courseIo, setCourseIo] = useLocalStorageState("course", {
 		defaultValue: [],
 	});
@@ -120,13 +69,13 @@ const Requirents = () => {
 	});
 	const router = useRouter();
 
+	// const newCourses = _.cloneDeep(coursesIo);
+	// const newCourse = _.cloneDeep(courseIo)
 	useEffect(() => {
-		console.log("courseIo", courseIo);
-		console.log("query", router.query);
-		if (router.query.Course && router.query.Requirent) {
-			console.log("Contiene Query ", requirentIo);
-			
+		if ((router.query.Course && router.query.Requirent) === false) {
+			setRequirentIo({});
 		}
+		console.log("courseIo0", courseIo);
 	}, []);
 
 	const handleChange = (event) => {
@@ -136,94 +85,171 @@ const Requirents = () => {
 		console.log("Value", value);
 		setKindState(value.key);
 	};
-	return (
-		<Formik
-			enableReinitialize
-			initialValues={{
-				requirements_code: requirentIo?.code ? requirentIo?.code : "",
-				kind: requirentIo?.kind ? kind[requirentIo.kind] : "",
-				requirements_expiration: requirentIo?.expirationInMonth ? requirentIo?.expirationInMonth : "",
-				requirements_description: requirentIo?.description ? requirentIo?.description : "",
-			}}
-			validationSchema={yup.object({
-				requirements_code: yup
-					.string("Ingresar el Código")
-					.required("Es requerido"),
-				kind: yup
-					.string("Seleccionar el Tipo de requerimiento")
-					.required("Es requerido"),
-			})}
-			onSubmit={(values, { setSubmitting }) => {
-				//event.preventDefault();
 
-				setSubmitting(false);
-				console.log("Values", values);
-				console.log("Rol", kindState);
-				postForm(values);
-			}}>
-			{({ submitForm, isSubmitting }) => (
-				<LocalizationProvider
-					dateAdapter={AdapterDayjs}
-					adapterLocale={"es-mx"}>
-					<Form>
-						<Stack justifyContent='center' alignItems='center'>
-							<Paper elevation={3}>
-								<Stack
-									alignItems='left'
-									justifyContent='left'
-									paddingX={{ xs: 1, sm: 2, md: 4 }}
-									paddingY={{ xs: 1, sm: 1, md: 2 }}>
-									<Typography variant='h6' color='primary'>
-										Requerimientos
-									</Typography>
-									<Field
-										component={TextField}
-										type='text'
-										label='Código'
-										name='requirements_code'
-									/>
-									<Field
-										component={Select}
-										type='text'
-										label='Tipo'
-										name='kind'
-										multiple={false}
-										value={kindState}
-										onChange={handleChange}
-										
-										>
-										{kind.map((item) => (
-											<MenuItem key={item} value={item}>
-												{item.value}
-											</MenuItem>
-										))}
-									</Field>
-									<Field
-										component={TextField}
-										type='number'
-										label='Expiración en meses'
-										name='requirements_expiration'
-									/>
-									<Field
-										component={TextField}
-										type='text'
-										label='Descripción'
-										name='requirements_description'
-									/>
-									<Button
-										variant='contained'
-										color='primary'
-										disabled={isSubmitting}
-										onClick={submitForm}>
-										Enviar
-									</Button>
-								</Stack>
-							</Paper>
-						</Stack>
-					</Form>
-				</LocalizationProvider>
-			)}
-		</Formik>
+	const postForm = async (values) => {
+		// console.log("newCourse0", newCourse);
+
+		const data = {
+			id2Course: courseIo.id,
+			code: values.requirements_code,
+			expirationInMonth: values.requirements_expiration,
+			kind: kindState,
+			description: values.requirements_description,
+		};
+		console.log("data", data);
+		// console.log("requirentIo", requirentIo);
+		let response = {};
+		if (router.query.Course && router.query.Requirent) {
+			data.id = router.query.Requirent;
+			response = await patch(URL_REQUIRENTS, data);
+			console.log("response1", response);
+		} else {
+			response = await post(URL_REQUIRENTS, data);
+			const responseCourse = await patch(URL_COURSES, courseIo);
+			console.log("responseCourse", responseCourse);
+			// setCourseIo(responseCourse);////
+		}
+
+		console.log("response2", response);
+		console.log("newCourse1", newCourse);
+		let arrayRequirents = newCourse.requirents;
+		console.log("arrayRequirents", arrayRequirents);
+		const indexReq = _.indexOf(
+			arrayRequirents,
+			_.find(arrayRequirents, response)
+		);
+		console.log("indexReq", indexReq);
+		arrayRequirents.splice(indexReq, 1, response);
+		console.log("newCourse", newCourse);
+		// console.log("newCourses", newCourses)
+		// let arrayRequirents = newCourse.requirents;
+		// arrayRequirents = [...arrayRequirents, response];
+		// newCourse.requirents = arrayRequirents;
+		// console.log("newCourse2", newCourse);
+
+		const index = _.indexOf(newCourses, _.find(newCourses, newCourse));
+		console.log("index", index);
+		newCourses.splice(index, 1, newCourse);
+		console.log("newCourse", newCourse);
+		console.log("newCourses", newCourses);
+
+		// setRequirentIo(data);
+		// setCoursesIo(newCourses);
+		// setRequirentIo("");
+
+		// router.push(`/secure/view/course/${course.id}`);
+	};
+	//TODO validar tamano maximo de los campos
+	return (
+		<Box sx={{ p: 3, border: "1px dashed grey" }}>
+			<Stack direction='column' spacing={2}>
+				<Breadcrumbs
+					separator={<NavigateNextIcon fontSize='small' color='primary' />}
+					aria-label='Link al Inicio'>
+					<Link underline='hover' color='primary.main' href='/'>
+						Inicio
+					</Link>
+					<Link
+						underline='hover'
+						color='primary.main'
+						href='/secure/view/Courses'>
+						Lista de Cursos
+					</Link>
+					<Link
+						underline='hover'
+						color='primary.main'
+						href={`/secure/view/course/${courseIo?.id}`}>
+						{`${courseIo?.name}`}
+					</Link>
+					<Typography color='text.primary'>{`Requermiento: ${requirentIo?.code}`}</Typography>
+				</Breadcrumbs>
+				<br />
+
+				<Typography variant='h6' color='primary'>
+					{`Editando Req.: ${requirentIo?.code}`}
+				</Typography>
+			</Stack>
+			<br />
+
+			<Formik
+				enableReinitialize
+				initialValues={{
+					requirements_code: requirentIo?.code ? requirentIo?.code : "",
+					kind: requirentIo?.kind ? kind[requirentIo.kind] : "",
+					requirements_expiration: requirentIo?.expirationInMonth
+						? requirentIo?.expirationInMonth
+						: "",
+					requirements_description: requirentIo?.description
+						? requirentIo?.description
+						: "",
+				}}
+				validationSchema={yup.object({
+					requirements_code: yup
+						.string("Ingresar el Código")
+						.required("Es requerido"),
+					kind: yup
+						.string("Seleccionar el Tipo de requerimiento")
+						.required("Es requerido"),
+				})}
+				onSubmit={(values, { setSubmitting }) => {
+					//event.preventDefault();
+
+					setSubmitting(false);
+					console.log("Values", values);
+					console.log("Rol", kindState);
+					postForm(values);
+				}}>
+				{({ submitForm, isSubmitting }) => (
+					<LocalizationProvider
+						dateAdapter={AdapterDayjs}
+						adapterLocale={"es-mx"}>
+						<Form>
+							<Stack spacing={2}>
+								<Field
+									component={TextField}
+									type='text'
+									label='Código'
+									name='requirements_code'
+								/>
+								<Field
+									component={Select}
+									type='text'
+									label='Tipo'
+									name='kind'
+									multiple={false}
+									value={kindState}
+									onChange={handleChange}>
+									{kind.map((item) => (
+										<MenuItem key={item} value={item}>
+											{item.value}
+										</MenuItem>
+									))}
+								</Field>
+								<Field
+									component={TextField}
+									type='number'
+									label='Expiración en meses'
+									name='requirements_expiration'
+								/>
+								<Field
+									component={TextField}
+									type='text'
+									label='Descripción'
+									name='requirements_description'
+								/>
+								<Button
+									variant='contained'
+									color='primary'
+									disabled={isSubmitting}
+									onClick={submitForm}>
+									Enviar
+								</Button>
+							</Stack>
+						</Form>
+					</LocalizationProvider>
+				)}
+			</Formik>
+		</Box>
 	);
 };
 

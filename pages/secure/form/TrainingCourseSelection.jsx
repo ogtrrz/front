@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+// import axios from "axios";
 import { useRouter } from "next/router";
 import _ from "lodash";
 import useLocalStorageState from "use-local-storage-state";
 import moment from "moment";
 import dayjs from "dayjs";
 import "dayjs/locale/es-mx";
+import {
+	patch,
+	post,
+	URL_EVIDENCES,
+	URL_TRAININGS,
+	URL_EMPLOYEES,
+} from "data/ApiData";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import EvidenceAddToDo from "../../../models/EvidenceAddToDo";
@@ -36,7 +43,7 @@ const TrainingCourseSelection = () => {
 	const [expiration, setExpiration] = useState("");
 	const router = useRouter();
 	const { Employee } = router.query;
-	const now = moment().format("yyyy-MM-DD") + "T00:00:01Z";
+	const NOW = moment().format("yyyy-MM-DD") + "T00:00:01Z";
 	useEffect(() => {
 		console.log("Course", course);
 		if (date) {
@@ -55,7 +62,7 @@ const TrainingCourseSelection = () => {
 		console.log("evidencearray", evidencearray);
 	};
 
-	async function postEvidences() {
+	const postEvidences = async () =>  {
 		const arrayOfEvidencePromises = course.requirents.map(returnEvidences);
 
 		for await (const item of arrayOfEvidencePromises) {
@@ -78,32 +85,19 @@ const TrainingCourseSelection = () => {
 					.add(element?.expirationInMonth, "months")
 					.format("yyyy-MM-DD") + "T00:00:01Z",
 			created: "usuario",
-			createdAt: now,
+			createdAt: NOW,
 			edited: "usuario",
-			editedAt: now,
+			editedAt: NOW,
 			extra1: element?.expirationInMonth,
 			extra2:
 				moment(date)
 					.add(element?.expirationInMonth, "months")
 					.format("yyyy-MM-DD") + "T00:00:01Z",
 		};
-		const config = {
-			method: "post",
-			url: `${process.env.NEXT_PUBLIC_API_REST}evidences`,
-			headers: {
-				"Content-Type": "application/json",
-			},
-			data: evidence,
-		};
 
-		await axios(config)
-			.then(function (response) {
-				console.log("evidence", response.data);
-				evidencearray.push(response.data);
-			})
-			.catch(function (error) {
-				console.log(error);
-			});
+		const res = await post(URL_EVIDENCES, evidence);
+		console.log('res 99', res);
+		evidencearray.push(res);
 	};
 
 	const postTraining = async () => {
@@ -124,54 +118,25 @@ const TrainingCourseSelection = () => {
 			extra4: course.autorizationBy,
 			extra5: course.link,
 			created: "usuario",
-			createdAt: now,
+			createdAt: NOW,
 			edited: "usuario",
-			editedAt: now,
+			editedAt: NOW,
 			evidences: evidencearray,
 		};
-		const configTraining = {
-			method: "post",
-			url: `${process.env.NEXT_PUBLIC_API_REST}trainings`,
-			headers: {
-				"Content-Type": "application/json",
-			},
-			data: traning,
-		};
+		const res = await post(URL_TRAININGS, traning);
 		console.log("traning", traning);
-
-		await axios(configTraining)
-			.then(function (response) {
-				console.log("traning response", response.data);
-				let employeeNew = _.cloneDeep(employeeIo);
-				console.log("employeeNew", employeeNew);
-				let arraytrainings = employeeNew.trainings;
-				arraytrainings = [...arraytrainings, response.data];
-				employeeNew.trainings = arraytrainings;
-				employeeNew.edited = "usuario";
-				employeeNew.editedAt = now;
-				console.log("employeeNew2", employeeNew);
-				const data = employeeNew;
-				const config = {
-					method: "patch",
-					url: `${process.env.NEXT_PUBLIC_API_REST}/employees/${employeeNew.id}`,
-					headers: {
-						"Content-Type": "application/json",
-					},
-					data: data,
-				};
-				axios(config)
-					.then(function (response) {
-						console.log("PATCH", response.data);
-						setEmployeeIo(response.data);
-						router.push(`/secure/view/employee/${employeeNew.id}`);
-					})
-					.catch(function (error) {
-						console.log(error);
-					});
-			})
-			.catch(function (error) {
-				console.log(error);
-			});
+		console.log("traning response", res);
+		let employeeNew = _.cloneDeep(employeeIo);
+		console.log("employeeNew", employeeNew);
+		let arraytrainings = employeeNew.trainings;
+		arraytrainings = [...arraytrainings, res];
+		employeeNew.trainings = arraytrainings;
+		employeeNew.edited = "usuario";
+		employeeNew.editedAt = NOW;
+		console.log("employeeNew2", employeeNew);
+		const emp = await patch(URL_EMPLOYEES, employeeNew);
+		setEmployeeIo(emp)
+		router.push(`/secure/view/employee/${emp.id}`);
 	};
 
 	return (

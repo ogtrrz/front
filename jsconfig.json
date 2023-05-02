@@ -1,8 +1,12 @@
 {
-  "compilerOptions": {
-    "baseUrl": "./",
-    "paths": {
-      "@component/*": ["src/components/*"],
-    }
-  }
+	"compilerOptions": {
+		// "module": "ES6",
+		// "jsx": "preserve",
+		// "checkJs": true,
+		"baseUrl": "./",
+		"paths": {
+			"@component/*": ["src/components/*"]
+		}
+	},
+	// "exclude": ["node_modules", "**/node_modules/*"]
 }

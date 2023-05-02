@@ -1,8 +1,16 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
-import axios from "axios";
-import _ from "lodash";
 import useLocalStorageState from "use-local-storage-state";
+import _ from "lodash";
+import moment from "moment";
+import axios from "axios";
+import {
+	get,
+	post,
+	patch,
+	URL_HISTORIC_DATA,
+	URL_EMPLOYEES,
+} from "data/ApiData";
 import * as yup from "yup";
 import { Formik, Form, Field } from "formik";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -32,6 +40,7 @@ import {
 } from "@mui/material";
 
 const HistoricData = () => {
+	const NOW = moment().format("yyyy-MM-DD") + "T00:00:01Z";
 	const router = useRouter();
 	const [selectedFile, setSelectedFile] = useState(null);
 	const [employeeIo, setEmployeeIo] = useLocalStorageState("employee", {
@@ -39,68 +48,35 @@ const HistoricData = () => {
 	});
 
 	async function postForm(values) {
-		console.log("Values post-0", values);
+		// console.log("Values post-0", values);
 		let formData = new FormData();
 		formData.append("files", selectedFile);
-		await axios({
+		const responseFile = await axios({
 			method: "post",
 			url: `${process.env.NEXT_PUBLIC_API_IMAGES}api/upload`,
 			data: formData,
-		})
-			.then((responseFile) => {
-				console.log("Sumited-1", responseFile);
-				const postValues = JSON.stringify({
-					name: values.historic_data_description,
-					link: responseFile.data[0].url,
-					employee: {
-						id: 10,
-					},
-				});
-				const config = {
-					method: "post",
-					url: `${process.env.NEXT_PUBLIC_API_REST}historic-data`,
-					headers: {
-						"Content-Type": "application/json",
-					},
-					data: postValues,
-				};
-
-				axios(config)
-					.then(function (response) {
-						console.log("Response DATOS 2", response);
-
-						let employeeNew = _.cloneDeep(employeeIo);
-						console.log("employeeNew", employeeNew);
-						let array = employeeNew.historicData;
-						array = [...array, response.data];
-						employeeNew.historicData = array;
-						console.log("employeeNew2", employeeNew);
-						const data = JSON.stringify(employeeNew);
-						const config = {
-							method: "patch",
-							url: `${process.env.NEXT_PUBLIC_API_REST}/employees/${employeeNew.id}`,
-							headers: {
-								"Content-Type": "application/json",
-							},
-							data: data,
-						};
-						axios(config)
-							.then(function (response) {
-								console.log(response.data);
-								setEmployeeIo(response.data);
-								router.push(`/secure/view/employee/${employeeNew.id}`);
-							})
-							.catch(function (error) {
-								console.log(error);
-							});
-					})
-					.catch(function (error) {
-						console.log("Error-2", error);
-					});
-			})
-			.catch(function (error) {
-				console.log("Error-1", error);
-			});
+		});
+		// console.log("Sumited-1", responseFile);
+		const postValues = {
+			name: values.historic_data_description,
+			link: responseFile.data[0].url,
+			id2Employee: employeeIo.id,
+			createdAt: NOW,
+			editedAt: NOW,
+			created: 'user',
+			edited: 'user'
+		};
+		const postHistoricData = await post(URL_HISTORIC_DATA, postValues);
+		// console.log("postHistoricData", postHistoricData);
+		let employeeNew = _.cloneDeep(employeeIo);
+		// console.log("employeeNew", employeeNew);
+		let array = employeeNew.historicData;
+		array = [...array, postHistoricData];
+		employeeNew.historicData = array;
+		// console.log("employeeNew2", employeeNew);
+		const res = await patch(URL_EMPLOYEES, employeeNew);
+		setEmployeeIo(res);
+		router.push(`/secure/view/employee/${employeeNew.id}`);
 	}
 
 	return (
@@ -138,12 +114,7 @@ const HistoricData = () => {
 										label='Descripción'
 										name='historic_data_description'
 									/>
-									<Field
-										component={TextField}
-										type='text'
-										label='Link'
-										name='historic_data_link'
-									/>
+									
 								</Form>
 								<Button
 									variant='contained'

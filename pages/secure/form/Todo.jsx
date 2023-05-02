@@ -1,15 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
 import _ from "lodash";
 import useLocalStorageState from "use-local-storage-state";
-import * as yup from "yup";
-import { Formik, Form, Field } from "formik";
-import CircularProgress from "@mui/material/CircularProgress";
+import { post, patch, URL_EMPLOYEES, URL_TO_DOS } from "data/ApiData";
+import moment from "moment";
 import dayjs from "dayjs";
 import format from "date-fns/format";
-import moment from "moment";
 import "dayjs/locale/es-mx";
+import { Formik, Form, Field } from "formik";
+import * as yup from "yup";
+import CircularProgress from "@mui/material/CircularProgress";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import {
@@ -36,6 +37,7 @@ import {
 
 const Todo = () => {
 	const router = useRouter();
+	const { Todo } = router.query;
 	const [selectedFile, setSelectedFile] = useState(null);
 
 	const [fechaExpiracion, setFechaExpiracion] = useState();
@@ -46,71 +48,53 @@ const Todo = () => {
 	const handlerChangueExpirationDate = (fecha) => {
 		setFechaExpiracion(fecha);
 	};
+	// let todoIo = null; 
+	// useEffect(() => {
+	// 	if (Todo) {
+	// 		console.log("Todo", Todo);
+	// 		todoIo = employeeIo.todos.find((obj) => {
+	// 			return obj.id == Todo;
+	// 		});
+	// 		console.log("todoIo", todoIo);
+	// 	}
+	// }, [Todo]);
+
+	const [todoIo, setTodoIo] = useLocalStorageState("todo", {
+		defaultValue: [],
+	});
+
 	async function postForm(values) {
 		console.log("Values post-0", values);
 		const date = fechaExpiracion.format("YYYY-MM-DD") + "T00:00:00.001Z";
 		let formData = new FormData();
 		formData.append("files", selectedFile);
-		await axios({
+		const responseFile = await axios({
 			method: "post",
 			url: `${process.env.NEXT_PUBLIC_API_IMAGES}api/upload`,
 			data: formData,
-		})
-			.then((responseFile) => {
-				console.log("Sumited-1", responseFile);
-				const postValues = JSON.stringify({
-					date: date,
-					description: values.todo_description,
-					state: values.is_complete ? "CHECK" : "NEW",
-					link: responseFile.data[0].url,
-					id2Employee: employeeIo.id,
-					
-				});
-				const config = {
-					method: "post",
-					url: `${process.env.NEXT_PUBLIC_API_REST}/to-dos`,
-					headers: {
-						"Content-Type": "application/json",
-					},
-					data: postValues,
-				};
+		});
+		console.log("Sumited-1", responseFile);
+		const postValues = JSON.stringify({
+			date: date,
+			description: values.todo_description,
+			state: values.is_complete ? "CHECK" : "NEW",
+			link: responseFile.data[0].url,
+			id2Employee: employeeIo.id,
+		});
 
-				axios(config)
-					.then(function (response) {
-						console.log("Response DATOS 2", response.data);
+		const responseTodo = await post(URL_TO_DOS, postValues);
+		console.log("Response DATOS 2", responseTodo);
 
-						let employeeNew = _.cloneDeep(employeeIo);
-						console.log("employeeNew", employeeNew);
-						let arraytodos= employeeNew.todos;
-						arraytodos = [...arraytodos, response.data];
-						employeeNew.todos = arraytodos;
-						console.log("employeeNew2", employeeNew);
-						const data = JSON.stringify(employeeNew);
-						const config = {
-							method: "patch",
-							url: `${process.env.NEXT_PUBLIC_API_REST}/employees/${employeeNew.id}`,
-							headers: {
-								"Content-Type": "application/json",
-							},
-							data: data,
-						};
-						axios(config)
-							.then(function (response) {
-								console.log(response.data);
-								setEmployeeIo(response.data);
-								router.push(`/secure/view/employee/${employeeNew.id}`);
-							})
-							.catch(function (error) {
-								console.log(error);
-							});
-					})
-					.catch(function (error) {
-						console.log("Error-2", error);
-					});
-			})
-			.catch(function (error) {
-				console.log("Error-1", error);
-			});
+		let employeeNew = _.cloneDeep(employeeIo);
+		console.log("employeeNew", employeeNew);
+		let arraytodos = employeeNew.todos;
+		arraytodos = [...arraytodos, responseTodo];
+		employeeNew.todos = arraytodos;
+		console.log("employeeNew2", employeeNew);
+		const emp = await patch(URL_EMPLOYEES, employeeNew);
+		console.log(emp);
+		setEmployeeIo(emp);
+		router.push(`/secure/view/employee/${employeeNew.id}`);
 	}
 	//http://localhost:1337/uploads/d3b110cd_e464_47a3_a505_544dd1efb3c7_2x_98d810f734.jpg?format=webp&height=200&q=80
 
@@ -125,10 +109,11 @@ const Todo = () => {
 					paddingY={{ xs: 1, sm: 1, md: 2 }}>
 					<Typography variant='h6'>Mis Notificaciones</Typography>
 					<Formik
+						enableReinitialize
 						initialValues={{
-							is_complete: false,
-							todo_description: "",
-							todo_link: "",
+							is_complete: todoIo?.state == "CHECK" ? true : false ,
+							todo_description: todoIo ? todoIo.description : "",
+							
 						}}
 						validationSchema={yup.object({
 							// todo_expiration_date: yup
@@ -180,7 +165,6 @@ const Todo = () => {
 											label='Descripción'
 											name='todo_description'
 										/>
-										
 									</Form>
 								</LocalizationProvider>
 								<Button

@@ -3,8 +3,10 @@ import { ThemeProvider } from "@mui/material";
 import { theme } from "../styles/theme";
 import createEmotionCache from "../styles/createEmotionCache";
 import { CacheProvider } from "@emotion/react";
-import { store } from "../app/store";
+import { store } from "app/store";
 import { Provider } from "react-redux";
+import { Stack } from "@mui/material";
+import ResponsiveAppBar from "./secure/ui/ResponsiveAppBar";
 
 const clientSideEmotionCache = createEmotionCache();
 
@@ -17,7 +19,10 @@ function MyApp({
 		<CacheProvider value={emotionCache}>
 			<ThemeProvider theme={theme}>
 				<Provider store={store}>
-					<Component {...pageProps} />
+					<Stack>
+						<ResponsiveAppBar />
+						<Component {...pageProps} />
+					</Stack>
 				</Provider>
 			</ThemeProvider>
 		</CacheProvider>

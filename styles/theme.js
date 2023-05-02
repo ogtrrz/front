@@ -1,6 +1,6 @@
 import { createTheme } from "@mui/material/styles";
 import { Poppins } from "next/font/google";
-import { purple, red, blueGrey } from '@mui/material/colors';
+import { purple, red, blueGrey } from "@mui/material/colors";
 
 const poppins = Poppins({
 	weight: ["300", "400"],
@@ -43,6 +43,18 @@ export const theme = createTheme({
 		body1: { fontSize: 16 },
 		body2: { fontSize: 12 },
 	},
+	// overrides: {
+	// 	datagrid: {
+	// 		header: {
+	// 			fontWeight: "bold",
+	// 		},
+	// 	},
+	// },
+	// "& .MuiDataGrid-columnHeaders": {
+	// 	backgroundColor: "rgba(0,0,255,0.6)",
+	// 	color: "rgba(255,0,0,0.7)",
+	// 	fontSize: 16,
+	// },
 	// components: {
 	// 	MuiStack: {
 	// 	  defaultProps: {
