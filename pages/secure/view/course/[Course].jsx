@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 // import axios from "axios";
+import _ from "lodash";
 import useLocalStorageState from "use-local-storage-state";
 import { useRouter } from "next/router";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
+import { del, URL_COURSES } from "data/ApiData";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import {
 	Button,
@@ -20,16 +21,26 @@ import {
 	Select,
 } from "@mui/material";
 import { DataGrid, esES } from "@mui/x-data-grid";
+import HeaderDeleteEdit from "models/HeaderDeleteEdit";
+import HeaderNew from "models/HeaderNew";
+import DialogDelete from "models/DialogDelete";
 
 const Course = () => {
+	const [open, setOpen] = useState(false);
+	const handleClose = () => {
+		setOpen(false);
+	};
 	const router = useRouter();
 
-	const [courseIo, setCourseIo, { isPersistent }] = useLocalStorageState(
-		"course",
+	const [coursesIo, setCoursesIo, { isPersistent }] = useLocalStorageState(
+		"courses",
 		{
 			defaultValue: [],
 		}
 	);
+	const [courseIo, setCourseIo] = useLocalStorageState("course", {
+		defaultValue: [],
+	});
 
 	const columns = [
 		{ field: "code", headerName: "Código", width: 200 },
@@ -70,6 +81,29 @@ const Course = () => {
 		);
 	};
 
+	const handleEdit = () => {
+		console.log("handleEdit");
+		router.push(`/secure/form/Course?Course=${courseIo.id}`);
+	};
+
+	const handleDelete1 = () => {
+		console.log("handleDelete1");
+		setOpen(true);
+	};
+
+	const handleDelete2 = async () => {
+		console.log("handleDelete2");
+		setOpen(false);
+
+		let newCourses = _.cloneDeep(coursesIo);
+		await del(URL_COURSES, courseIo.id);
+		_.remove(newCourses, (item) => item.id == courseIo.id);
+
+		setCoursesIo(newCourses);
+		setCourseIo("");
+		router.push(`/secure/view/Courses`);
+	};
+
 	return (
 		<Box sx={{ p: 3, border: "1px dashed grey" }}>
 			<Stack direction='column' spacing={2}>
@@ -87,11 +121,11 @@ const Course = () => {
 					</Link>
 					<Typography color='text.primary'>{`Curso: ${courseIo?.name}`}</Typography>
 				</Breadcrumbs>
-				<Stack direction='row' spacing={2}>
-					<Typography variant='h6' color='primary'>
-						{courseIo?.name}
-					</Typography>
-				</Stack>
+				<HeaderDeleteEdit
+					title={courseIo?.code}
+					onDelete={handleDelete1}
+					onEdit={handleEdit}
+				/>
 			</Stack>
 
 			<Typography variant='body1' color='text'>
@@ -121,19 +155,9 @@ const Course = () => {
 			</Typography>
 			<br />
 
-			<Stack direction='row' spacing={2}>
-				<Typography variant='h6' color='primary'>
-					Requerimientos
-				</Typography>
-
-				<Button
-					variant='contained'
-					endIcon={<AddCircleIcon />}
-					onClick={handleNewRequirement}>
-					Nuevo Requerimiento
-				</Button>
-			</Stack>
+			<HeaderNew title='Requerimientos' onNew={handleNewRequirement} />
 			<br />
+
 			<div style={{ height: 300, width: "100%" }}>
 				{courseIo?.requirents ? (
 					<DataGrid
@@ -160,6 +184,12 @@ const Course = () => {
 					""
 				)}
 			</div>
+			<DialogDelete
+				onOpen={open}
+				on_Close={handleClose}
+				onCancel={handleClose}
+				onOk={handleDelete2}
+			/>
 		</Box>
 	);
 };

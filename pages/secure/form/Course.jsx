@@ -1,4 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import useLocalStorageState from "use-local-storage-state";
+import { useRouter } from "next/router";
+import { post, patch, URL_COURSES } from "data/ApiData";
+import _ from "lodash";
+import { updateArray } from "utils/arrays";
 import * as yup from "yup";
 import { Formik, Form, Field } from "formik";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -6,6 +11,7 @@ import dayjs from "dayjs";
 import "dayjs/locale/es-mx";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import {
 	Autocomplete,
 	TextField,
@@ -26,6 +32,8 @@ import {
 	Paper,
 	Typography,
 	MenuItem,
+	Breadcrumbs,
+	Link,
 } from "@mui/material";
 
 const typeCourse = [
@@ -48,135 +56,219 @@ const typeCourse = [
 ];
 
 const Course = () => {
+	const [coursesIo, setCoursesIo] = useLocalStorageState("courses", {
+		defaultValue: [],
+	});
+
+	const [courseIo, setCourseIo] = useLocalStorageState("course", {
+		defaultValue: [],
+	});
+
+	const router = useRouter();
+
+	const { Course } = router.query;
+
 	const [type, setType] = useState();
-    const handleChange = (event) => {
+
+	useEffect(() => {
+		console.log("Course", Course);
+		if (Course === false) {
+			console.log("Es nuevo");
+			setCourseIo({});
+		}
+		console.log("courseIo0", courseIo);
+	}, [router]);
+
+	const handleChange = (event) => {
 		const {
 			target: { value },
 		} = event;
 		console.log("Value Type", value);
 		setType(value.key);
 	};
+
+	const postForm = async (values) => {
+		console.log("values", values);
+		const data = {
+			id2Job: 1,
+			code: values.course_code,
+			name: values.course_name,
+			expirationInMonth: values.expiration_in_months,
+			typeCourse: type,
+			autorizationBy: values.authorization_email,
+			durationAuthorizationInMonth: values.duration_autorization_months,
+			description: values.description,
+			link: values.course_link,
+		};
+		console.log("data", data);
+		let newCourses = _.cloneDeep(coursesIo)
+		// let newCourse = _.cloneDeep(courseIo)
+		
+		if (Course) {
+			data.id = Course;
+			const response = await patch(URL_COURSES, data);
+			console.log("response1a", response);
+			updateArray(newCourses, response);
+			console.log("response3a", newCourses);
+		} else {
+			const response = await post(URL_COURSES, data);
+			console.log("response1b", response);
+			newCourses = [response, ...newCourses]
+			console.log("response3b", newCourses);
+		}
+
+		setCoursesIo(newCourses);
+		setCourseIo({});
+
+		router.push(`/secure/view/Courses`);
+	};
+
 	return (
-		<Formik
-			initialValues={{
-				course_code: "",
-				course_name: "",
-				expiration_in_months: "",
-				course_type: "",
-				authorization_email: "",
-				duration_autorization_months: "",
-				description: "",
-				course_link: "",
-			}}
-			validationSchema={yup.object({
-				course_code: yup
-					.string("Ingresar código del curso")
-					.required("Es requerido"),
-				course_name: yup
-					.string("Ingresat nombre del curso")
-					.required("Es requerido"),
-				expiration_in_months: yup
-					.string("Ingresar los meses de vigencia")
-					.required("Es requerido"),
-				course_type: yup
-					.string("Ingresar el Tipo de Curso")
-					.required("Es requerido"),
-				authorization_email: yup.string(
-					"Ingresar el correo de quien debe autorizarlo"
-				),
-				duration_autorization_months: yup.string("Vigencia de la autorización"),
-				description: yup
-					.string("Ingresar la descripción")
-					.required("Es requerido"),
-				course_link: yup.string("Ingresar el link del curso"),
-			})}
-			onSubmit={(values, { setSubmitting }) => {
-				setSubmitting(false);
-				console.log("Values", values);
-                console.log("Type", type);
-			}}>
-			{({ submitForm, isSubmitting }) => (
-				<Form>
-					<Stack justifyContent='center' alignItems='center'>
-						<Paper elevation={3}>
-							<Stack
-								spacing={{ xs: 1, sm: 2, md: 4 }}
-								alignItems='left'
-								justifyContent='left'
-								paddingX={{ xs: 1, sm: 2, md: 4 }}
-								paddingY={{ xs: 1, sm: 1, md: 2 }}>
-								<Typography variant='h6' color='primary'>
-									Cursos
-								</Typography>
-								<Field
-									component={TextField}
-									type='text'
-									label='Código'
-									name='course_code'
-								/>
-								<Field
-									component={TextField}
-									type='text'
-									label='Nombre'
-									name='course_name'
-								/>
-								<Field
-									component={TextField}
-									type='number'
-									label='Duración (en meses)'
-									name='expiration_in_months'
-								/>
-								<Field
-									component={Select}
-									type='text'
-									label='Tipo de Curso'
-									name='course_type'
-									multiple={false}
-                                    value={type}
-									onChange={handleChange}>
-									{typeCourse.map((item) => (
-										<MenuItem key={item} value={item}>
-											{item.value}
-										</MenuItem>
-									))}
-								</Field>
-								<Field
-									component={TextField}
-									type='text'
-									label='Correo Autorizador'
-									name='authorization_email'
-								/>
-								<Field
-									component={TextField}
-									type='number'
-									label='Duración de la Autorización'
-									name='duration_autorization_months'
-								/>
-								<Field
-									component={TextField}
-									type='text'
-									label='Descripción'
-									name='description'
-								/>
-								<Field
-									component={TextField}
-									type='text'
-									label='Link'
-									name='course_link'
-								/>
-								<Button
-									variant='contained'
-									color='primary'
-									disabled={isSubmitting}
-									onClick={submitForm}>
-									Enviar
-								</Button>
-							</Stack>
-						</Paper>
-					</Stack>
-				</Form>
-			)}
-		</Formik>
+		<Box sx={{ p: 3, border: "1px dashed grey" }}>
+			<Stack direction='column' spacing={2}>
+				<Breadcrumbs
+					separator={<NavigateNextIcon fontSize='small' color='primary' />}
+					aria-label='Link al Inicio'>
+					<Link underline='hover' color='primary.main' href='/'>
+						Inicio
+					</Link>
+					<Link
+						underline='hover'
+						color='primary.main'
+						href='/secure/view/Courses'>
+						Lista de Cursos
+					</Link>
+					<Typography color='text.primary'>
+						{Course ? `Editar curso: ${courseIo.code}` : `Nuevo Curso`}
+					</Typography>
+				</Breadcrumbs>
+				<br />
+
+				<Typography variant='h6' color='primary'>
+					{Course ? `Editar curso: ${courseIo.code}` : `Nuevo Curso`}
+				</Typography>
+			</Stack>
+			<br />
+			<Formik
+				enableReinitialize
+				initialValues={{
+					course_code: Course ? courseIo.code : "",
+					course_name: Course ? courseIo.name : "",
+					expiration_in_months: Course ? courseIo.expirationInMonth : "",
+					course_type: Course ? courseIo.typeCourse : "",
+					authorization_email: Course ? courseIo.autorizationBy : "",
+					duration_autorization_months: Course
+						? courseIo.durationAuthorizationInMonth
+						: "",
+					description: Course ? courseIo.description : "",
+					course_link: Course ? courseIo.link : "",
+				}}
+				validationSchema={yup.object({
+					course_code: yup
+						.string("Ingresar código del curso")
+						.required("Es requerido"),
+					course_name: yup
+						.string("Ingresat nombre del curso")
+						.required("Es requerido"),
+					expiration_in_months: yup
+						.string("Ingresar los meses de vigencia")
+						.required("Es requerido"),
+					course_type: yup
+						.string("Ingresar el Tipo de Curso")
+						.required("Es requerido"),
+					authorization_email: yup.string(
+						"Ingresar el correo de quien debe autorizarlo"
+					),
+					duration_autorization_months: yup.string(
+						"Vigencia de la autorización"
+					),
+					description: yup
+						.string("Ingresar la descripción")
+						.required("Es requerido"),
+					course_link: yup.string("Ingresar el link del curso"),
+				})}
+				onSubmit={(values, { setSubmitting }) => {
+					setSubmitting(false);
+					console.log("Values", values);
+					console.log("Type", type);
+					postForm(values);
+				}}>
+				{({ submitForm, isSubmitting }) => (
+					<Form>
+						<Stack
+							spacing={{ xs: 1, sm: 2, md: 4 }}
+							alignItems='left'
+							justifyContent='left'
+							paddingX={{ xs: 1, sm: 2, md: 4 }}
+							paddingY={{ xs: 1, sm: 1, md: 2 }}>
+							<Field
+								component={TextField}
+								type='text'
+								label='Código'
+								name='course_code'
+							/>
+							<Field
+								component={TextField}
+								type='text'
+								label='Nombre'
+								name='course_name'
+							/>
+							<Field
+								component={TextField}
+								type='number'
+								label='Duración (en meses)'
+								name='expiration_in_months'
+							/>
+							<Field
+								component={Select}
+								type='text'
+								label='Tipo de Curso'
+								name='course_type'
+								multiple={false}
+								value={type}
+								onChange={handleChange}>
+								{typeCourse.map((item) => (
+									<MenuItem key={item} value={item}>
+										{item.value}
+									</MenuItem>
+								))}
+							</Field>
+							<Field
+								component={TextField}
+								type='text'
+								label='Correo Autorizador'
+								name='authorization_email'
+							/>
+							<Field
+								component={TextField}
+								type='number'
+								label='Duración de la Autorización'
+								name='duration_autorization_months'
+							/>
+							<Field
+								component={TextField}
+								type='text'
+								label='Descripción'
+								name='description'
+							/>
+							<Field
+								component={TextField}
+								type='text'
+								label='Link'
+								name='course_link'
+							/>
+							<Button
+								variant='contained'
+								color='primary'
+								disabled={isSubmitting}
+								onClick={submitForm}>
+								Enviar
+							</Button>
+						</Stack>
+					</Form>
+				)}
+			</Formik>
+		</Box>
 	);
 };
 

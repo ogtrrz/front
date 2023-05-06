@@ -30,6 +30,9 @@ import {
 	InputLabel,
 	Select,
 } from "@mui/material";
+import HeaderDeleteEdit from "models/HeaderDeleteEdit";
+import DialogDelete from "models/DialogDelete";
+import { updateArray } from "utils/arrays";
 
 const Requirent = () => {
 	const [open, setOpen] = useState(false);
@@ -85,12 +88,12 @@ const Requirent = () => {
 		setCourseIo(newCourse);
 
 		const newCourses = _.cloneDeep(coursesIo);
-		const index = _.indexOf(newCourses, _.find(newCourses, newCourse));
-		console.log("index", index);
-		newCourses.splice(index, 1, newCourse);
+
+		updateArray(newCourses, newCourse);
+
 		console.log("newCourses", newCourses);
 		setCoursesIo(newCourses);
-		
+
 		router.push(`/secure/view/course/${newCourse.id}`);
 	};
 
@@ -118,23 +121,11 @@ const Requirent = () => {
 					<Typography color='text.primary'>{`Requermiento: ${requirentState?.code}`}</Typography>
 				</Breadcrumbs>
 				<br />
-				<Stack direction='row' spacing={2}>
-					<Typography variant='h6' color='primary'>
-						{`${requirentState?.code}`}
-					</Typography>
-					<Button
-						variant='outlined'
-						endIcon={<DeleteIcon />}
-						onClick={handleDelete1}>
-						Borrar
-					</Button>
-					<Button
-						variant='contained'
-						endIcon={<ModeEditIcon />}
-						onClick={handleEdit}>
-						Editar
-					</Button>
-				</Stack>
+				<HeaderDeleteEdit
+					title={`${requirentState?.code}`}
+					onDelete={handleDelete1}
+					onEdit={handleEdit}
+				/>
 			</Stack>
 			<br />
 			<Stack direction='column' spacing={2}>
@@ -157,35 +148,12 @@ const Requirent = () => {
 				</Typography>
 			</Stack>
 
-			<Dialog
-				open={open}
-				onClose={handleClose}
-				aria-labelledby='alert-dialog-title'
-				aria-describedby='alert-dialog-description'>
-				<DialogTitle id='alert-dialog-title' color='primary'>
-					Borrar
-				</DialogTitle>
-				<DialogContent>
-					<DialogContentText id='alert-dialog-description'>
-						Esta seguro que quiere borrar los datos, no podrán ser recuperados.
-					</DialogContentText>
-				</DialogContent>
-				<DialogActions>
-					<Button
-						variant='outlined'
-						onClick={handleClose}
-						endIcon={<CancelIcon />}>
-						Cancelar
-					</Button>
-					<Button
-						variant='contained'
-						onClick={handleDelete2}
-						autoFocus
-						endIcon={<CheckCircleIcon />}>
-						Aceptar
-					</Button>
-				</DialogActions>
-			</Dialog>
+			<DialogDelete
+				onOpen={open}
+				on_Close={handleClose}
+				onCancel={handleClose}
+				onOk={handleDelete2}
+			/>
 		</Box>
 	);
 };

@@ -4,9 +4,9 @@
 		// "jsx": "preserve",
 		// "checkJs": true,
 		"baseUrl": "./",
-		"paths": {
-			"@component/*": ["src/components/*"]
-		}
+		// "paths": {
+		// 	"@component/*": ["src/components/*"]
+		// }
 	},
 	// "exclude": ["node_modules", "**/node_modules/*"]
 }

@@ -3,6 +3,7 @@ import useLocalStorageState from "use-local-storage-state";
 import { useRouter } from "next/router";
 import { post, patch, URL_REQUIRENTS, URL_COURSES } from "data/ApiData";
 import _ from "lodash";
+import { updateArray } from "utils/arrays";
 import * as yup from "yup";
 import { Formik, Form, Field } from "formik";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -69,8 +70,8 @@ const Requirents = () => {
 	});
 	const router = useRouter();
 
-	// const newCourses = _.cloneDeep(coursesIo);
-	// const newCourse = _.cloneDeep(courseIo)
+	const newCourses = _.cloneDeep(coursesIo);
+	const newCourse = _.cloneDeep(courseIo);
 	useEffect(() => {
 		if ((router.query.Course && router.query.Requirent) === false) {
 			setRequirentIo({});
@@ -86,9 +87,8 @@ const Requirents = () => {
 		setKindState(value.key);
 	};
 
-	const postForm = async (values) => {
-		// console.log("newCourse0", newCourse);
 
+	const postForm = async (values) => {
 		const data = {
 			id2Course: courseIo.id,
 			code: values.requirements_code,
@@ -96,50 +96,31 @@ const Requirents = () => {
 			kind: kindState,
 			description: values.requirements_description,
 		};
-		console.log("data", data);
-		// console.log("requirentIo", requirentIo);
 		let response = {};
 		if (router.query.Course && router.query.Requirent) {
 			data.id = router.query.Requirent;
 			response = await patch(URL_REQUIRENTS, data);
 			console.log("response1", response);
+			updateArray(newCourse.requirents, response);
+			console.log("response3", newCourse);
 		} else {
 			response = await post(URL_REQUIRENTS, data);
-			const responseCourse = await patch(URL_COURSES, courseIo);
-			console.log("responseCourse", responseCourse);
-			// setCourseIo(responseCourse);////
+			console.log("response1", response);
+			newCourse.requirents = [response, ...newCourse.requirents];
+			console.log("response3", newCourse);
+			const ret = await patch(URL_COURSES, newCourse);
+			console.log("ret", ret);
 		}
 
-		console.log("response2", response);
-		console.log("newCourse1", newCourse);
-		let arrayRequirents = newCourse.requirents;
-		console.log("arrayRequirents", arrayRequirents);
-		const indexReq = _.indexOf(
-			arrayRequirents,
-			_.find(arrayRequirents, response)
-		);
-		console.log("indexReq", indexReq);
-		arrayRequirents.splice(indexReq, 1, response);
-		console.log("newCourse", newCourse);
-		// console.log("newCourses", newCourses)
-		// let arrayRequirents = newCourse.requirents;
-		// arrayRequirents = [...arrayRequirents, response];
-		// newCourse.requirents = arrayRequirents;
-		// console.log("newCourse2", newCourse);
+		updateArray(newCourses, newCourses);
 
-		const index = _.indexOf(newCourses, _.find(newCourses, newCourse));
-		console.log("index", index);
-		newCourses.splice(index, 1, newCourse);
-		console.log("newCourse", newCourse);
-		console.log("newCourses", newCourses);
+		setCoursesIo(newCourses);
+		setCourseIo(newCourse);
+		setRequirentIo({});
 
-		// setRequirentIo(data);
-		// setCoursesIo(newCourses);
-		// setRequirentIo("");
-
-		// router.push(`/secure/view/course/${course.id}`);
+		router.push(`/secure/view/course/${newCourse.id}`);
 	};
-	//TODO validar tamano maximo de los campos
+	//TODO validar tamano maximo de los campos y Encabezado entre nuevo y Edicion
 	return (
 		<Box sx={{ p: 3, border: "1px dashed grey" }}>
 			<Stack direction='column' spacing={2}>

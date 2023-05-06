@@ -4,7 +4,7 @@
       "browser": true,
       "es2021": true
   },
-  "extends": ["prettier", "plugin:react/jsx-runtime", "plugin:jsx-a11y/recommended", "plugin:react-hooks/recommended",  "next/core-web-vitals"],
+  "extends": [ "plugin:react/jsx-runtime", "plugin:jsx-a11y/recommended", "plugin:react-hooks/recommended",  "next/core-web-vitals"],
   "settings": {
       "import/resolver": {
           "node": {
@@ -12,20 +12,20 @@
           }
       }
   },
-  "parser": "babel/eslint-parser",
-  "parserOptions": {
-      "requireConfigFile": false, // <== ADD THIS
-      "sourceType": "module",
-      "babelOptions": {
-          "presets": ["@babel/preset-react"]
-       },
-      "ecmaFeatures": {
-          "experimentalObjectRestSpread": true,
-          "impliedStrict": true
-      },
-      "ecmaVersion": 2018
-  },
-  "plugins": ["prettier", "react", "react-hooks"],
+//   "parser": "babel/eslint-parser",
+//   "parserOptions": {
+//       "requireConfigFile": false, // <== ADD THIS
+//       "sourceType": "module",
+//       "babelOptions": {
+//           "presets": ["@babel/preset-react"]
+//        },
+//       "ecmaFeatures": {
+//           "experimentalObjectRestSpread": true,
+//           "impliedStrict": true
+//       },
+//       "ecmaVersion": 2018
+//   },
+  "plugins": [ "react", "react-hooks"],
   "rules": {
       "react/jsx-filename-extension": 0,
       "no-param-reassign": 0,
@@ -44,19 +44,19 @@
           {
               "ignoreRestSiblings": false
           }
-      ],
-      "prettier/prettier": [
-          2,
-          {
-              "bracketSpacing": true,
-              "printWidth": 140,
-              "singleQuote": true,
-              "trailingComma": "none",
-              "tabWidth": 4,
-              "useTabs": false,
-              "endOfLine": "auto"
-          }
       ]
+    //   "prettier/prettier": [
+    //       2,
+    //       {
+    //           "bracketSpacing": true,
+    //           "printWidth": 140,
+    //           "singleQuote": true,
+    //           "trailingComma": "none",
+    //           "tabWidth": 4,
+    //           "useTabs": false,
+    //           "endOfLine": "auto"
+    //       }
+    //   ]
   }
 }
 

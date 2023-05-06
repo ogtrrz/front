@@ -17,6 +17,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import EvidenceAddToDo from "../../../models/EvidenceAddToDo";
 import SaveIcon from "@mui/icons-material/Save";
+import CancelIcon from "@mui/icons-material/Cancel";
 import {
 	Autocomplete,
 	TextField,
@@ -34,13 +35,19 @@ import {
 	Typography,
 	FormControl,
 	FormHelperText,
+	List,
+	ListItem,
+	Breadcrumbs,
+	Link,
 } from "@mui/material";
-import Courses from "../view/Courses";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import CoursesSelection from "models/CoursesSelection";
 
 const TrainingCourseSelection = () => {
 	const [course, setCourse] = useState();
-	const [date, setDate] = useState();
+	const [date, setDate] = useState('');
 	const [expiration, setExpiration] = useState("");
+
 	const router = useRouter();
 	const { Employee } = router.query;
 	const NOW = moment().format("yyyy-MM-DD") + "T00:00:01Z";
@@ -48,7 +55,7 @@ const TrainingCourseSelection = () => {
 		console.log("Course", course);
 		if (date) {
 			setExpiration(
-				moment(date).add(course?.expirationInMonth, "months").format("MM/YYYY")
+				moment(date.$d).add(course?.expirationInMonth, "months").format("MM/YYYY")
 			);
 		}
 	}, [date, course]);
@@ -62,7 +69,7 @@ const TrainingCourseSelection = () => {
 		console.log("evidencearray", evidencearray);
 	};
 
-	const postEvidences = async () =>  {
+	const postEvidences = async () => {
 		const arrayOfEvidencePromises = course.requirents.map(returnEvidences);
 
 		for await (const item of arrayOfEvidencePromises) {
@@ -70,7 +77,7 @@ const TrainingCourseSelection = () => {
 		}
 
 		postTraining();
-	}
+	};
 
 	const returnEvidences = async (element) => {
 		const evidence = {
@@ -81,7 +88,7 @@ const TrainingCourseSelection = () => {
 			kind: element.kind,
 			description: element.description,
 			expiration:
-				moment(date)
+				moment(date.$d)
 					.add(element?.expirationInMonth, "months")
 					.format("yyyy-MM-DD") + "T00:00:01Z",
 			created: "usuario",
@@ -90,20 +97,20 @@ const TrainingCourseSelection = () => {
 			editedAt: NOW,
 			extra1: element?.expirationInMonth,
 			extra2:
-				moment(date)
+				moment(date.$d)
 					.add(element?.expirationInMonth, "months")
 					.format("yyyy-MM-DD") + "T00:00:01Z",
 		};
 
 		const res = await post(URL_EVIDENCES, evidence);
-		console.log('res 99', res);
+		console.log("res 99", res);
 		evidencearray.push(res);
 	};
 
 	const postTraining = async () => {
-		const dateTrainning = moment(date).format("yyyy-MM-DD") + "T00:00:01Z";
+		const dateTrainning = moment(date.$d).format("yyyy-MM-DD") + "T00:00:01Z";
 		const dateExpiry =
-			moment(date)
+			moment(date.$d)
 				.add(course?.expirationInMonth, "months")
 				.format("yyyy-MM-DD") + "T00:00:01Z";
 		const traning = {
@@ -117,6 +124,7 @@ const TrainingCourseSelection = () => {
 			extra3: course.typeCourse,
 			extra4: course.autorizationBy,
 			extra5: course.link,
+			extra6: course.expirationInMonth,
 			created: "usuario",
 			createdAt: NOW,
 			edited: "usuario",
@@ -135,45 +143,90 @@ const TrainingCourseSelection = () => {
 		employeeNew.editedAt = NOW;
 		console.log("employeeNew2", employeeNew);
 		const emp = await patch(URL_EMPLOYEES, employeeNew);
-		setEmployeeIo(emp)
+		setEmployeeIo(emp);
 		router.push(`/secure/view/employee/${emp.id}`);
 	};
 
+	const handleOnSelect = (params) => {
+		console.log("row", params.row);
+		setCourse(params.row);
+	};
+
+	const onCancel = () => {
+		console.log("Cancelar");
+		router.push(`/secure/view/employee/${employeeIo.id}`);
+	};
+
 	return (
-		<>
-			<Courses training={true} setCourse={setCourse} />
-			<Typography variant='h6' color='primary'>
-				{`Mi Entrenamiento ${course ? course.name : ""}  ${
-					course ? "( " + course.code + " )" : ""
-				}`}
-			</Typography>
-			<LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={"es-mx"}>
-				<DatePicker
-					label='Fecha del Entrenamiento'
-					value={date}
-					onChange={(newDate) => setDate(newDate)}
-				/>
-			</LocalizationProvider>
-			<Typography variant='subtitle2'>
-				{expiration ? "Fecha de expiracion: " + expiration : ""}
-			</Typography>
-			{course?.requirents.map((item) => {
-				return (
-					<>
-						<Typography variant='body1' color='secondary' key={item.id}>
-							{item.description}
-						</Typography>
-						<EvidenceAddToDo course={item} />
-					</>
-				);
-			})}
-			<Button
-				variant='contained'
-				endIcon={<SaveIcon />}
-				onClick={postEvidences}>
-				Nuevo Entrenamiento
-			</Button>
-		</>
+		<Box sx={{ p: 3, border: "1px dashed grey" }}>
+			<Stack direction='column' spacing={2}>
+				<Breadcrumbs
+					separator={<NavigateNextIcon fontSize='small' color='primary' />}
+					aria-label='Link al Inicio'>
+					<Link underline='hover' color='primary.main' href='/'>
+						Inicio
+					</Link>
+					<Link
+						underline='hover'
+						color='primary.main'
+						href={`/secure/view/employee/${employeeIo.id}`}>
+						Mis Datos
+					</Link>
+
+					<Typography color='text.primary'>{`Nuevo Entrenamiento`}</Typography>
+				</Breadcrumbs>
+
+				<Typography variant='h6' color='primary'>
+					{`Nuevo Entrenamiento`}
+				</Typography>
+				<Typography variant='body1' color='text'>
+					{`Seleccionar curso`}
+				</Typography>
+				<CoursesSelection training={true} handleRowClick={handleOnSelect} />
+
+				<Typography variant='body1' color='secondary'>
+					{course
+						? `Requerimientos (${course?.requirents.length})`
+						: `Seleccionar Curso para ver Requerimientos`}
+				</Typography>
+				<List>
+					{course?.requirents.map((item) => {
+						return (
+							<ListItem key={item.id}>
+								<Typography variant='body1' color='text'>
+									{item.description}
+								</Typography>
+							</ListItem>
+						);
+					})}
+				</List>
+
+				<LocalizationProvider
+					dateAdapter={AdapterDayjs}
+					adapterLocale={"es-mx"}>
+					<DatePicker
+						label='Fecha del Entrenamiento'
+						value={date}
+						onChange={(newDate) => setDate(newDate)}
+					/>
+				</LocalizationProvider>
+
+				<Stack direction='row' spacing={4}>
+					<Button
+						variant='contained'
+						endIcon={<CancelIcon />}
+						onClick={onCancel}>
+						Cancelar
+					</Button>
+					<Button
+						variant='contained'
+						endIcon={<SaveIcon />}
+						onClick={postEvidences}>
+						Guardar
+					</Button>
+				</Stack>
+			</Stack>
+		</Box>
 	);
 };
 

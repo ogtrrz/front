@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { HYDRATE } from 'next-redux-wrapper'
+// import { HYDRATE } from 'next-redux-wrapper'
 
 // import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 // import { fetchCount } from './counterAPI';
@@ -7,11 +7,11 @@ import { HYDRATE } from 'next-redux-wrapper'
 export const apiCourse = createApi({
 	reducerPath: "apiCourse",
 	baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:3000/appi/" }),
-  extractRehydrationInfo(action, { reducerPath }) {
-    if (action.type === HYDRATE) {
-      return action.payload[reducerPath]
-    }
-  },
+  // extractRehydrationInfo(action, { reducerPath }) {
+  //   if (action.type === HYDRATE) {
+  //     return action.payload[reducerPath]
+  //   }
+  // },
 	endpoints: (builder) => ({
 
         getCourses: builder.query({
