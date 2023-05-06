@@ -244,7 +244,7 @@ const Evidence = () => {
 					<NextLink
 						href={`/files${evidenceIo?.link}?format=webp&height=800&q=80`}
 						passHref
-						target='_'>
+						target='_blank' rel="noopener noreferrer">
 						<Typography
 							color='secondary.main'
 							sx={{

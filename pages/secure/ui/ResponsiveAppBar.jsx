@@ -255,38 +255,7 @@ const ResponsiveAppBar = (props) => {
                                                 </IconButton>
                                             </Tooltip>
                                         </TooltipWrapper>
-                                        <TooltipWrapper>
-                                            <Tooltip title="Favoritos">
-                                                <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-                                                    <Badge
-                                                        badgeContent={5}
-                                                        color="secondary"
-                                                        max={99}
-                                                        invisible={5 > 0 ? false : true}
-                                                    >
-                                                        <FavoriteIcon />
-                                                    </Badge>
-                                                </IconButton>
-                                            </Tooltip>
-                                        </TooltipWrapper>
-                                        <TooltipWrapper>
-                                            <Tooltip title="Carrito de Compras">
-                                                <IconButton size="large" aria-label="show 17 new notifications" color="inherit">
-                                                    <Badge badgeContent={10} color="secondary">
-                                                        <ShoppingCartIcon />
-                                                    </Badge>
-                                                </IconButton>
-                                            </Tooltip>
-                                        </TooltipWrapper>
-                                        <TooltipWrapper>
-                                            <Tooltip title="Mis Pedidos">
-                                                <IconButton size="large" aria-label="show 17 new notifications" color="inherit">
-                                                    <Badge badgeContent={17} color="secondary">
-                                                        <MopedIcon />
-                                                    </Badge>
-                                                </IconButton>
-                                            </Tooltip>
-                                        </TooltipWrapper>
+                                       
                                     </Box>
                                     <Box sx={{ flexGrow: 0 }}>
                                         <TooltipWrapper>

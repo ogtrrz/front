@@ -1,4 +1,8 @@
 import React, { useState } from "react";
+import useLocalStorageState from "use-local-storage-state";
+import { useRouter } from "next/router";
+import { patch, URL_EMPLOYEES } from "data/ApiData";
+import _ from "lodash";
 import * as yup from "yup";
 import { Formik, Form, Field } from "formik";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -7,6 +11,9 @@ import "dayjs/locale/es-mx";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 // import { blueGrey } from '@mui/material/colors';
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import SaveIcon from "@mui/icons-material/Save";
+import CancelIcon from "@mui/icons-material/Cancel";
 import {
 	Autocomplete,
 	TextField,
@@ -26,63 +33,112 @@ import {
 	Box,
 	Paper,
 	Typography,
+	Breadcrumbs,
+	Link,
 } from "@mui/material";
 
 const Employee = () => {
+	const router = useRouter();
+
+	const [employeeIo, setEmployeeIo] = useLocalStorageState("employee", {
+		defaultValue: [],
+	});
+
+	const update = async (values) => {
+		console.log("values", values);
+		let newEmployee = _.cloneDeep(employeeIo);
+		newEmployee.firstName = values.first_name;
+		newEmployee.lastName = values.last_name;
+		newEmployee.email = values.email;
+		newEmployee.hireDate = values.hire_date.$d;
+		newEmployee.birthDate = values.birth_date.$d;
+		newEmployee.emergencyContact = values.emergency_contact;
+		newEmployee.emergencyPhone = values.emergency_telephone;
+		newEmployee.blodeType = values.blode_type;
+		newEmployee.allergies = values.alergies;
+		newEmployee.note = values.notes;
+		const res = await patch(URL_EMPLOYEES, newEmployee);
+		setEmployeeIo(res);
+		router.push(`/secure/view/employee/${employeeIo.id}`);
+	};
+
+	const onCancel = () => {
+		router.push(`/secure/view/employee/${employeeIo.id}`);
+	}
+
 	return (
-		<Formik
-			initialValues={{
-				first_name: "",
-				last_name: "",
-				email: "",
-				telephone: "",
-				hire_date: "",
-				birth_date: "",
-				emergency_contact: "",
-				emergency_telephone: "",
-				blode_type: "",
-				alergies: "",
-				notes: "",
-			}}
-			validationSchema={yup.object({
-				first_name: yup
-					.string("Ingresar su Puesto de Trabajo")
-					.required("Es requerido"),
-				last_name: yup.string("Seleccionar su Rol").required("Es requerido"),
-				email: yup.string("Seleccionar su Handling").required("Es requerido"),
-				telephone: yup
-					.string("Ingresar su Puesto de Trabajo")
-					.required("Es requerido"),
-				hire_date: yup.string("Seleccionar su Rol").required("Es requerido"),
-				birth_date: yup
-					.string("Indicar su fecha de nacimiento")
-					.required("Es requerido"),
-				emergency_contact: yup
-					.string("Indicar su contacto de emergencia")
-					.required("Es requerido"),
-				emergency_telephone: yup
-					.string("Indicar el teléfono de emergencia")
-					.required("Es requerido"),
-				blode_type: yup.string("Ingresar su ripo sanguineo"),
-			})}
-			onSubmit={(values, { setSubmitting }) => {
-				setSubmitting(false);
-				console.log("Values", values);
-			}}>
-			{({ submitForm, isSubmitting }) => (
-				<LocalizationProvider
-					dateAdapter={AdapterDayjs}
-					adapterLocale={"es-mx"}>
-					<Form>
-						<Stack justifyContent='center' alignItems='center'>
-							<Paper elevation={3}>
-								<Stack
-									spacing={{ xs: 1, sm: 2, md: 4 }}
-									alignItems='left'
-									justifyContent='left'
-									paddingX={{ xs: 1, sm: 2, md: 4 }}
-									paddingY={{ xs: 1, sm: 1, md: 2 }}>
-									<Typography variant='h6' color='primary'>Mis Datos</Typography>
+		<Box sx={{ p: 3, border: "1px dashed grey" }}>
+			<Stack direction='column' spacing={2}>
+				<Breadcrumbs
+					separator={<NavigateNextIcon fontSize='small' color='primary' />}
+					aria-label='Link al Inicio'>
+					<Link underline='hover' color='primary.main' href='/'>
+						Inicio
+					</Link>
+					<Typography color='text.primary'>{`Mis Datos`}</Typography>
+				</Breadcrumbs>
+
+				<Typography variant='h6' color='primary'>
+					{`Hola, ${employeeIo?.firstName} ${employeeIo?.lastName}.`}
+				</Typography>
+
+				<Formik
+					enableReinitialize
+					initialValues={{
+						first_name: employeeIo.firstName ? employeeIo.firstName : "",
+						last_name: employeeIo.lastName ? employeeIo.lastName : "",
+						email: employeeIo.email ? employeeIo.email : "",
+						telephone: employeeIo.phoneNumber ? employeeIo.phoneNumber : "",
+						hire_date: "",
+						birth_date: "",
+						emergency_contact: employeeIo.emergencyContact
+							? employeeIo.emergencyContact
+							: "",
+						emergency_telephone: employeeIo.emergencyPhone
+							? employeeIo.emergencyPhone
+							: "",
+						blode_type: employeeIo.blodeType ? employeeIo.blodeType : "",
+						alergies: employeeIo.allergies ? employeeIo.allergies : "",
+						notes: employeeIo.note ? employeeIo.note : "",
+					}}
+					validationSchema={yup.object({
+						first_name: yup
+							.string("Ingresar su Puesto de Trabajo")
+							.required("Es requerido"),
+						last_name: yup
+							.string("Seleccionar su Rol")
+							.required("Es requerido"),
+						email: yup
+							.string("Seleccionar su Handling")
+							.required("Es requerido"),
+						telephone: yup
+							.string("Ingresar su Puesto de Trabajo")
+							.required("Es requerido"),
+						hire_date: yup
+							.string("Seleccionar su Rol")
+							.required("Es requerido"),
+						birth_date: yup
+							.string("Indicar su fecha de nacimiento")
+							.required("Es requerido"),
+						emergency_contact: yup
+							.string("Indicar su contacto de emergencia")
+							.required("Es requerido"),
+						emergency_telephone: yup
+							.string("Indicar el teléfono de emergencia")
+							.required("Es requerido"),
+						blode_type: yup.string("Ingresar su ripo sanguineo"),
+					})}
+					onSubmit={(values, { setSubmitting }) => {
+						setSubmitting(false);
+						console.log("Values", values);
+						update(values);
+					}}>
+					{({ submitForm, isSubmitting }) => (
+						<LocalizationProvider
+							dateAdapter={AdapterDayjs}
+							adapterLocale={"es-mx"}>
+							<Form>
+								<Stack spacing={2}>
 									<Field
 										component={TextField}
 										type='text'
@@ -159,20 +215,31 @@ const Employee = () => {
 										label='Notas'
 										name='notes'
 									/>
-									<Button
-										variant='contained'
-										color='primary'
-										disabled={isSubmitting}
-										onClick={submitForm}>
-										Enviar
-									</Button>
+									<Box>
+										<Stack direction='row' spacing={4}>
+											<Button
+												variant='contained'
+												color='primary'
+												disabled={isSubmitting}
+												onClick={submitForm}
+												endIcon={<SaveIcon />}>
+												Guardar
+											</Button>
+											<Button
+												variant='outlined'
+												onClick={onCancel}
+												endIcon={<CancelIcon />}>
+												Cancelar
+											</Button>
+										</Stack>
+									</Box>
 								</Stack>
-							</Paper>
-						</Stack>
-					</Form>
-				</LocalizationProvider>
-			)}
-		</Formik>
+							</Form>
+						</LocalizationProvider>
+					)}
+				</Formik>
+			</Stack>
+		</Box>
 	);
 };
 

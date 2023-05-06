@@ -43,7 +43,7 @@ import "dayjs/locale/es-mx";
 const Todo = () => {
 	const router = useRouter();
 
-	// const { Todo } = router.query;
+	const { Todo } = router.query;
 
 	const [selectedFile, setSelectedFile] = useState(null);
 
@@ -59,10 +59,17 @@ const Todo = () => {
 		defaultValue: [],
 	});
 
+	// useEffect(() => {
+	//   if(Todo) {
+
+	//   }
+
+	// }, [Todo])
+
 	const onCancel = () => {
 		console.log("On Cancel");
 		router.push(`/secure/view/employee/${employeeIo.id}`);
-	}
+	};
 
 	async function postForm() {
 		console.log("notaField", notaField);
@@ -78,7 +85,7 @@ const Todo = () => {
 		});
 		console.log("Sumited-1", responseFile);
 
-		const postValues = {
+		let postValues = {
 			date: moment(dateField.$d).format("YYYY-MM-DD") + "T00:00:00.001Z",
 			description: notaField,
 			state: "NEW",
@@ -89,17 +96,24 @@ const Todo = () => {
 
 		console.log("postValues", postValues);
 
-		const responseTodo = await post(URL_TO_DOS, postValues);
-		console.log("Response DATOS 2", responseTodo);
-
 		let employeeNew = _.cloneDeep(employeeIo);
 		console.log("employeeNew", employeeNew);
 		let arraytodos = employeeNew.todos;
-		arraytodos = [...arraytodos, responseTodo];
+		if (Todo) {
+			postValues.id = Todo;
+			const responseTodo = await patch(URL_TO_DOS, postValues);
+			console.log("Response DATOS patch", responseTodo);
+			updateArray(arraytodos, responseTodo);
+		} else {
+			const responseTodo = await post(URL_TO_DOS, postValues);
+			console.log("Response DATOS post", responseTodo);
+			arraytodos = [...arraytodos, responseTodo];
+		}
+		console.log("arraytodos", arraytodos);
 		employeeNew.todos = arraytodos;
 		console.log("employeeNew2", employeeNew);
 		const emp = await patch(URL_EMPLOYEES, employeeNew);
-		console.log("employeeNew3",emp);
+		console.log("employeeNew3", emp);
 		setEmployeeIo(emp);
 		router.push(`/secure/view/employee/${employeeIo.id}`);
 	}
@@ -133,7 +147,7 @@ const Todo = () => {
 							Mis Datos
 						</Typography>
 					</NextLink>
-					
+
 					<Typography color='text.primary'>{`Nueva Tarea`}</Typography>
 				</Breadcrumbs>
 
@@ -185,10 +199,7 @@ const Todo = () => {
 				</Box>
 				<br />
 				<Stack direction={"row"} spacing={4}>
-					<Button
-						variant='contained'
-						onClick={postForm}
-						endIcon={<SaveIcon />}>
+					<Button variant='contained' onClick={postForm} endIcon={<SaveIcon />}>
 						Guardar
 					</Button>
 					<Button

@@ -89,31 +89,32 @@ const Course = () => {
 
 	const postForm = async (values) => {
 		console.log("values", values);
-		const data = {
-			id2Job: 1,
-			code: values.course_code,
-			name: values.course_name,
-			expirationInMonth: values.expiration_in_months,
-			typeCourse: type,
-			autorizationBy: values.authorization_email,
-			durationAuthorizationInMonth: values.duration_autorization_months,
-			description: values.description,
-			link: values.course_link,
-		};
-		console.log("data", data);
-		let newCourses = _.cloneDeep(coursesIo)
+		const newCourse = _.cloneDeep(courseIo);
+		newCourse.id2Job = 1;
+		newCourse.code = values.course_code;
+		newCourse.name = values.course_name;
+		newCourse.expirationInMonth = values.expiration_in_months;
+		newCourse.typeCourse = type;
+		newCourse.autorizationBy = values.authorization_email;
+		newCourse.durationAuthorizationInMonth =
+			values.duration_autorization_months;
+		newCourse.description = values.description;
+		newCourse.link = values.course_link;
+
+		let newCourses = _.cloneDeep(coursesIo);
+		console.log("newCourses", newCourses);
 		// let newCourse = _.cloneDeep(courseIo)
-		
+
 		if (Course) {
-			data.id = Course;
-			const response = await patch(URL_COURSES, data);
+			newCourse.id = Course;
+			const response = await patch(URL_COURSES, newCourse);
 			console.log("response1a", response);
 			updateArray(newCourses, response);
 			console.log("response3a", newCourses);
 		} else {
-			const response = await post(URL_COURSES, data);
+			const response = await post(URL_COURSES, newCourse);
 			console.log("response1b", response);
-			newCourses = [response, ...newCourses]
+			newCourses = [response, ...newCourses];
 			console.log("response3b", newCourses);
 		}
 
@@ -155,7 +156,7 @@ const Course = () => {
 					course_code: Course ? courseIo.code : "",
 					course_name: Course ? courseIo.name : "",
 					expiration_in_months: Course ? courseIo.expirationInMonth : "",
-					course_type: Course ? courseIo.typeCourse : "",
+					course_type: "",
 					authorization_email: Course ? courseIo.autorizationBy : "",
 					duration_autorization_months: Course
 						? courseIo.durationAuthorizationInMonth
@@ -228,7 +229,7 @@ const Course = () => {
 								value={type}
 								onChange={handleChange}>
 								{typeCourse.map((item) => (
-									<MenuItem key={item} value={item}>
+									<MenuItem key={item.value} value={item}>
 										{item.value}
 									</MenuItem>
 								))}

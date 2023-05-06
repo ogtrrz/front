@@ -4,6 +4,7 @@ import useLocalStorageState from "use-local-storage-state";
 import { useRouter } from "next/router";
 import moment from "moment";
 import { patch, del, URL_EMPLOYEES, URL_TO_DOS } from "data/ApiData";
+import { updateArray } from "utils/arrays";
 import HeaderDeleteEdit from "models/HeaderDeleteEdit";
 import HeaderNew from "models/HeaderNew";
 import DialogDelete from "models/DialogDelete";
@@ -83,7 +84,21 @@ const Todo = () => {
 		console.log("response", returnTodo);
 		await del(URL_TO_DOS, Todo);
 		setEmployeeIo(clone);
-		// router.push(`/secure/view/employee/${clone.id}`);
+		router.push(`/secure/view/employee/${clone.id}`);
+	};
+
+	const handleConcluido = async () => {
+		console.log("handle concluido");
+		let todoNew = _.cloneDeep(todoIo)
+		todoNew.state = 'CHECK'
+		const responseTodo = await patch(URL_TO_DOS, todoNew);
+		console.log("Response DATOS patch", responseTodo);
+		setTodoIo(responseTodo);
+		let employeeNew = _.cloneDeep(employeeIo);
+		console.log("employeeNew", employeeNew);
+		let arraytodos = employeeNew.todos;
+		updateArray(arraytodos, responseTodo);
+		router.push(`/secure/view/employee/${employeeIo.id}`);
 	};
 
 	return (
@@ -131,7 +146,8 @@ const Todo = () => {
 				<NextLink
 					href={`/files${todoState?.link}?format=webp&height=800&q=80`}
 					passHref
-					target='_'>
+					target='_blank'
+					rel='noopener noreferrer'>
 					<Typography
 						color='secondary.main'
 						sx={{
@@ -142,6 +158,14 @@ const Todo = () => {
 						{`Ver archivo: ${todoState?.extra1}`}
 					</Typography>
 				</NextLink>
+				<Box>
+					<Button
+						onClick={handleConcluido}
+						variant='contained'
+						endIcon={<CheckCircleIcon />}>
+						Marcar como Concluido
+					</Button>
+				</Box>
 
 				<DialogDelete
 					onOpen={open}

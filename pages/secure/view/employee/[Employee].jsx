@@ -4,12 +4,6 @@ import moment from "moment";
 import _ from "lodash";
 import { useRouter } from "next/router";
 import { get, URL_EMPLOYEES } from "data/ApiData";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
@@ -18,9 +12,9 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import HeaderDeleteEdit from "models/HeaderDeleteEdit";
 import HeaderNew from "models/HeaderNew";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import DialogDelete from "models/DialogDelete";
 import { DataGrid, esES } from "@mui/x-data-grid";
 import FlagCircleIcon from "@mui/icons-material/FlagCircle";
+import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import {
 	Button,
 	LinearProgress,
@@ -101,6 +95,12 @@ const Employee = () => {
 		{
 			field: "name",
 			headerName: "Nombre",
+			width: 200,
+			description: "Código del curso tomado.",
+		},
+		{
+			field: "extra1",
+			headerName: "Notas",
 			minWidth: 150,
 			flex: 1,
 			description: "Código del curso tomado.",
@@ -166,8 +166,16 @@ const Employee = () => {
 	};
 	const handleRowHistoricDataClick = (params) => {
 		console.log("HistoricData Click", params.row.link);
+		// router.push({ pathname: `${process.env.NEXT_PUBLIC_API_IMAGES}${params.row.link}`}, undefined, { shallow: true });
 		router.push(`${process.env.NEXT_PUBLIC_API_IMAGES}${params.row.link}`);
 	};
+
+	const handleEdit = () => {
+		console.log('handle Edit Mis Datos');
+		router.push(
+			`/secure/form/Employee`
+		);
+	}
 
 	//TODO errores ux color del titulo titulo color de los datos de la tabla en celular no existe el hover, call to action no es consistente
 	return (
@@ -181,180 +189,198 @@ const Employee = () => {
 					</Link>
 					<Typography color='text.primary'>{`Mis Datos`}</Typography>
 				</Breadcrumbs>
-				<Typography variant='h6' color='primary'>
-					{`Hola ${employeeState?.firstName} ${employeeState?.lastName}`}
-				</Typography>
-			</Stack>
+				<Stack direction='row' spacing={2}>
+					<Typography variant='h6' color='primary'>
+						{`Hola, ${employeeState?.firstName} ${employeeState?.lastName}.`}
+					</Typography>
+					<Button
+						variant='outlined'
+						endIcon={<ModeEditIcon />}
+						onClick={(handleEdit)}>
+						editar Mis Datos
+					</Button>
+				</Stack>
 
-			<Typography variant='body1' color='text'>
-				{`Usuario: ${employeeState?.user}`}
-			</Typography>
-			<Typography variant='body1' color='text'>
-				{`Mi correo: ${employeeState?.email}`}
-			</Typography>
-			<Typography variant='body1' color='text'>
-				{`Mi teléfono: ${employeeState?.phoneNumber}`}
-			</Typography>
-			<Typography variant='body1' color='text'>
-				{`Fecha de contratación: ${moment(employeeState?.hireDate).format('DD/MM/yyyy')}`}
-			</Typography>
-			<Typography variant='body1' color='text'>
-				{`Contacto de emergencia: ${employeeState?.emergencyContact}`}
-			</Typography>
-			<Typography variant='body1' color='text'>
-				{`Teléfono de emergencia: ${employeeState?.emergencyPhone}`}
-			</Typography>
-			<Typography variant='body1' color='text'>
-				{`Tipo sanguineo: ${employeeState?.blondeType}`}
-			</Typography>
-			<Typography variant='body1' color='text'>
-				{`Alergias: ${employeeState?.allergies}`}
-			</Typography>
-			<Typography variant='body1' color='text'>
-				{`Fecha de nacimiento: ${moment(employeeState?.birthDate).format('DD/MM/yyyy')}`}
-			</Typography>
-			<Typography variant='body1' color='text'>
-				{`Notas: ${employeeState?.note}`}
-			</Typography>
-			<br />
-			<Accordion>
-				<AccordionSummary
-					expandIcon={<ExpandMoreIcon color='primary' />}
-					aria-controls='panel1a-content'
-					id='panel1a-header'>
-					<Stack direction='row' spacing={2}>
-						<Typography variant='subtitle2' color='primary'>
-							Entrenamientos
-						</Typography>
-						<Button
-							variant='contained'
-							endIcon={<AddCircleIcon />}
-							onClick={handleNewTraining}>
-							Nuevo Entrenamiento
-						</Button>
-					</Stack>
-				</AccordionSummary>
-				<AccordionDetails>
-					<div style={{ height: 300, width: "100%" }}>
-						{employeeState?.trainings ? (
-							<DataGrid
-								rows={employeeState.trainings}
-								columns={columnTraining}
-								onRowClick={handleRowTrainingClick}
-								localeText={esES.components.MuiDataGrid.defaultProps.localeText}
-								sx={{
-									"& .MuiDataGrid-columnHeaders": {
-										// backgroundColor: "white",
-										color: "primary.main",
-										//fontWeight: "bold" no sirve
-										// fontSize: 14,
-									},
-									".MuiDataGrid-cell:focus": {
-										outline: "none",
-									},
-									"& .MuiDataGrid-row:hover": {
-										cursor: "pointer",
-									},
-								}}
-							/>
-						) : (
-							""
-						)}
-					</div>
-				</AccordionDetails>
-			</Accordion>
-			<Accordion>
-				<AccordionSummary
-					expandIcon={<ExpandMoreIcon color='primary' />}
-					aria-controls='panel2a-content'
-					id='panel2a-header'>
-					<Stack direction='row' spacing={2}>
-						<Typography variant='subtitle2' color='primary'>
-							Tareas
-						</Typography>
-						<Button
-							variant='contained'
-							endIcon={<AddCircleIcon />}
-							onClick={handleNewTodo}>
-							Nueva Tarea
-						</Button>
-					</Stack>
-				</AccordionSummary>
-				<AccordionDetails>
-					<div style={{ height: 300, width: "100%" }}>
-						{employeeState?.todos ? (
-							<DataGrid
-								rows={employeeState.todos}
-								columns={columnTodos}
-								onRowClick={handleRowTodosClick}
-								localeText={esES.components.MuiDataGrid.defaultProps.localeText}
-								sx={{
-									"& .MuiDataGrid-columnHeaders": {
-										// backgroundColor: "white",
-										color: "primary.main",
-										//fontWeight: "bold" no sirve
-										// fontSize: 14,
-									},
-									".MuiDataGrid-cell:focus": {
-										outline: "none",
-									},
-									"& .MuiDataGrid-row:hover": {
-										cursor: "pointer",
-									},
-								}}
-							/>
-						) : (
-							""
-						)}
-					</div>
-				</AccordionDetails>
-			</Accordion>
-			<Accordion>
-				<AccordionSummary
-					expandIcon={<ExpandMoreIcon color='primary' />}
-					aria-controls='panel2a-content'
-					id='panel2a-header'>
-					<Stack direction='row' spacing={2}>
-						<Typography variant='subtitle2' color='primary'>
-							Archivos
-						</Typography>
-						<Button
-							variant='contained'
-							endIcon={<AddCircleIcon />}
-							onClick={handleNewFile}>
-							Nuevo Archivo
-						</Button>
-					</Stack>
-				</AccordionSummary>
-				<AccordionDetails>
-					<div style={{ height: 300, width: "100%" }}>
-						{employeeState?.historicData ? (
-							<DataGrid
-								rows={employeeState.historicData}
-								columns={columnHistoricData}
-								onRowClick={handleRowHistoricDataClick}
-								localeText={esES.components.MuiDataGrid.defaultProps.localeText}
-								sx={{
-									"& .MuiDataGrid-columnHeaders": {
-										// backgroundColor: "white",
-										color: "primary.main",
-										//fontWeight: "bold" no sirve
-										// fontSize: 14,
-									},
-									".MuiDataGrid-cell:focus": {
-										outline: "none",
-									},
-									"& .MuiDataGrid-row:hover": {
-										cursor: "pointer",
-									},
-								}}
-							/>
-						) : (
-							""
-						)}
-					</div>
-				</AccordionDetails>
-			</Accordion>
+				<Typography variant='body1' color='text'>
+					{`Usuario: ${employeeState?.user}`}
+				</Typography>
+				<Typography variant='body1' color='text'>
+					{`Mi correo: ${employeeState?.email}`}
+				</Typography>
+				<Typography variant='body1' color='text'>
+					{`Mi teléfono: ${employeeState?.phoneNumber}`}
+				</Typography>
+				<Typography variant='body1' color='text'>
+					{`Fecha de contratación: ${moment(employeeState?.hireDate).format(
+						"DD/MM/yyyy"
+					)}`}
+				</Typography>
+				<Typography variant='body1' color='text'>
+					{`Contacto de emergencia: ${employeeState?.emergencyContact}`}
+				</Typography>
+				<Typography variant='body1' color='text'>
+					{`Teléfono de emergencia: ${employeeState?.emergencyPhone}`}
+				</Typography>
+				<Typography variant='body1' color='text'>
+					{`Tipo sanguineo: ${employeeState?.blodeType}`}
+				</Typography>
+				<Typography variant='body1' color='text'>
+					{`Alergias: ${employeeState?.allergies}`}
+				</Typography>
+				<Typography variant='body1' color='text'>
+					{`Fecha de nacimiento: ${moment(employeeState?.birthDate).format(
+						"DD/MM/yyyy"
+					)}`}
+				</Typography>
+				<Typography variant='body1' color='text'>
+					{`Notas: ${employeeState?.note}`}
+				</Typography>
+				<br />
+				<Accordion>
+					<AccordionSummary
+						expandIcon={<ExpandMoreIcon color='primary' />}
+						aria-controls='panel1a-content'
+						id='panel1a-header'>
+						<Stack direction='row' spacing={2}>
+							<Typography variant='subtitle2' color='secondary'>
+								Entrenamientos
+							</Typography>
+							<Button
+								variant='contained'
+								endIcon={<AddCircleIcon />}
+								onClick={handleNewTraining}>
+								Nuevo Entrenamiento
+							</Button>
+						</Stack>
+					</AccordionSummary>
+					<AccordionDetails>
+						<div style={{ height: 300, width: "100%" }}>
+							{employeeState?.trainings ? (
+								<DataGrid
+									rows={employeeState.trainings}
+									columns={columnTraining}
+									onRowClick={handleRowTrainingClick}
+									localeText={
+										esES.components.MuiDataGrid.defaultProps.localeText
+									}
+									sx={{
+										"& .MuiDataGrid-columnHeaders": {
+											// backgroundColor: "white",
+											color: "primary.main",
+											//fontWeight: "bold" no sirve
+											// fontSize: 14,
+										},
+										".MuiDataGrid-cell:focus": {
+											outline: "none",
+										},
+										"& .MuiDataGrid-row:hover": {
+											cursor: "pointer",
+										},
+									}}
+								/>
+							) : (
+								""
+							)}
+						</div>
+					</AccordionDetails>
+				</Accordion>
+				<Accordion>
+					<AccordionSummary
+						expandIcon={<ExpandMoreIcon color='primary' />}
+						aria-controls='panel2a-content'
+						id='panel2a-header'>
+						<Stack direction='row' spacing={2}>
+							<Typography variant='subtitle2' color='secondary'>
+								Tareas
+							</Typography>
+							<Button
+								variant='contained'
+								endIcon={<AddCircleIcon />}
+								onClick={handleNewTodo}>
+								Nueva Tarea
+							</Button>
+						</Stack>
+					</AccordionSummary>
+					<AccordionDetails>
+						<div style={{ height: 300, width: "100%" }}>
+							{employeeState?.todos ? (
+								<DataGrid
+									rows={employeeState.todos}
+									columns={columnTodos}
+									onRowClick={handleRowTodosClick}
+									localeText={
+										esES.components.MuiDataGrid.defaultProps.localeText
+									}
+									sx={{
+										"& .MuiDataGrid-columnHeaders": {
+											// backgroundColor: "white",
+											color: "primary.main",
+											//fontWeight: "bold" no sirve
+											// fontSize: 14,
+										},
+										".MuiDataGrid-cell:focus": {
+											outline: "none",
+										},
+										"& .MuiDataGrid-row:hover": {
+											cursor: "pointer",
+										},
+									}}
+								/>
+							) : (
+								""
+							)}
+						</div>
+					</AccordionDetails>
+				</Accordion>
+				<Accordion>
+					<AccordionSummary
+						expandIcon={<ExpandMoreIcon color='primary' />}
+						aria-controls='panel2a-content'
+						id='panel2a-header'>
+						<Stack direction='row' spacing={2}>
+							<Typography variant='subtitle2' color='secondary'>
+								Archivos
+							</Typography>
+							<Button
+								variant='contained'
+								endIcon={<AddCircleIcon />}
+								onClick={handleNewFile}>
+								Nuevo Archivo
+							</Button>
+						</Stack>
+					</AccordionSummary>
+					<AccordionDetails>
+						<div style={{ height: 300, width: "100%" }}>
+							{employeeState?.historicData ? (
+								<DataGrid
+									rows={employeeState.historicData}
+									columns={columnHistoricData}
+									onRowClick={handleRowHistoricDataClick}
+									localeText={
+										esES.components.MuiDataGrid.defaultProps.localeText
+									}
+									sx={{
+										"& .MuiDataGrid-columnHeaders": {
+											// backgroundColor: "white",
+											color: "primary.main",
+											//fontWeight: "bold" no sirve
+											// fontSize: 14,
+										},
+										".MuiDataGrid-cell:focus": {
+											outline: "none",
+										},
+										"& .MuiDataGrid-row:hover": {
+											cursor: "pointer",
+										},
+									}}
+								/>
+							) : (
+								""
+							)}
+						</div>
+					</AccordionDetails>
+				</Accordion>
+			</Stack>
 		</Box>
 	);
 };
