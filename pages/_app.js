@@ -9,6 +9,7 @@ import { CacheProvider } from "@emotion/react";
 import { AppContextProvider } from "app/AppContext";
 import { Stack } from "@mui/material";
 import ResponsiveAppBar from "./secure/ui/ResponsiveAppBar";
+import { SessionProvider } from "next-auth/react";
 
 const clientSideEmotionCache = createEmotionCache();
 
@@ -22,12 +23,14 @@ function MyApp({
 			<ThemeProvider theme={theme}>
 				{/* <Provider store={store}> */}
 				{/* <AppWrapper> */}
-				<AppContextProvider>
-					<Stack>
-						<ResponsiveAppBar />
-						<Component {...pageProps} />
-					</Stack>
-				</AppContextProvider>
+				<SessionProvider>
+					<AppContextProvider>
+						<Stack>
+							<ResponsiveAppBar />
+							<Component {...pageProps} />
+						</Stack>
+					</AppContextProvider>
+				</SessionProvider>
 				{/* </AppWrapper> */}
 				{/* </Provider> */}
 			</ThemeProvider>

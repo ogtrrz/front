@@ -1,6 +1,6 @@
 El requerimiento de cursos anteriores se debe resolver en requerimientos no como se modelo en jhipster
 Fallo en seleccion de <Select > los enumeration
-Subir busquedas
+Subir busquedas // no le hace flata
 Seguridad
-Redis 2 level cache
+Redis 2 level cache // no le hace flata
 funcionalidades workflow email y calendar

@@ -1,0 +1,101 @@
+// // export {default} from 'next-auth/middleware' 
+
+// // // export const config = {matcher: ['/secure']}
+
+// // export const config = {matcher: ['/secure/:path*']}
+
+// // import { getToken } from 'next-auth/jwt';
+// // import { NextRequest, NextResponse } from 'next/server';
+
+// // export default async function middleware(req) {
+// //   // Get the pathname of the request (e.g. /, /protected)
+// //   const path = req.nextUrl.pathname;
+
+// //   // If it's the root path, just render it
+// //   if (path === '/') {
+// //     return NextResponse.next();
+// //   }
+
+// //   const session = await getToken({
+// //     req,
+// //     secret: process.env.NEXTAUTH_SECRET,
+// //   });
+
+// //   const isProtected = path.includes('/secure');
+
+// //   if (!session && isProtected) {
+// //     return NextResponse.redirect(new URL('/restore', req.url));
+// //   } else if (session && (path === '/restore' || path === '/register')) {
+// //     return NextResponse.redirect(new URL('/secure', req.url));
+// //   }
+// //   return NextResponse.next();
+// // }
+
+
+
+
+
+
+
+
+// import { getToken } from 'next-auth/jwt';
+// import { NextResponse } from 'next/server';
+
+// export default async function middleware(req) {
+//   // Get the pathname of the request (e.g. /, /protected)
+
+
+
+//   const path = req.nextUrl.pathname;
+//   console.log("path middleware", path);
+
+//   // If it's the root path, just render it
+//   if (path === '/') {
+//     console.log("regreso del /");
+//     return NextResponse.next();
+//   }
+
+//   const session = await getToken({
+//     req,
+//     secret: process.env.NEXTAUTH_SECRET,
+//   });
+
+//   console.log('middleware session', session );
+
+//   const isProtected = path.includes('/secure');
+
+//   console.log('middleware isProtected', isProtected );
+
+// //   if (!session && isProtected) {
+// //     return NextResponse.redirect(new URL('/restore', req.url));
+// //   } else if (session && (path === '/restore' || path === '/register')) {
+// //     return NextResponse.redirect(new URL('/secure', req.url));
+// //   }
+//   return NextResponse.next();
+// }
+
+
+import { withAuth } from "next-auth/middleware";
+import { NextResponse } from "next/server";
+
+export default withAuth(
+  // `withAuth` augments your `Request` with the user's token.
+  function middleware(req) {
+    console.log(req.nextauth);
+    if (
+      req.nextUrl.pathname === "/secure" 
+    ) {
+      return new NextResponse("You are not authorized!");
+    }
+  },
+  {
+    callbacks: {
+      authorized: (params) => {
+        let { token } = params;
+        return token;
+      },
+    },
+  }
+);
+
+export const config = {matcher: ['/secure/:path*']};
