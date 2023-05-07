@@ -5,7 +5,7 @@ const nextConfig = {
   poweredByHeader: false,
   compress: false,
   images: {
-      domains: ['localhost']
+      domains: ['localhost', '34.122.102.32']
   },
 
   async rewrites() {
@@ -13,11 +13,11 @@ const nextConfig = {
           
           {
               source: "/appi/:path*",
-              destination: `http://localhost:8080/api/:path*`
+              destination: `http://34.122.102.32:8080/api/:path*`
           },
           {
             source: "/files/:path*",
-            destination: `http://localhost:1337/:path*`
+            destination: `http://34.122.102.32:1337/:path*`
         }
       ];
   },

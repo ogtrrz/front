@@ -40,7 +40,6 @@ const Home = () => {
 	
 	const router = useRouter();
     
-
 	// const [courses, setCourses] = useState();
 
 	// const [totalCount, setTotalCount] = useState();

@@ -148,7 +148,7 @@ const ResponsiveAppBar = (props) => {
             router.push(`/secure/view/Courses`);
         }
         else {
-            router.push("/secure/view/Employees");
+            router.push("/secure/view/Employee");
         }
         // target.innerText
     };

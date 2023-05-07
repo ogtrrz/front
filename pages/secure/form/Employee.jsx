@@ -1,7 +1,8 @@
 import React, { useState } from "react";
+import { useSession } from "next-auth/react";
 import useLocalStorageState from "use-local-storage-state";
 import { useRouter } from "next/router";
-import { patch, URL_EMPLOYEES } from "data/ApiData";
+import { patchSecure, URL_EMPLOYEES_SECURE } from "data/ApiData";
 import _ from "lodash";
 import * as yup from "yup";
 import { Formik, Form, Field } from "formik";
@@ -38,6 +39,8 @@ import {
 } from "@mui/material";
 
 const Employee = () => {
+	const { data: session, status } = useSession();
+
 	const router = useRouter();
 
 	const [employeeIo, setEmployeeIo] = useLocalStorageState("employee", {
@@ -57,9 +60,9 @@ const Employee = () => {
 		newEmployee.blodeType = values.blode_type;
 		newEmployee.allergies = values.alergies;
 		newEmployee.note = values.notes;
-		const res = await patch(URL_EMPLOYEES, newEmployee);
+		const res = await patchSecure(URL_EMPLOYEES_SECURE, newEmployee, session?.id_token);
 		setEmployeeIo(res);
-		router.push(`/secure/view/employee/${employeeIo.id}`);
+		router.push(`/secure/view/Employee`);
 	};
 
 	const onCancel = () => {

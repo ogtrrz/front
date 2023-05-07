@@ -9,6 +9,8 @@ export const URL_EVIDENCES = `${process.env.NEXT_PUBLIC_API_REST}evidences/`;
 export const URL_EMPLOYEES = `${process.env.NEXT_PUBLIC_API_REST}employees/`;
 export const URL_COURSES = `${process.env.NEXT_PUBLIC_API_REST}courses/`;
 
+export const URL_EMPLOYEES_SECURE = `${process.env.NEXT_PUBLIC_API_REST}employees/secure/`;
+
 //TODO queries http://localhost:8080/api/evidences?page=1&size=50&state.equals=NEW
 // http://localhost:8080/api/evidences?page=1&size=50&sort=state
 //https://www.jhipster.tech/entities-filtering/
@@ -35,13 +37,21 @@ export const gets = async (url, page = 0, size = 10, sort = "id") => {
 	return res;
 };
 
-export const get = async (url, entityId) => {
+export const get = async (url, entityId, authorization = "") => {
 	// console.log("entro al llamado");
+
+	let headers = { "Content-Type": "application/json" };
+	if (authorization != "") {
+		headers.Authorization = "Bearer " + authorization;
+	}
+
+	console.log("headers", headers);
+
 	let res = {};
 	const config = {
 		method: "get",
 		url: `${url}${entityId}`,
-		headers: { "Content-Type": "application/json" },
+		headers,
 	};
 
 	await axios(config)
@@ -126,6 +136,60 @@ export const del = async (url, entityId) => {
 		headers: { "Content-Type": "application/json" },
 	};
 
+	await axios(config)
+		.then(function (response) {
+			// console.log(response.data);
+			res = response.data;
+		})
+		.catch(function (error) {
+			// console.log(error);
+			res = error;
+		});
+	return res;
+};
+
+export const getSecure = async (url, authorization = "") => {
+	// console.log("entro al llamado");
+
+	let headers = { "Content-Type": "application/json" };
+	if (authorization != "") {
+		headers.Authorization = "Bearer " + authorization;
+	}
+
+	console.log("headers", headers);
+
+	let res = {};
+	const config = {
+		method: "get",
+		url: `${url}`,
+		headers,
+	};
+
+	await axios(config)
+		.then(function (response) {
+			// console.log(response.data);
+			res = response.data;
+		})
+		.catch(function (error) {
+			// console.log(error);
+			res = error;
+		});
+	return res;
+};
+
+export const patchSecure = async (url, entity, authorization = "") => {
+	let headers = { "Content-Type": "application/json" };
+	if (authorization != "") {
+		headers.Authorization = "Bearer " + authorization;
+	}
+
+	let res = {};
+	const config = {
+		method: "patch",
+		url: `${url}${entity.id}`,
+		headers,
+		data: entity,
+	};
 	await axios(config)
 		.then(function (response) {
 			// console.log(response.data);
