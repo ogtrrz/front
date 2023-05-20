@@ -13,11 +13,11 @@ const nextConfig = {
           
           {
               source: "/appi/:path*",
-              destination: `http://34.122.102.32:8080/api/:path*`
+              destination: `http://localhost:8080/api/:path*`
           },
           {
             source: "/files/:path*",
-            destination: `http://34.122.102.32:1337/:path*`
+            destination: `http://localhost:1337/:path*`
         }
       ];
   },

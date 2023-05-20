@@ -2,7 +2,7 @@ import React from 'react';
 import { styled, alpha } from '@mui/material/styles';
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
 import { Typography } from '@mui/material';
-import theme from '../../lib/theme';
+import theme from 'styles/theme';
 
 const FooterStyl = styled('footer')(({ theme }) => ({
     color: theme.palette.secondary.light,

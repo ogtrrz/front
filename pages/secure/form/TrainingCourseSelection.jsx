@@ -45,7 +45,7 @@ import CoursesSelection from "models/CoursesSelection";
 
 const TrainingCourseSelection = () => {
 	const [course, setCourse] = useState();
-	const [date, setDate] = useState('');
+	const [date, setDate] = useState("");
 	const [expiration, setExpiration] = useState("");
 
 	const router = useRouter();
@@ -55,7 +55,9 @@ const TrainingCourseSelection = () => {
 		console.log("Course", course);
 		if (date) {
 			setExpiration(
-				moment(date.$d).add(course?.expirationInMonth, "months").format("MM/YYYY")
+				moment(date.$d)
+					.add(course?.expirationInMonth, "months")
+					.format("MM/YYYY")
 			);
 		}
 	}, [date, course]);
@@ -214,15 +216,15 @@ const TrainingCourseSelection = () => {
 				<Stack direction='row' spacing={4}>
 					<Button
 						variant='contained'
-						endIcon={<CancelIcon />}
-						onClick={onCancel}>
-						Cancelar
-					</Button>
-					<Button
-						variant='contained'
 						endIcon={<SaveIcon />}
 						onClick={postEvidences}>
 						Guardar
+					</Button>
+					<Button
+						variant='outlined'
+						endIcon={<CancelIcon />}
+						onClick={onCancel}>
+						Cancelar
 					</Button>
 				</Stack>
 			</Stack>

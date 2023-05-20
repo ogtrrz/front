@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 // import axios from "axios";
 import useLocalStorageState from "use-local-storage-state";
 import { useRouter } from "next/router";
-import { gets, URL_COURSES } from "data/ApiData";
+
 import FlagCircleIcon from "@mui/icons-material/FlagCircle";
 import {
 	Button,
@@ -19,6 +19,7 @@ import {
 	InputLabel,
 	Select,
 } from "@mui/material";
+import Grid from "@mui/material/Grid";
 
 // import Table from "@mui/material/Table";
 // import TableBody from "@mui/material/TableBody";
@@ -30,179 +31,155 @@ import { DataGrid, esES } from "@mui/x-data-grid";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
+
 // import { useDemoData } from '@mui/x-data-grid-generator';
 
 import { useSession } from "next-auth/react";
+import Reporte from "pages/api/Reporte";
+import { graphql } from "@apollo/client/react/hoc";
+import gql from "graphql-tag";
+import { useLazyQuery, useQuery } from "@apollo/react-hooks";
+import Backdrop from "@mui/material/Backdrop";
+import CircularProgress from "@mui/material/CircularProgress";
+import Tarjeta from "components/Tarjeta";
+
+const Busqueda = gql`
+	query ($searchInput: String!) {
+		show(search: $searchInput)
+			@rest(
+				type: "Reporte"
+				path: "_search/reportes?query=:search&page=0&size=20"
+			) {
+			id @export(as: "showId")
+			titulo
+			caso
+			img
+			fechaix
+			ciudad
+			estado
+			pais
+		}
+	}
+`;
+
+const Pagina = gql`
+	query ($paginaInput: String!) {
+		show(pagina: $paginaInput)
+			@rest(
+				type: "Reporte"
+				path: "reportes?page=:pagina&size=32&sort=fechaix,desc"
+			) {
+			id @export(as: "showId")
+			titulo
+			caso
+			img
+			fechaix
+			ciudad
+			estado
+			pais
+			informacion {
+				id
+				comentarios
+				vistas
+				rating
+			}	
+		}
+	}
+`;
 
 const Home = () => {
+	// const [searchInput, setSearchInput] = useState("hola");
 
-	const { data: session, status } = useSession();
-	
-	const router = useRouter();
-    
-	// const [courses, setCourses] = useState();
+	//TODO prefetch 5 paginas de manera silenciosa en cache
+	//TODO Skeleton
+	//reactivo
+	const [paginaTotal, setPaginaTotal] = useState(0);
+	const [page, setPage] = useState(0);
 
-	// const [totalCount, setTotalCount] = useState();
-
-	const [coursesIo, setCoursesIo, { isPersistent }] = useLocalStorageState(
-		"courses",
-		{
-			defaultValue: [],
-		}
-	);
-
-	const [coursesIoTime, setCoursesIoTime] = useLocalStorageState(
-		"coursesTime",
-		{
-			defaultValue: [],
-		}
-	);
-
-	const [courseIo, setCourseIo] = useLocalStorageState("course", {
-		defaultValue: [],
+	// const { loading, error, data, fetchMore } = useQuery(Pagina, {
+	const { loading, error, data } = useQuery(Pagina, {
+		variables: { paginaInput: page - 1 },
+		// fetchPolicy: "cache-and-network",
+		// nextFetchPolicy: "cache-first",
 	});
 
+	const handleChangePagination = (event, value) => {
+		setPage(value);
+	};
+
+	//TODO se me hace que no jala
+	// https://github.com/apollographql/apollo-client/issues/7131
+	// useEffect(() => {
+	// 	console.log(`fetch More Pagina ===================== ${page+1}`);
+	// 	fetchMore({
+	// 		variables: { paginaInput: page+1 },
+	// 	});
+	// }, [!loading]);
+
 	useEffect(() => {
-		if (Date.now() - coursesIoTime > 1000 * 60 * 60 * 24 * 7) {
-			getCourses();
-			setCoursesIoTime(Date.now());
+		if (paginaTotal === 0) {
+			var requestOptions = {
+				method: "GET",
+			};
+
+			fetch(
+				"http://localhost:8080/api/reportes/count?distinct=true",
+				requestOptions
+			)
+				.then((response) => response.text())
+				.then((result) => setPaginaTotal(result))
+				.catch((error) => console.log("error", error));
 		}
 	}, []);
 
-    useEffect(() => {
-		if (status) {
-			console.log('nextauth', status);
-            console.log('next data', session);
-		}
-	}, [status]);
+	// const getAfter = (data) =>
+	// 	data.edges && data.edges.length > 0
+	// 		? data.edges[data.edges.length - 1].cursor
+	// 		: null;
 
-	//-----------------------------
-	const getCourses = async () => {
-		const coursesData = await gets(URL_COURSES, 0, 10, "id,asc");
-		// console.log("response", coursesData.data);
-		// console.log("===========================================");
-		//setTotalCount(coursesData.headers["x-total-count"]);
-		// setCourses(coursesData.data);
-		setCoursesIo(coursesData.data);
-	};
+	if (error) {
+		return <p>Error</p>;
+	}
 
-	const columns = [
-		{ field: "code", headerName: "Código", width: 150 },
-		{
-			field: "autorizationBy",
-			headerName: "Vo.Bo.",
-			width: 40,
-			sortable: false,
+	if (loading) {
+		return (
+			<Backdrop
+				sx={{ color: "#000", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+				open={loading}>
+				<CircularProgress color='inherit' />
+			</Backdrop>
+		);
+	}
 
-			description: "Notifica si es necesaria la Autorización.",
-			renderCell: (params) => {
-				return params.value ? <FlagCircleIcon color='secondary' /> : "";
-			},
-		},
-		{
-			field: "typeCourse",
-			headerName: "Tipo",
-			width: 60,
-			renderCell: (params) => {
-				return params.value === "PRESENT"
-					? "Presente"
-					: params.value === "REMOTE"
-					? "Remoto"
-					: params.value === "ONLINE"
-					? "Online"
-					: params.value;
-			},
-		},
-		{
-			field: "expirationInMonth",
-			headerName: "Expira",
-			type: "number",
-			width: 80,
-
-			description:
-				"Es el número de meses de duración antes de que se requiera retomar un refresh del curso.",
-		},
-		{ field: "name", headerName: "Nombre", width: 150 },
-		{ field: "description", headerName: "Descripcion", minWidth: 150, flex: 1 },
-	];
-
-	const handleRowClick = (params) => {
-		console.log("row", params.row);
-		setCourseIo(params.row);
-		router.push(`course/${params.row.id}`);
-	};
-
-	const handleRefresh = () => {
-		// console.log("refresh");
-		getCourses();
-		setCoursesIoTime(Date.now());
-	};
-
-	const handleNew = () => {
-		router.push(`/secure/form/Course`);
-	};
+	console.log("data", data.show);
 
 	return (
 		<Box sx={{ p: 3, border: "1px dashed grey" }}>
 			<Stack direction='column' spacing={2}>
-				<Breadcrumbs
-					separator={<NavigateNextIcon fontSize='small' color='primary' />}
-					aria-label='Link al Inicio'>
-					<Link underline='hover' color='primary.main' href='/'>
-						Inicio
-					</Link>
-					<Typography color='text.primary'>Lista de Cursos</Typography>
-
+				<Breadcrumbs aria-label='breadcrumb'>
+					<Typography color='text'>Inicio</Typography>
 				</Breadcrumbs>
-				<Stack direction='row' spacing={2}>
-					<Typography variant='h6' color='primary'>
-						Cursos
-					</Typography>
-					<Button
-						variant='outlined'
-						color='primary'
-						//disabled={isSubmitting}
-						endIcon={<RefreshIcon />}
-						onClick={handleRefresh}>
-						Actualizar
-					</Button>
-					<Button
-						variant='contained'
-						color='primary'
-						//disabled={isSubmitting}
-						endIcon={<AddCircleIcon />}
-						onClick={handleNew}>
-						Nuevo
-					</Button>
-				</Stack>
-			</Stack>
-			<br />
-			<div style={{ height: 550, width: "100%" }}>
-				{coursesIo ? (
-					<DataGrid
-						rows={coursesIo}
-						columns={columns}
-						onRowClick={handleRowClick}
-						localeText={esES.components.MuiDataGrid.defaultProps.localeText}
-						sx={{
-							"& .MuiDataGrid-columnHeaders": {
-								// backgroundColor: "white",
-								color: "primary.main",
-								// fontSize: 14,
-							},
+				<Grid
+					container
+					spacing={{ xs: 2, sm: 3, md: 5 }}
+					columns={{ xs: 3, sm: 6, md: 9, lg: 12 }}>
+					{data.show.map((item) => {
+						return (
+							<Grid xs={3} key={item.id}>
+								<Tarjeta item={item} />
+							</Grid>
+						);
+					})}
+				</Grid>
 
-							".MuiDataGrid-cell:focus": {
-								outline: "none",
-							},
-							"& .MuiDataGrid-row:hover": {
-								cursor: "pointer",
-							},
-						}}
-					/>
-				) : (
-					""
-				)}
-			</div>
+				<Pagination
+					count={Math.ceil(paginaTotal / 32)}
+					page={page}
+					onChange={handleChangePagination}
+					variant='outlined'
+					color='primary'
+				/>
+			</Stack>
 		</Box>
 	);
 };
@@ -211,7 +188,7 @@ export default Home;
 
 // export async function getServerSideProps() {
 //     // console.log('context', context.query.page);
-//     const res = await fetch(`${process.env.NEXT_PUBLIC_API_REST}/all/branches`);
+//     const res = await fetch(`${process.env.NEXT_PUBLIC_API_REST}/api/reportes`);
 //     const data = await res.json();
 //     if (!data) {
 //         return {

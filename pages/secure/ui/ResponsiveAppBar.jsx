@@ -41,7 +41,6 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import LoginIcon from '@mui/icons-material/Login';
 import MopedIcon from '@mui/icons-material/Moped';
 
-import { useDispatch, useSelector } from 'react-redux';
 // import { wishlist2 } from '../../store/ecommerce/action';
 
 // import { useCart } from 'react-use-cart';

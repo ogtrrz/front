@@ -21,7 +21,7 @@ export const theme = createTheme({
 		text: {
 			main: blueGrey,
 		},
-		error: { main: "#6E353A" },
+		error: { main: "#FF0000" },
 		warning: { main: "#F5EE9E" },
 		info: { main: "#568BFF" },
 		success: { main: "#00B389" },

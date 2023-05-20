@@ -1,9 +1,10 @@
 transota.org
 https://www.pond5.com/es/stock-footage/item/120685640-judge-hits-hammer-courtroom
 
-El requerimiento de cursos anteriores se debe resolver en requerimientos no como se modelo en jhipster
-Fallo en seleccion de <Select > los enumeration
-Subir busquedas // no le hace flata
-Seguridad
-Redis 2 level cache // no le hace flata
-funcionalidades workflow email y calendar
+
+Sitios de cocina
+
+
+Que poner para llamar a la interaccion
+-Entre todos los obligaremos a dejar de ser Transotas
+
