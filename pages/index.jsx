@@ -38,7 +38,7 @@ import { useSession } from "next-auth/react";
 import Reporte from "pages/api/Reporte";
 import { graphql } from "@apollo/client/react/hoc";
 import gql from "graphql-tag";
-import { useLazyQuery, useQuery } from "@apollo/react-hooks";
+import { useLazyQuery, useQuery, useMutation } from "@apollo/react-hooks";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import Tarjeta from "components/Tarjeta";
@@ -63,7 +63,7 @@ const Busqueda = gql`
 `;
 
 const Pagina = gql`
-	query ($paginaInput: String!) {
+	query REPORTES_QUERY($paginaInput: String!) {
 		show(pagina: $paginaInput)
 			@rest(
 				type: "Reporte"
@@ -82,10 +82,12 @@ const Pagina = gql`
 				comentarios
 				vistas
 				rating
-			}	
+			}
 		}
 	}
 `;
+
+
 
 const Home = () => {
 	// const [searchInput, setSearchInput] = useState("hola");
@@ -106,6 +108,8 @@ const Home = () => {
 	const handleChangePagination = (event, value) => {
 		setPage(value);
 	};
+
+
 
 	//TODO se me hace que no jala
 	// https://github.com/apollographql/apollo-client/issues/7131
@@ -165,9 +169,11 @@ const Home = () => {
 					columns={{ xs: 3, sm: 6, md: 9, lg: 12 }}>
 					{data.show.map((item) => {
 						return (
-							<Grid xs={3} key={item.id}>
-								<Tarjeta item={item} />
-							</Grid>
+							<React.Fragment key={item.id}>
+								<Grid xs={3}>
+									<Tarjeta item={item} />
+								</Grid>
+							</React.Fragment>
 						);
 					})}
 				</Grid>

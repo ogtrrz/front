@@ -43,6 +43,7 @@ export const theme = createTheme({
 		body1: { fontSize: 16 },
 		body2: { fontSize: 12 },
 	},
+	spacing: 1,
 	// overrides: {
 	// 	datagrid: {
 	// 		header: {

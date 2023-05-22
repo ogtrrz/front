@@ -8,7 +8,7 @@ import { CacheProvider } from "@emotion/react";
 // import { AppWrapper } from "app/state";
 // import { AppContextProvider } from "app/AppContext";
 import { Stack } from "@mui/material";
-import ResponsiveAppBar from "./secure/ui/ResponsiveAppBar";
+import ResponsiveAppBar from "pages/ui/ResponsiveAppBar";
 import { SessionProvider } from "next-auth/react";
 import {
 	ApolloClient,
@@ -42,6 +42,12 @@ const clientSideEmotionCache = createEmotionCache();
 
 const restLink = new RestLink({
 	uri: `${process.env.NEXT_PUBLIC_API_REST}`,
+	headers: {
+		"Content-Type": "application/json",
+		mode: "cors",
+		credentials: "include",
+	},
+	// responseTransformer: async response => response.json().then(({data}) => data),
 });
 
 const client = new ApolloClient({

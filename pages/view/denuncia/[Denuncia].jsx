@@ -8,9 +8,18 @@ import { useRouter } from "next/router";
 import { graphql } from "@apollo/client/react/hoc";
 import gql from "graphql-tag";
 import { useLazyQuery, useQuery } from "@apollo/react-hooks";
-import { Paper, Box, Typography, Chip, Stack, Divider } from "@mui/material";
+import {
+	Paper,
+	Box,
+	Typography,
+	Chip,
+	Stack,
+	Divider,
+	Breadcrumbs,
+} from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import Badge from "@mui/material/Badge";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import TwitterIcon from "@mui/icons-material/Twitter";
@@ -25,8 +34,9 @@ import AdsClickIcon from "@mui/icons-material/AdsClick";
 // import Image from "../img/main.jpg"; // Import using relative path
 // <Paper sx={{ backgroundImage: `url(${Image})` }}></Paper>;
 
+//TODO read from cache if exist o el manejo es automatico???
 const ReporteQuery = gql`
-	query ($idReporte: String!) {
+	query REPORTE_QUERY($idReporte: String!) {
 		show(id: $idReporte) @rest(type: "Reporte", path: "reportes/:id") {
 			id @export(as: "showId")
 			titulo
@@ -59,7 +69,7 @@ const ReporteQuery = gql`
 `;
 
 const CasoQuery = gql`
-	query ($idCaso: String!) {
+	query CASO_QUERY($idCaso: String!) {
 		show(id: $idCaso) @rest(type: "Caso", path: "caso-texts/:id") {
 			id @export(as: "showId")
 			descripcion
@@ -107,8 +117,8 @@ const Denuncia = () => {
 	}, [loadingReporte]);
 
 	// console.log("caso", dataCaso?.show?.descripcion);
-
-	if (!loadingReporte && !loadingCaso) {
+	//TODO el Breadcrumbs debe traer la pagina de la que llega y el page debe estar en url por si gurdan en favoritos
+	if (!loadingReporte && !loadingCaso && dataCaso && dataReporte) {
 		return (
 			<Box sx={{ p: 3, border: "1px dashed grey" }}>
 				<Paper
@@ -116,6 +126,24 @@ const Denuncia = () => {
 					style={{
 						padding: 24,
 					}}>
+					<Breadcrumbs
+						separator={<NavigateNextIcon fontSize='small' color='primary' />}
+						aria-label='Link al Inicio'>
+						<NextLink href={`/`} passHref>
+							<Typography
+								sx={{
+									"&:hover": {
+										textDecoration: "underline",
+									},
+								}}
+								color='primary.main'>
+								Inicio
+							</Typography>
+						</NextLink>
+
+						<Typography color='text.primary'>{`Transota:  ${dataReporte?.show?.titulo}`}</Typography>
+					</Breadcrumbs>
+					<br />
 					<Box
 						sx={{ position: "relative" }}
 						display='flex'
@@ -147,35 +175,33 @@ const Denuncia = () => {
 								padding: "10px",
 							}}>
 							<Typography variant='h6' color='white'>
-								{`Transota de ${dataReporte?.show?.titulo}`}
+								{`Transota; ${dataReporte?.show?.titulo}`}
 							</Typography>
 						</Box>
 					</Box>
+					<Divider light />
+					<Typography variant='body1' color='secondary'>
+						{`Denunciado el, ${moment(dataReporte?.show?.fechaix).format(
+							"DD/MM/YY"
+						)} en 
+							${dataReporte?.show?.estado}, ${dataReporte?.show?.ciudad}, 
+							${dataReporte?.show?.pais}
+						`}
+						<p />
+					</Typography>
+					<p />
+					<Typography
+						variant='body1'
+						color='text'
+						style={{ whiteSpace: "pre-line" }}>
+						{dataCaso?.show?.descripcion.replaceAll("\n", "\n\n")}
+					</Typography>
 
 					{/* <Typography variant='h6' color='text'>
 						{`Transota de ${dataReporte?.show?.titulo}`}
 					</Typography> */}
-					<Typography variant='body1' color='secondary'>
-						{`Denunciado el, ${moment(dataReporte?.show?.fechaix).format(
-							"D [del] M [del] YY"
-						)} en 
-						${dataReporte?.show?.estado}, ${dataReporte?.show?.ciudad}, ${
-							dataReporte?.show?.pais
-						}`}
-					</Typography>
-					<p />
-					<Stack direction='row' spacing={2}>
-						{dataReporte?.show?.categorys?.map((item) => {
-							return (
-								<Chip
-									key={item.id}
-									label={`${item.categoria}`}
-									variant='outlined'
-								/>
-							);
-						})}
-					</Stack>
-					<p />
+					<p>.</p>
+
 					<Stack direction='row' spacing={2}>
 						<Tooltip title='Facebookea al Transota' arrow>
 							<IconButton aria-label='denunciar por Facebook'>
@@ -203,10 +229,10 @@ const Denuncia = () => {
 								</Badge>
 							</IconButton>
 						</Tooltip>
-						<Tooltip title='Comentar la denuncia.' arrow>
+						<Tooltip title='Comentar la Transota.' arrow>
 							<IconButton aria-label='Comentar la denuncia'>
 								<Badge
-									badgeContent={dataReporte?.show?.informacion.comentarios}
+									badgeContent={dataReporte?.show?.comentarios?.length}
 									color='primary'
 									anchorOrigin={{
 										vertical: "bottom",
@@ -246,14 +272,17 @@ const Denuncia = () => {
 						</Tooltip>
 					</Stack>
 					<p />
-					<Divider light />
-					<p />
-					<Typography
-						variant='body1'
-						color='text'
-						style={{ whiteSpace: "pre-line" }}>
-						{dataCaso?.show?.descripcion}
-					</Typography>
+					<Stack direction='row' spacing={2}>
+						{dataReporte?.show?.categorys?.map((item) => {
+							return (
+								<Chip
+									key={item.id}
+									label={`${item.categoria}`}
+									variant='outlined'
+								/>
+							);
+						})}
+					</Stack>
 					<p />
 					<Divider light />
 					<p />
@@ -261,14 +290,19 @@ const Denuncia = () => {
 						variant='subtitle2'
 						color='text'
 						style={{ whiteSpace: "pre-line" }}>
-						Comentarios
+						{dataReporte?.show?.comentarios?.length === 0
+							? `Sea el primero en Comentar`
+							: `Comentarios`}
 					</Typography>
 					<br />
 					{dataReporte?.show?.comentarios.map((item) => {
 						return (
 							<React.Fragment key={item.id}>
-								<Typography variant='body1' color='text'>
-									{item.comentario}
+								<Typography
+									variant='body1'
+									color='text'
+									style={{ whiteSpace: "pre-line" }}>
+									{item.comentario.replaceAll("<br/>", "\n")}
 								</Typography>
 								<Typography variant='body1' color='secondary'>
 									{item.autor}
