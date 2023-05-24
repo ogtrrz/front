@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 // import axios from "axios";
-import useLocalStorageState from "use-local-storage-state";
 import { useRouter } from "next/router";
 
 import FlagCircleIcon from "@mui/icons-material/FlagCircle";
@@ -23,6 +22,9 @@ import Grid from "@mui/material/Grid";
 
 // import Table from "@mui/material/Table";
 // import TableBody from "@mui/material/TableBody";
+
+
+
 // import TableCell from "@mui/material/TableCell";
 // import TableContainer from "@mui/material/TableContainer";
 // import TableHead from "@mui/material/TableHead";
@@ -62,12 +64,14 @@ const Busqueda = gql`
 	}
 `;
 
+
+//TODO order by id o por fechaix el id si jala fechaix no jala tan bien
 const Pagina = gql`
 	query REPORTES_QUERY($paginaInput: String!) {
 		show(pagina: $paginaInput)
 			@rest(
 				type: "Reporte"
-				path: "reportes?page=:pagina&size=32&sort=fechaix,desc"
+				path: "reportes?page=:pagina&size=32&sort=id,desc"
 			) {
 			id @export(as: "showId")
 			titulo

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import useLocalStorageState from "use-local-storage-state";
+import axios from "axios";
 import { useRouter } from "next/router";
+import moment from "moment";
 import _ from "lodash";
 import * as yup from "yup";
-import { Formik, Form, Field } from "formik";
+import { Formik, Form, Field, FormikProvider } from "formik";
 import CircularProgress from "@mui/material/CircularProgress";
 import dayjs from "dayjs";
 import "dayjs/locale/es-mx";
@@ -36,21 +37,19 @@ import {
 	Label,
 	HelperText,
 } from "@mui/material";
-import TextareaAutosize from "@mui/base/TextareaAutosize";
-import { styled } from "@mui/system";
-import { graphql } from "@apollo/client/react/hoc";
 import gql from "graphql-tag";
 import { useLazyQuery, useQuery, useMutation } from "@apollo/react-hooks";
 
 export const POST_INFORMACION = gql`
 	mutation PostInformacion($input: InformacionRequest!) {
-		patchInformacion(input: $input)
+		postInformacion(input: $input)
 			@rest(
 				type: "Informacion"
 				path: "/informacions/"
 				method: "POST"
 				bodyKey: "input"
 			) {
+			id
 			comentarios
 			vistas
 			rating
@@ -60,13 +59,14 @@ export const POST_INFORMACION = gql`
 
 export const POST_CASO = gql`
 	mutation PostCaso($input: CasoRequest!) {
-		patchInformacion(input: $input)
+		postCaso(input: $input)
 			@rest(
-				type: "Informacion"
+				type: "Caso"
 				path: "/caso-texts/"
 				method: "POST"
 				bodyKey: "input"
 			) {
+			id
 			descripcion
 		}
 	}
@@ -81,6 +81,7 @@ export const POST_REPORTE = gql`
 				method: "POST"
 				bodyKey: "input"
 			) {
+			id
 			titulo
 			caso
 			img
@@ -92,127 +93,154 @@ export const POST_REPORTE = gql`
 			ciudad
 			estado
 			pais
+			informacion {
+				id
+				comentarios
+				vistas
+				rating
+			}
+			casoText {
+				id
+			}
 		}
 	}
 `;
 
 const Denuncia = () => {
-	const blue = {
-		100: "#DAECFF",
-		200: "#b6daff",
-		400: "#3399FF",
-		500: "#007FFF",
-		600: "#0072E5",
-		900: "#003A75",
-	};
+	const router = useRouter();
 
-	const grey = {
-		50: "#f6f8fa",
-		100: "#eaeef2",
-		200: "#d0d7de",
-		300: "#afb8c1",
-		400: "#8c959f",
-		500: "#6e7781",
-		600: "#57606a",
-		700: "#424a53",
-		800: "#32383f",
-		900: "#24292f",
-	};
+	const [selectedFile, setSelectedFile] = useState(null);
 
-	const StyledTextarea = styled(TextareaAutosize)(
-		({ theme }) => `
-        width: 320px;
-        font-family: IBM Plex Sans, sans-serif;
-        font-size: 0.875rem;
-        font-weight: 400;
-        line-height: 1.5;
-        padding: 12px;
-        border-radius: 12px 12px 0 12px;
-        color: ${theme.palette.mode === "dark" ? grey[300] : grey[900]};
-        background: ${theme.palette.mode === "dark" ? grey[900] : "#fff"};
-        border: 1px solid ${
-					theme.palette.mode === "dark" ? grey[700] : grey[200]
-				};
-        box-shadow: 0px 2px 2px ${
-					theme.palette.mode === "dark" ? grey[900] : grey[50]
-				};
-      
-        &:hover {
-          border-color: ${blue[400]};
-        }
-      
-        &:focus {
-          border-color: ${blue[400]};
-          box-shadow: 0 0 0 3px ${
-						theme.palette.mode === "dark" ? blue[500] : blue[200]
-					};
-        }
-      
-        // firefox
-        &:focus-visible {
-          outline: 0;
-        }
-      `
-	);
-
-	const [postReporte, { loading, error, data }] = useMutation(POST_REPORTE, {
+	const [postReporte] = useMutation(POST_REPORTE, {
 		update(cache, { data: { postReporte } }) {
 			// const cacheId = cache.identify(item);
-			console.log("postReporte", postReporte);
-			// cache.writeQuery({
-			// 	query: gql`
-			// 		query WriteTodo($id: Int!) {
-			// 			Reporte(id: $id) {
-			// 				id
-			// 				informacion {
-			// 					comentarios
-			// 					vistas
-			// 					rating
-			// 				}
-			// 			}
-			// 		}
-			// 	`,
-			// 	data: {
-			// 		Reporte: {
-			// 			__typename: "Reporte",
-			// 			id: item.id,
-			// 			informacion: {
-			// 				comentarios: patchInformacion.comentarios,
-			// 				vistas: patchInformacion.vistas,
-			// 				rating: patchInformacion.rating,
-			// 			},
-			// 		},
-			// 	},
-			// 	variables: {
-			// 		idReporte: item.id,
-			// 	},
-			// });
+
+			// console.log("postReporte", postReporte);
+			cache.writeQuery({
+				query: gql`
+					query WriteTodo($id: Int!) {
+						Reporte(id: $id) {
+							id
+							autor
+							autorix
+							titulo
+							tituloix
+							caso
+							ciudad
+							estado
+							pais
+							img
+							imgix
+							informacion {
+								id
+								comentarios
+								vistas
+								rating
+							}
+							casoText {
+								id
+							}
+						}
+					}
+				`,
+				data: {
+					Reporte: {
+						__typename: "Reporte",
+						id: postReporte.id,
+						autor: postReporte.autor,
+						autorix: postReporte.autor,
+						titulo: postReporte.titulo,
+						tituloix: postReporte.titulo,
+						caso: postReporte.caso,
+						ciudad: postReporte.ciudad,
+						estado: postReporte.estado,
+						pais: postReporte.pais,
+						img: postReporte.img,
+						imgix: postReporte.img,
+						fechaix: postReporte.fechaix,
+						informacion: {
+							id: postReporte.informacion.id,
+							comentarios: 0,
+							vistas: 0,
+							rating: 0,
+						},
+						casoText: {
+							id: postReporte.casoText.id,
+						},
+					},
+				},
+				variables: {
+					id: postReporte.id,
+				},
+			});
 		},
 	});
 
-	const postForm = (values) => {
-		console.log("values", values);
-		// const request = {
+	const [postInformacion] = useMutation(POST_INFORMACION);
 
-		//         "titulo": ,
-		//         "caso": "string",
-		//         "img": "string",
-		//         "autor": "string",
-		//         "tituloix": "string",
-		//         "autorix": "string",
-		//         "fechaix": "2023-05-22T15:49:37.423Z",
-		//         "imgix": "string",
-		//         "ciudad": "string",
-		//         "estado": "string",
-		//         "pais": "string",
-		// };
-		// // console.log("request", request);
-		// patchInformacion({
-		// 	variables: {
-		// 		id: item.informacion.id,
-		// 		input: request,
-		// 	},
-		// });
+	const [postCaso] = useMutation(POST_CASO);
+
+	const post1 = async (values) => {
+		let formData = new FormData();
+		formData.append("files", selectedFile);
+		const responseFile = await axios({
+			method: "post",
+			url: `${process.env.NEXT_PUBLIC_API_IMAGES}api/upload`,
+			data: formData,
+		});
+		// console.log("Upload Response", responseFile.data);
+
+		let reqLet = values;
+		let regresoInfoLet = {};
+		let regresoCasoLet = {};
+		// console.log("values", values);
+		// setValuesForm(values);
+		const informacion = {
+			comentarios: 0,
+			vistas: 0,
+			rating: 0,
+		};
+
+		const caso = {
+			descripcion: values.caso,
+		};
+
+		postInformacion({
+			variables: {
+				input: informacion,
+			},
+		}).then((regresoInfo) => {
+			regresoInfoLet = regresoInfo;
+			// console.log("regresoInfoLet", regresoInfoLet);
+			postCaso({
+				variables: {
+					input: caso,
+				},
+			}).then((regresoCaso) => {
+				regresoCasoLet = regresoCaso;
+				reqLet.caso = values.caso.substring(0, 250);
+				reqLet.tituloix = reqLet.titulo;
+				reqLet.fechaix = moment().format("YYYY-MM-DD[T00:00:00.000Z]");
+				reqLet.autor = "autor";
+				reqLet.autorix = "autor";
+				reqLet.img = `${process.env.NEXT_PUBLIC_API_IMAGES}${responseFile.data[0].url}?format=webp&height=250&q=80`;
+				reqLet.imgix = `${process.env.NEXT_PUBLIC_API_IMAGES}${responseFile.data[0].url}?format=webp&height=250&q=80`;
+				reqLet.informacion = {
+					id: regresoInfoLet.data.postInformacion.id,
+				};
+				reqLet.casoText = {
+					id: regresoCasoLet.data.postCaso.id,
+				};
+				// console.log("regresoCasoLet", regresoCasoLet);
+				console.log("reqLet", reqLet);
+				postReporte({
+					variables: {
+						input: reqLet,
+					},
+				});
+				router.push(`/`);
+			});
+		});
 	};
 
 	return (
@@ -221,7 +249,7 @@ const Denuncia = () => {
 				enableReinitialize
 				initialValues={{
 					titulo: "",
-					caso: "",
+
 					ciudad: "",
 					estado: "",
 					pais: "",
@@ -231,7 +259,7 @@ const Denuncia = () => {
 					titulo: yup
 						.string("Ingresar el título de su denuncia")
 						.required("Es requerido"),
-					caso: yup.string("Describa su denuncia").required("Es requerido"),
+					// caso: yup.string("Describa su denuncia").required("Es requerido"),
 					ciudad: yup
 						.string("En que ciudad se encuentra")
 						.required("Es requerido"),
@@ -242,18 +270,11 @@ const Denuncia = () => {
 				})}
 				onSubmit={(values, { setSubmitting }) => {
 					setSubmitting(false);
-					console.log("Values", values);
-					// console.log("Type", type);
-					postForm(values);
+					post1(values);
 				}}>
 				{({ submitForm, isSubmitting }) => (
 					<Form>
-						<Stack
-							spacing={{ xs: 1, sm: 2, md: 4 }}
-							alignItems='left'
-							justifyContent='left'
-							paddingX={{ xs: 1, sm: 2, md: 4 }}
-							paddingY={{ xs: 1, sm: 1, md: 2 }}>
+						<Stack spacing={4} alignItems='left' justifyContent='left'>
 							<Field
 								component={TextField}
 								type='text'
@@ -261,15 +282,17 @@ const Denuncia = () => {
 								name='titulo'
 							/>
 
-							<StyledTextarea
-								aria-label='minimum height'
-								minRows={3}
+							<Field
+								component={TextField}
+								type='text'
+								label='Denuncia'
+								name='caso'
+								multiline
+								rows={8}
+								// maxRows={50}
 								placeholder='Descripción de la Denuncia'
-								// value={formik.values.caso}
-								// onChange={formik.handleChange}
-								// error={formik.touched.caso && Boolean(formik.errors.caso)}
-								// helperText={formik.touched.caso && formik.errors.caso}
 							/>
+
 							<Field
 								component={TextField}
 								type='text'
@@ -288,7 +311,23 @@ const Denuncia = () => {
 								label='País'
 								name='pais'
 							/>
+
+							<Typography variant='body1'>
+								{selectedFile ? "Nombre del archivo: " + selectedFile.name : ""}
+							</Typography>
 							<Box>
+								<Button variant='contained' component='label'>
+									Agregar Imagen
+									<input
+										hidden
+										accept='image/*'
+										multiple
+										type='file'
+										// value={selectedFile}
+										onChange={(e) => setSelectedFile(e.target.files[0])}
+									/>
+								</Button>
+								<br />
 								<Button
 									variant='contained'
 									color='primary'
@@ -306,3 +345,12 @@ const Denuncia = () => {
 };
 
 export default Denuncia;
+
+// export const getStaticProps = async (context) => {
+//     const res = await fetch('https://openmensa.org/api/v2/canteens?near[lat]=' + lat+ '&near[lng]=' + long + '&near[dist]=50000');
+//     const data = await res.json();
+
+//     return {
+//       props: { mensen: data }
+//     }
+// }

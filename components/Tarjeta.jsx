@@ -45,7 +45,7 @@ export default function Tarjeta({ item }) {
 		PATCH_INFORMACION,
 		{
 			update(cache, { data: { patchInformacion } }) {
-				// const cacheId = cache.identify(item); 
+				// const cacheId = cache.identify(item);
 				// console.log("patchInformacion", patchInformacion);
 				cache.writeQuery({
 					query: gql`
@@ -151,7 +151,9 @@ export default function Tarjeta({ item }) {
 				<Tooltip title='Comentar la denuncia.' arrow>
 					<IconButton aria-label='Comentar la denuncia'>
 						<Badge
-							badgeContent={item.informacion.comentarios}
+							badgeContent={
+								item?.informacion?.comentarios ? item?.informacion?.comentarios : 0
+							}
 							color='primary'
 							anchorOrigin={{
 								vertical: "bottom",
