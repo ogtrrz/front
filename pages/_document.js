@@ -7,7 +7,14 @@ export default class MyDocument extends Document {
 	render() {
 		return (
 			<Html lang='es'>
-				<Head>{this.props.emotionStyleTags}</Head>
+				<Head>
+					<meta
+						httpEquiv='Content-Security-Policy'
+						content="img-src *"
+					/>
+
+					{this.props.emotionStyleTags}
+				</Head>
 				<body>
 					<Main />
 					<NextScript />

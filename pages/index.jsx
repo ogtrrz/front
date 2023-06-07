@@ -1,69 +1,14 @@
 import React, { useState, useEffect } from "react";
-// import axios from "axios";
 import { useRouter } from "next/router";
-
-import FlagCircleIcon from "@mui/icons-material/FlagCircle";
-import {
-	Button,
-	LinearProgress,
-	Stack,
-	Box,
-	Paper,
-	Typography,
-	MenuItem,
-	Link,
-	Pagination,
-	Breadcrumbs,
-	FormControl,
-	InputLabel,
-	Select,
-} from "@mui/material";
+import Head from "next/head";
+import { Stack, Box, Typography, Pagination, Breadcrumbs } from "@mui/material";
 import Grid from "@mui/material/Grid";
-
-// import Table from "@mui/material/Table";
-// import TableBody from "@mui/material/TableBody";
-
-
-
-// import TableCell from "@mui/material/TableCell";
-// import TableContainer from "@mui/material/TableContainer";
-// import TableHead from "@mui/material/TableHead";
-// import TableRow from "@mui/material/TableRow";
-import { DataGrid, esES } from "@mui/x-data-grid";
-import RefreshIcon from "@mui/icons-material/Refresh";
-import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
-
-// import { useDemoData } from '@mui/x-data-grid-generator';
-
-import { useSession } from "next-auth/react";
-import Reporte from "pages/api/Reporte";
-import { graphql } from "@apollo/client/react/hoc";
 import gql from "graphql-tag";
-import { useLazyQuery, useQuery, useMutation } from "@apollo/react-hooks";
+import { useQuery } from "@apollo/react-hooks";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import Tarjeta from "components/Tarjeta";
-
-const Busqueda = gql`
-	query ($searchInput: String!) {
-		show(search: $searchInput)
-			@rest(
-				type: "Reporte"
-				path: "_search/reportes?query=:search&page=0&size=20"
-			) {
-			id @export(as: "showId")
-			titulo
-			caso
-			img
-			fechaix
-			ciudad
-			estado
-			pais
-		}
-	}
-`;
-
+import useLocalStorageState from "use-local-storage-state";
 
 //TODO order by id o por fechaix el id si jala fechaix no jala tan bien
 const Pagina = gql`
@@ -71,7 +16,7 @@ const Pagina = gql`
 		show(pagina: $paginaInput)
 			@rest(
 				type: "Reporte"
-				path: "reportes?page=:pagina&size=32&sort=id,desc"
+				path: "reportes?page={args.pagina}&size=12&sort=id,desc"
 			) {
 			id @export(as: "showId")
 			titulo
@@ -81,6 +26,7 @@ const Pagina = gql`
 			ciudad
 			estado
 			pais
+			extra10
 			informacion {
 				id
 				comentarios
@@ -91,16 +37,31 @@ const Pagina = gql`
 	}
 `;
 
-
-
 const Home = () => {
 	// const [searchInput, setSearchInput] = useState("hola");
 
 	//TODO prefetch 5 paginas de manera silenciosa en cache
 	//TODO Skeleton
 	//reactivo
-	const [paginaTotal, setPaginaTotal] = useState(0);
+	const router = useRouter();
+
+	const { Page, Search } = router.query;
+
 	const [page, setPage] = useState(0);
+
+	const [paginaTotal, setPaginaTotal] = useState(0);
+
+	const [paginaTotalMemoria, setPaginaTotalMemoria] = useLocalStorageState(
+		"transas_total_paginas",
+		{
+			defaultValue: 0,
+		}
+	);
+
+	//TODO historia para el BreadCrumb
+	const [historia, setHistoria] = useLocalStorageState("transas_historia", {
+		defaultValue: [],
+	});
 
 	// const { loading, error, data, fetchMore } = useQuery(Pagina, {
 	const { loading, error, data } = useQuery(Pagina, {
@@ -111,9 +72,14 @@ const Home = () => {
 
 	const handleChangePagination = (event, value) => {
 		setPage(value);
+		router.push(
+			{
+				pathname: `/`,
+			},
+			`/?Pages=${value}`,
+			{ shallow: true }
+		);
 	};
-
-
 
 	//TODO se me hace que no jala
 	// https://github.com/apollographql/apollo-client/issues/7131
@@ -123,22 +89,27 @@ const Home = () => {
 	// 		variables: { paginaInput: page+1 },
 	// 	});
 	// }, [!loading]);
+	//TODO poner Page if loaded y no volver a corer el fetch
+
+	const descripcionMeta = data?.show.map((item) => `${item.titulo}`).join(", ");
+
+	// console.log("descripcionMeta", descripcionMeta);
 
 	useEffect(() => {
-		if (paginaTotal === 0) {
-			var requestOptions = {
-				method: "GET",
-			};
-
-			fetch(
-				"http://localhost:8080/api/reportes/count?distinct=true",
-				requestOptions
-			)
-				.then((response) => response.text())
-				.then((result) => setPaginaTotal(result))
-				.catch((error) => console.log("error", error));
+		if (Page) {
+			setPage(parseInt(Page));
 		}
-	}, []);
+		const pag = data?.show[0]?.extra10 ? data?.show[0]?.extra10 : 0;
+		// TODO no sirbe paginacion???
+		console.log("Pagina0", pag);
+		console.log("paginaTotalMemoria", paginaTotalMemoria);
+		if (parseInt(paginaTotalMemoria) !== parseInt(pag)) {
+			//|| parseInt(pag) === 0) {
+			setPaginaTotal(parseInt(pag));
+			setPaginaTotalMemoria(pag);
+			console.log("Pagina", pag);
+		}
+	}, [data]);
 
 	// const getAfter = (data) =>
 	// 	data.edges && data.edges.length > 0
@@ -159,38 +130,66 @@ const Home = () => {
 		);
 	}
 
-	console.log("data", data.show);
+	// console.log("data", data);
 
 	return (
-		<Box sx={{ p: 3, border: "1px dashed grey" }}>
-			<Stack direction='column' spacing={2}>
-				<Breadcrumbs aria-label='breadcrumb'>
-					<Typography color='text'>Inicio</Typography>
-				</Breadcrumbs>
-				<Grid
-					container
-					spacing={{ xs: 2, sm: 3, md: 5 }}
-					columns={{ xs: 3, sm: 6, md: 9, lg: 12 }}>
-					{data.show.map((item) => {
-						return (
-							<React.Fragment key={item.id}>
-								<Grid xs={3}>
-									<Tarjeta item={item} />
-								</Grid>
-							</React.Fragment>
-						);
-					})}
-				</Grid>
-
-				<Pagination
-					count={Math.ceil(paginaTotal / 32)}
-					page={page}
-					onChange={handleChangePagination}
-					variant='outlined'
-					color='primary'
+		<React.Fragment>
+			<Head>
+				<title>{`Transotas.org, el poder del consumidor, sitio de denuncia.`}</title>
+				<meta name='robots' content='index, follow' />
+				<link
+					rel='canonical'
+					href={`${process.env.NEXT_PUBLIC_URL}${router.asPath}`}
 				/>
-			</Stack>
-		</Box>
+				<meta name='description' content={`Transotas de ${descripcionMeta}`} />
+			</Head>
+
+			<Box
+				sx={{ border: "1px dashed grey", display: "flex" }}
+				justifyContent='center'
+				alignItems='center'>
+				<Stack direction='column' spacing={2}>
+					<Breadcrumbs aria-label='breadcrumb'>
+						<Typography color='text'>Inicio</Typography>
+					</Breadcrumbs>
+					<Grid
+						container
+						align='center'
+						spacing={{ xs: 2, sm: 3, md: 5 }}
+						columns={{ xs: 3, sm: 6, md: 9, lg: 12 }}>
+						{data.show.map((item) => {
+							return (
+								<React.Fragment key={item.id}>
+									<Grid xs={3} item={true}>
+										<Tarjeta item={item} Page={page === 0 ? 1 : page} />
+									</Grid>
+								</React.Fragment>
+							);
+						})}
+					</Grid>
+
+					{paginaTotal > 12 ? (
+						<Box
+							display='flex'
+							justifyContent='center'
+							alignItems='center'
+							minHeight='10vh'>
+							<Pagination
+								count={Math.ceil(paginaTotal / 12)}
+								page={page}
+								siblingCount={1}
+								boundaryCount={1}
+								onChange={handleChangePagination}
+								variant='outlined'
+								color='primary'
+							/>
+						</Box>
+					) : (
+						""
+					)}
+				</Stack>
+			</Box>
+		</React.Fragment>
 	);
 };
 

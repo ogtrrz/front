@@ -3,21 +3,13 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import moment from "moment";
 import _ from "lodash";
-import * as yup from "yup";
-import { Formik, Form, Field, FormikProvider } from "formik";
-import CircularProgress from "@mui/material/CircularProgress";
+import gql from "graphql-tag";
+import { useLazyQuery, useQuery, useMutation } from "@apollo/react-hooks";
 import dayjs from "dayjs";
 import "dayjs/locale/es-mx";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import {
-	Autocomplete,
-	TextField,
-	Select,
-	Switch,
-	ToggleButtonGroup,
-} from "formik-mui";
+import * as yup from "yup";
+import { Formik, Form, Field, FormikProvider } from "formik";
+import { Autocomplete, TextField, Switch, ToggleButtonGroup } from "formik-mui";
 import {
 	TimePicker,
 	DatePicker,
@@ -37,8 +29,30 @@ import {
 	Label,
 	HelperText,
 } from "@mui/material";
-import gql from "graphql-tag";
-import { useLazyQuery, useQuery, useMutation } from "@apollo/react-hooks";
+import CircularProgress from "@mui/material/CircularProgress";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+
+import OutlinedInput from "@mui/material/OutlinedInput";
+import InputLabel from "@mui/material/InputLabel";
+
+import ListItemText from "@mui/material/ListItemText";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
+import Checkbox from "@mui/material/Checkbox";
+import { Categorias } from "data/categorias";
+import { useSession } from "next-auth/react";
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+	PaperProps: {
+		style: {
+			maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+			width: 250,
+		},
+	},
+};
 
 export const POST_INFORMACION = gql`
 	mutation PostInformacion($input: InformacionRequest!) {
@@ -53,6 +67,21 @@ export const POST_INFORMACION = gql`
 			comentarios
 			vistas
 			rating
+		}
+	}
+`;
+
+export const POST_CATEGORIA = gql`
+	mutation PostCategoria($input: CategoriaRequest!) {
+		postCategoria(input: $input)
+			@rest(
+				type: "Informacion"
+				path: "/categorys/"
+				method: "POST"
+				bodyKey: "input"
+			) {
+			id
+			categoria
 		}
 	}
 `;
@@ -102,14 +131,34 @@ export const POST_REPORTE = gql`
 			casoText {
 				id
 			}
+			categorys {
+				id
+				categoria
+			}
 		}
 	}
 `;
 
 const Denuncia = () => {
 	const router = useRouter();
+	const { data: session } = useSession();
 
 	const [selectedFile, setSelectedFile] = useState(null);
+	const [categoryState, setCategoryState] = useState([]);
+
+	const handleChangeCategory = (event) => {
+		const {
+			target: { value },
+		} = event;
+
+		// console.log("value categoria", value);
+		// console.log("value categoryState", categoryState);
+
+		setCategoryState(
+			// On autofill we get a stringified value.
+			typeof value === "string" ? value.split(",") : value
+		);
+	};
 
 	const [postReporte] = useMutation(POST_REPORTE, {
 		update(cache, { data: { postReporte } }) {
@@ -140,6 +189,10 @@ const Denuncia = () => {
 							casoText {
 								id
 							}
+							categorys {
+								id
+								categoria
+							}
 						}
 					}
 				`,
@@ -148,7 +201,9 @@ const Denuncia = () => {
 						__typename: "Reporte",
 						id: postReporte.id,
 						autor: postReporte.autor,
+
 						autorix: postReporte.autor,
+
 						titulo: postReporte.titulo,
 						tituloix: postReporte.titulo,
 						caso: postReporte.caso,
@@ -167,6 +222,7 @@ const Denuncia = () => {
 						casoText: {
 							id: postReporte.casoText.id,
 						},
+						categorys: postReporte.categorys 
 					},
 				},
 				variables: {
@@ -175,10 +231,6 @@ const Denuncia = () => {
 			});
 		},
 	});
-
-	const [postInformacion] = useMutation(POST_INFORMACION);
-
-	const [postCaso] = useMutation(POST_CASO);
 
 	const post1 = async (values) => {
 		let formData = new FormData();
@@ -190,61 +242,47 @@ const Denuncia = () => {
 		});
 		// console.log("Upload Response", responseFile.data);
 
-		let reqLet = values;
-		let regresoInfoLet = {};
-		let regresoCasoLet = {};
-		// console.log("values", values);
-		// setValuesForm(values);
-		const informacion = {
-			comentarios: 0,
-			vistas: 0,
-			rating: 0,
-		};
+		let reqLet = _.cloneDeep(values);
 
-		const caso = {
+		reqLet.caso = reqLet.caso.substring(0, 250);
+		reqLet.tituloix = reqLet.titulo;
+		reqLet.fechaix = moment().format("YYYY-MM-DD[T00:00:00.000Z]");
+		reqLet.autor =
+			session === null || session === undefined ? "Anonimo" : session?.username;
+
+		reqLet.autorix =
+			session === null || session === undefined ? "Anonimo" : session?.username;
+		reqLet.img = `${process.env.NEXT_PUBLIC_API_IMAGES}${responseFile.data[0].url}?format=webp&height=250&q=80`;
+		reqLet.imgix = `${process.env.NEXT_PUBLIC_API_IMAGES}${responseFile.data[0].url}?format=webp&height=250&q=80`;
+
+		reqLet.casoText = {
 			descripcion: values.caso,
 		};
 
-		postInformacion({
+		const categorias = categoryState.map((s) => ({ categoria: s }));
+
+		reqLet.categorys = categorias;
+
+		// console.log("reqLet", reqLet);
+		postReporte({
 			variables: {
-				input: informacion,
+				input: reqLet,
 			},
-		}).then((regresoInfo) => {
-			regresoInfoLet = regresoInfo;
-			// console.log("regresoInfoLet", regresoInfoLet);
-			postCaso({
-				variables: {
-					input: caso,
-				},
-			}).then((regresoCaso) => {
-				regresoCasoLet = regresoCaso;
-				reqLet.caso = values.caso.substring(0, 250);
-				reqLet.tituloix = reqLet.titulo;
-				reqLet.fechaix = moment().format("YYYY-MM-DD[T00:00:00.000Z]");
-				reqLet.autor = "autor";
-				reqLet.autorix = "autor";
-				reqLet.img = `${process.env.NEXT_PUBLIC_API_IMAGES}${responseFile.data[0].url}?format=webp&height=250&q=80`;
-				reqLet.imgix = `${process.env.NEXT_PUBLIC_API_IMAGES}${responseFile.data[0].url}?format=webp&height=250&q=80`;
-				reqLet.informacion = {
-					id: regresoInfoLet.data.postInformacion.id,
-				};
-				reqLet.casoText = {
-					id: regresoCasoLet.data.postCaso.id,
-				};
-				// console.log("regresoCasoLet", regresoCasoLet);
-				console.log("reqLet", reqLet);
-				postReporte({
-					variables: {
-						input: reqLet,
-					},
-				});
-				router.push(`/`);
-			});
 		});
+		router.push(`/`);
 	};
 
 	return (
-		<Box sx={{ p: 3, border: "1px dashed grey" }}>
+		<Box
+			sx={{
+				p: 3,
+				border: "1px dashed grey",
+				flexDirection: "column",
+				mt: 40,
+				mb: 40,
+			}}>
+			<Typography variant='subtitle1'>{`Agregar su denuncia.`}</Typography>
+			<br />
 			<Formik
 				enableReinitialize
 				initialValues={{
@@ -259,7 +297,7 @@ const Denuncia = () => {
 					titulo: yup
 						.string("Ingresar el título de su denuncia")
 						.required("Es requerido"),
-					// caso: yup.string("Describa su denuncia").required("Es requerido"),
+					caso: yup.string("Describa su denuncia").required("Es requerido"),
 					ciudad: yup
 						.string("En que ciudad se encuentra")
 						.required("Es requerido"),
@@ -274,7 +312,7 @@ const Denuncia = () => {
 				}}>
 				{({ submitForm, isSubmitting }) => (
 					<Form>
-						<Stack spacing={4} alignItems='left' justifyContent='left'>
+						<Stack spacing={20} alignItems='left' justifyContent='left'>
 							<Field
 								component={TextField}
 								type='text'
@@ -312,10 +350,32 @@ const Denuncia = () => {
 								name='pais'
 							/>
 
+							<FormControl sx={{ m: 1, width: 300 }}>
+								<InputLabel id='demo-multiple-checkbox-label'>
+									Categorias
+								</InputLabel>
+								<Select
+									labelId='demo-multiple-checkbox-label'
+									id='demo-multiple-checkbox'
+									multiple
+									value={categoryState}
+									onChange={handleChangeCategory}
+									input={<OutlinedInput label='Categorias' />}
+									renderValue={(selected) => selected.join(", ")}
+									MenuProps={MenuProps}>
+									{Categorias.map((name) => (
+										<MenuItem key={name} value={name}>
+											<Checkbox checked={categoryState.indexOf(name) > -1} />
+											<ListItemText primary={name} />
+										</MenuItem>
+									))}
+								</Select>
+							</FormControl>
+
 							<Typography variant='body1'>
 								{selectedFile ? "Nombre del archivo: " + selectedFile.name : ""}
 							</Typography>
-							<Box>
+							<Box sx={{ mt: 80, mb: 80 }}>
 								<Button variant='contained' component='label'>
 									Agregar Imagen
 									<input
@@ -327,7 +387,8 @@ const Denuncia = () => {
 										onChange={(e) => setSelectedFile(e.target.files[0])}
 									/>
 								</Button>
-								<br />
+							</Box>
+							<Box sx={{ mt: 80, mb: 80 }}>
 								<Button
 									variant='contained'
 									color='primary'

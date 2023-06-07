@@ -1,0 +1,9 @@
+# robotstxt.org/
+
+User-agent: *
+Disallow: /secure
+Disallow: /appi
+
+# Allow all crawlers
+User-agent: *
+Allow: /

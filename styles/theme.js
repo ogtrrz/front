@@ -19,7 +19,7 @@ export const theme = createTheme({
 			main: "#4277FF",
 		},
 		text: {
-			main: blueGrey,
+			main: "#37474F", //blueGrey.A700,
 		},
 		error: { main: "#FF0000" },
 		warning: { main: "#F5EE9E" },
@@ -28,22 +28,32 @@ export const theme = createTheme({
 		background: { default: "#FDFFFC" },
 	},
 	breakpoints: {
-		values: { xs: 600, sm: 800, md: 1000, lg: 1200, xl: 1536 },
+		values: { xs: 0, sm: 600, md: 900, lg: 1200, xl: 1536 },
 	},
 	typography: {
 		fontFamily: poppins.style.fontFamily,
-		h1: { fontSize: 250 },
-		h2: { fontSize: 57 },
-		h3: { fontSize: 48 },
-		h4: { fontSize: 40 },
-		h5: { fontSize: 33 },
+		h1: { fontSize: 28 },
+		h2: { fontSize: 23 },
+		h3: { fontSize: 26 },
+		h4: { fontSize: 25 },
+		h5: { fontSize: 24 },
 		h6: { fontSize: 28 },
-		subtitle1: { fontSize: 23 },
+		subtitle1: { fontSize: 22 },
 		subtitle2: { fontSize: 19 },
 		body1: { fontSize: 16 },
-		body2: { fontSize: 12 },
+		body2: { fontSize: 14 },
 	},
 	spacing: 1,
+	"overrides": {
+		MuiSvgIcon: {
+		  colorPrimary: {
+			color: ["#FFF", "!important"],
+		  },
+		  colorSecondary: {
+			color: ["#FFF", "!important"],
+		  },
+		},
+	}
 	// overrides: {
 	// 	datagrid: {
 	// 		header: {

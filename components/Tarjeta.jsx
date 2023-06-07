@@ -1,5 +1,6 @@
 import * as React from "react";
 import NextLink from "next/link";
+import _ from "lodash";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
@@ -19,6 +20,8 @@ import AdsClickIcon from "@mui/icons-material/AdsClick";
 import { graphql } from "@apollo/client/react/hoc";
 import gql from "graphql-tag";
 import { useLazyQuery, useQuery, useMutation } from "@apollo/react-hooks";
+import useLocalStorageState from "use-local-storage-state";
+import { FacebookShareButton } from "react-share";
 
 export const PATCH_INFORMACION = gql`
 	mutation PatchInformacion($id: Int!, $input: InformacionRequest!) {
@@ -37,9 +40,18 @@ export const PATCH_INFORMACION = gql`
 	}
 `;
 
-export default function Tarjeta({ item }) {
+export default function Tarjeta({ item, Page }) {
 	//TODO actualizar cache con respuesta
 	// https://thinkster.io/tutorials/boost-your-react-apps-with-apollo-beyond-the-basics/updating-the-cache-after-adding-a-habit
+
+	// console.log("item", item);
+
+	const [pestesStorage, setPestesStorage] = useLocalStorageState(
+		"transas_pestes",
+		{
+			defaultValue: [],
+		}
+	);
 
 	const [patchInformacion, { loading, error, data }] = useMutation(
 		PATCH_INFORMACION,
@@ -81,49 +93,72 @@ export default function Tarjeta({ item }) {
 	//TODO actualizar cache con respuesta
 	const handlePestes = () => {
 		// console.log("Pestes");
-		const request = {
-			id: item.informacion.id,
-			comentarios: 3,
-			vistas: 1000,
-			rating: 100,
-		};
-		// console.log("request", request);
+		const findView = _.findIndex(pestesStorage, (it) => it === item.id + "");
+
+		let info = _.cloneDeep(item?.informacion);
+		if (findView === -1) {
+			// console.log("entro agregar");
+			setPestesStorage([...pestesStorage, item.id + ""]);
+			info.rating = item?.informacion?.rating + 1;
+			// console.log("info", info);
+		} else {
+			// console.log("entro remove");
+			let pestesArray = _.cloneDeep(pestesStorage);
+			// console.log("entro remove1", pestesArray);
+			_.remove(pestesArray, (it) => it === item.id + "");
+			// console.log("entro remove2", pestesArray);
+			setPestesStorage(pestesArray);
+			info.rating = item?.informacion?.rating - 1;
+		}
+
 		patchInformacion({
 			variables: {
-				id: item.informacion.id,
-				input: request,
+				id: info.id,
+				input: info,
 			},
 		});
 	};
 
-	console.log("data", data);
+	// console.log("data", data);
+	;
 
 	return (
 		<Card sx={{ maxWidth: 340 }}>
-			<NextLink href={`/view/denuncia/${item?.id}`} passHref>
-				<CardMedia sx={{ height: 140 }} image={item?.img} title='Transotas' />
+			<NextLink  href={`/view/denuncia/${item?.id}?Page=${Page}&slug=${_.kebabCase(item?.titulo.replace(/[\W_]+/g, '-'))}`} passHref>
+				<CardMedia
+					sx={{ height: 140 }}
+					image={item?.img ? item.img : "/transotas.jpg"}
+					alt={`Transotas.org ${item?.titulo}`}
+				/>
 				<CardContent>
-					<Typography gutterBottom variant='subtitle2' component='div'>
-						{item?.titulo}
-					</Typography>
-					<Typography variant='body2' color='text.secondary'>
-						{`${item?.caso}...`}
-					</Typography>
-					<br />
-					<Typography variant='body2' color='text.secondary'>
-						{`el ${moment(item?.fechaix).format("DD/MM/YY")}, en ${
-							item?.estado
-						}, ${item?.ciudad}, ${item?.pais}`}
-					</Typography>
-					<br />
-					<Typography variant='body2' color='text.secondary'>
-						{`Ayudenos a compartir, para ver a los Transotas poner ojos de chonito.`}
-					</Typography>
+					<div align='left'>
+						<Typography gutterBottom variant='h2' component='div'>
+							{item?.titulo}
+						</Typography>
+						<Typography variant='body2' color='text'>
+							{`${item?.caso}...`}
+						</Typography>
+						<br />
+						<Typography variant='body2' color='secondary'>
+							{`el ${moment(item?.fechaix).format("DD/MM/YY")}, en ${
+								item?.estado
+							}, ${item?.ciudad}, ${item?.pais}`}
+						</Typography>
+						<br />
+						<Typography variant='body2' color='secondary'>
+							{`Ayudenos a compartir, para ver a los Transotas poner ojos de chonito.`}
+						</Typography>
+					</div>
 				</CardContent>
 			</NextLink>
 			<CardActions>
+				&nbsp;&nbsp;
 				<Tooltip title='Facebookea al Transota' arrow>
-					<IconButton aria-label='denunciar por Facebook'>
+					<FacebookShareButton
+						url={"http://wf.com.mx"}
+						quote={"Quote"}
+						hashtag={"#Transotas"}
+						description={"aiueo"}>
 						<Badge
 							badgeContent={4}
 							color='primary'
@@ -131,28 +166,58 @@ export default function Tarjeta({ item }) {
 								vertical: "bottom",
 								horizontal: "right",
 							}}>
-							<FacebookIcon />
+							<FacebookIcon color='secondary' />
 						</Badge>
-					</IconButton>
+					</FacebookShareButton>
 				</Tooltip>
-				<Tooltip title='Twittazzzo al Transota' arrow>
-					<IconButton aria-label='denunciar por Twitter'>
+				&nbsp;&nbsp;
+				<Tooltip title='Control de Pestes, ponganlo en primera plana.' arrow>
+					<IconButton
+						aria-label='vota Control de Pestes'
+						onClick={handlePestes}>
 						<Badge
-							badgeContent={3}
+							badgeContent={
+								item?.informacion?.rating ? item?.informacion?.rating : 0
+							}
 							color='primary'
 							anchorOrigin={{
 								vertical: "bottom",
 								horizontal: "right",
 							}}>
-							<TwitterIcon />
+							<PestControlIcon
+								color={
+									_.findIndex(pestesStorage, (it) => it === item.id + "") === -1
+										? ""
+										: "secondary"
+								}
+							/>
 						</Badge>
 					</IconButton>
 				</Tooltip>
-				<Tooltip title='Comentar la denuncia.' arrow>
-					<IconButton aria-label='Comentar la denuncia'>
+				&nbsp;&nbsp;
+				<Tooltip title='Personas que lo han visto.' arrow>
+					<span aria-label='Número de vistas'>
 						<Badge
 							badgeContent={
-								item?.informacion?.comentarios ? item?.informacion?.comentarios : 0
+								item?.informacion?.vistas ? item?.informacion?.vistas : 0
+							}
+							color='primary'
+							anchorOrigin={{
+								vertical: "bottom",
+								horizontal: "right",
+							}}>
+							<AdsClickIcon />
+						</Badge>
+					</span>
+				</Tooltip>
+				&nbsp;&nbsp;&nbsp;&nbsp;
+				<Tooltip title='Total de comentarios.' arrow>
+					<span aria-label='Total de comentarios'>
+						<Badge
+							badgeContent={
+								item?.informacion?.comentarios
+									? item?.informacion?.comentarios
+									: 0
 							}
 							color='primary'
 							anchorOrigin={{
@@ -161,35 +226,7 @@ export default function Tarjeta({ item }) {
 							}}>
 							<ReviewsIcon />
 						</Badge>
-					</IconButton>
-				</Tooltip>
-				<Tooltip title='Control de Pestes, ponganlo en primera plana.' arrow>
-					<IconButton
-						aria-label='vota Control de Pestes'
-						onClick={handlePestes}>
-						<Badge
-							badgeContent={1}
-							color='primary'
-							anchorOrigin={{
-								vertical: "bottom",
-								horizontal: "right",
-							}}>
-							<PestControlIcon />
-						</Badge>
-					</IconButton>
-				</Tooltip>
-				<Tooltip title='Clicks realizados por la comunidad.' arrow>
-					<IconButton aria-label='Número de clicks'>
-						<Badge
-							badgeContent={1}
-							color='primary'
-							anchorOrigin={{
-								vertical: "bottom",
-								horizontal: "right",
-							}}>
-							<AdsClickIcon />
-						</Badge>
-					</IconButton>
+					</span>
 				</Tooltip>
 			</CardActions>
 			<br />

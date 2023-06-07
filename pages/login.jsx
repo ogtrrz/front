@@ -4,8 +4,8 @@ import { useEffect } from 'react';
 export default function Component() {
     const { data: session, status } = useSession();
     useEffect(() => {
-        console.log('session', session);
-        console.log('status', status);
+        // console.log('session', session);
+        // console.log('status', status);
     }, [session]);
 
     if (status === 'authenticated') {
