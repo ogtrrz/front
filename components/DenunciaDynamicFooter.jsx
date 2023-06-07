@@ -30,7 +30,6 @@ import { useLazyQuery, useQuery, useMutation } from "@apollo/react-hooks";
 import useLocalStorageState from "use-local-storage-state";
 import { FacebookShareButton } from "react-share";
 import { useSession } from "next-auth/react";
-import DenunciaDynamicFooter from "components/DenunciaDynamicFooter";
 // import { useLocalStorage, useEffectOnce } from "usehooks-ts";
 
 // import IconButton from "material-ui/IconButton";
@@ -109,6 +108,9 @@ const PATCH_REPORTE = gql`
 				id
 				autor
 				comentario
+                extra1
+                extra2
+                extra3
 			}
 		}
 	}
@@ -183,15 +185,15 @@ export const POST_COMENTARIO = gql`
 // 	}
 // `;
 
-const Denuncia = (props) => {
-	const { data, caso } = props;
-	console.log("props", props);
+const DenunciaDynamicFooter = ({ data }) => {
+	// console.log("props", props);
 
-	const router = useRouter();
-	const { Denuncia, Page } = router.query;
-	const { data: session } = useSession();
+	// const router = useRouter();
+	// const { Denuncia, Page } = router.query;
+	// const { data: session } = useSession();
 
 	const [comentarioState, setComentarioState] = useState("");
+
 	// const [
 	// 	getReporte,
 	// 	{ loading: loadingReporte, error: errorReporte, data: dataReporte },
@@ -201,8 +203,8 @@ const Denuncia = (props) => {
 	// 	// nextFetchPolicy: "cache-first",
 	// });
 
-	const [getCaso, { loading: loadingCaso, error: errorCaso, data: dataCaso }] =
-		useLazyQuery(CasoQuery);
+	// const [getCaso, { loading: loadingCaso, error: errorCaso, data: dataCaso }] =
+	// 	useLazyQuery(CasoQuery);
 
 	const [patchInformacion] = useMutation(PATCH_INFORMACION, {
 		update(cache, { data: { patchInformacion } }) {
@@ -242,11 +244,11 @@ const Denuncia = (props) => {
 
 	const [
 		postComentario,
-		{
-			loading: lodingComentario,
-			error: errorComentario,
-			data: dataComentarios,
-		},
+		// {
+		// 	loading: lodingComentario,
+		// 	error: errorComentario,
+		// 	data: dataComentarios,
+		// },
 	] = useMutation(POST_COMENTARIO, {
 		update(cache, { data: { postComentario } }) {
 			// const cacheId = cache.identify(item);
@@ -302,6 +304,8 @@ const Denuncia = (props) => {
 		}
 	);
 
+	const [pestesBadge, setPestesBadge] = useState(data.informacion);
+
 	const chipFilter = (item) => {
 		// console.log(item.id);//categoria
 		router.push(
@@ -312,10 +316,10 @@ const Denuncia = (props) => {
 	//TODO incrementa el badge de los vistos
 	const handleView = () => {
 		// console.log("View", viewStorage);
-		const findView = _.findIndex(viewStorage, (item) => item === Denuncia);
+		const findView = _.findIndex(viewStorage, (item) => item === data.id);
 		// console.log("findView", findView);
 		if (findView === -1) {
-			setViewStorage([...viewStorage, Denuncia]);
+			setViewStorage([...viewStorage, data.id]);
 			// console.log("findView Entro0");
 			// console.log("findView Entro", data.informacion);
 			let info = {};
@@ -344,7 +348,7 @@ const Denuncia = (props) => {
 	// 		getCaso({ variables: { idCaso: data.casoText?.id } });
 	// 		handleView();
 	// 	}
-	// }, [loadingReporte]);
+	// }, [data]);
 
 	const handleSubmitComentario = (e) => {
 		// console.log("comentarioState", comentarioState);
@@ -355,16 +359,16 @@ const Denuncia = (props) => {
 				// 		? "Anonimo"
 				// 		: session?.username,
 				comentario: comentarioState,
-				extra1: Denuncia,
+				extra1: data.id,
 				extra3: data.titulo,
 			};
 			let variables = {};
-			variables.id = Denuncia;
+			variables.id = data.id;
 			variables.comentarios = [request];
 			// console.log("variables", variables);
 			patchReporte({
 				variables: {
-					id: Denuncia,
+					id: data.id,
 					input: variables,
 				},
 			}).then((req) => {
@@ -376,34 +380,38 @@ const Denuncia = (props) => {
 	};
 
 	const handlePestes = () => {
-		const findView = _.findIndex(pestesStorage, (item) => item === Denuncia);
+		const findView = _.findIndex(pestesStorage, (item) => item === data.id);
 		let info = _.cloneDeep(data.informacion);
 		if (findView === -1) {
 			// console.log("entro agregar");
-			setPestesStorage([...pestesStorage, Denuncia]);
-			info.rating = data.informacion.rating + 1;
+			setPestesStorage([...pestesStorage, data.id]);
+			info.rating = pestesBadge.rating + 1;
 			// console.log("info", info);
 		} else {
 			// console.log("entro remove");
 			let pestesArray = _.cloneDeep(pestesStorage);
 			// console.log("entro remove1", pestesArray);
-			_.remove(pestesArray, (item) => item === Denuncia);
+			_.remove(pestesArray, (item) => item === data.id);
 			// console.log("entro remove2", pestesArray);
 			setPestesStorage(pestesArray);
-			info.rating = data.informacion.rating - 1;
+			info.rating = pestesBadge.rating - 1;
 		}
 		patchInformacion({
 			variables: {
 				id: info.id,
 				input: info,
 			},
-		}).then((res) => console.log("res", res));
+		}).then((res) => {
+			console.log("res", res);
+            console.log("res.data.patchInformacion", res.data.patchInformacion);
+			setPestesBadge(res.data.patchInformacion);
+		});
 	};
 
 	//ordenar comentarios por id
 	const comentariosArray = _.orderBy(data.comentarios, ["id"], ["desc"]);
 	// console.log("comentariosArray", comentariosArray);
-	const informacionItem = data.informacion;
+	// const informacionItem = data.informacion;
 	// console.log("dataReporte", dataReporte);
 
 	// console.log("dataCaso", dataCaso);
@@ -412,205 +420,150 @@ const Denuncia = (props) => {
 	if (true) {
 		return (
 			<React.Fragment>
-				<Head>
-					<title>{`Transotas.org | ${data.titulo}`}</title>
-					<meta name='robots' content='index, follow' />
-					<link
-						rel='canonical'
-						href={`${process.env.NEXT_PUBLIC_URL}${router.asPath}`}
-					/>
-					<meta name='description' content={`Transota, ${data.caso}`} />
-					<meta property='og:type' content='website' />
-					<meta property='og:title' content={`Transota, ${data.titulo}`} />
-					<meta property='og:description' content={`Transota, ${data.caso}`} />
-					<meta
-						property='og:image'
-						content={data.img ? data.img : "/transotas.jpg"}
-					/>
-					<meta
-						property='og:url'
-						content={`${process.env.NEXT_PUBLIC_URL}${router.asPath}`}
-					/>
-				</Head>
-				<Box sx={{ p: 3, border: "1px dashed grey" }}>
-					<Paper
-						elevation={6}
-						style={{
-							padding: 24,
-						}}>
-						<Breadcrumbs
-							separator={<NavigateNextIcon fontSize='small' color='primary' />}
-							aria-label='Link al Inicio'>
-							<NextLink href={`/?Page=${Page}`} shallow={true}>
-								<Typography
-									sx={{
-										"&:hover": {
-											textDecoration: "underline",
-										},
-									}}
-									color='primary.main'>
-									{`Inicio (${Page})`}
-								</Typography>
-							</NextLink>
-
-							<Typography color='text.primary'>{`Transota,  ${data.titulo}`}</Typography>
-						</Breadcrumbs>
-
-						<Box
-							sx={{ position: "relative", mt: 40 }}
-							display='flex'
-							justifyContent='center'
-							alignItems='center'>
-							{data.img ? (
-								<img
-									src={data.img}
-									alt={`Transotas ${data.titulo}`}
-									height='250'
-								/>
-							) : (
-								<img src='/transotas.jpg' alt='Transotas' height='250' />
-							)}
-
-							<Box
-								display='flex'
-								sx={{
-									position: "absolute",
-									bottom: 0,
-									left: 0,
-									width: "100%",
-									bgcolor: "rgba(142, 3, 45, 0.85)",
-									color: "white",
-									padding: "10px",
+				<Box
+					sx={{ flexDirection: "row", mt: 40, mb: 40 }}
+					minHeight='5vh'
+					alignItems='center'
+					display='flex'>
+					<Tooltip title='Facebookea al Transota' arrow>
+						<FacebookShareButton
+							url={"http://wf.com.mx"}
+							quote={"Quote"}
+							hashtag={"#Transotas"}
+							description={"aiueo"}>
+							<Badge
+								badgeContent={4}
+								color='primary'
+								anchorOrigin={{
+									vertical: "bottom",
+									horizontal: "right",
 								}}>
-								<Typography variant='h1' color='white'>
-									{`Transota, ${data.titulo}`}
-								</Typography>
-							</Box>
-						</Box>
+								<FacebookIcon color='secondary' />
+							</Badge>
+						</FacebookShareButton>
+					</Tooltip>
+					&nbsp;&nbsp;&nbsp;
+					<Tooltip title='Control de Pestes, ponganlo en primera plana.' arrow>
+						<IconButton
+							aria-label='vota Control de Pestes'
+							onClick={handlePestes}>
+							<Badge
+								badgeContent={pestesBadge?.rating}
+								color='primary'
+								max={999}
+								anchorOrigin={{
+									vertical: "bottom",
+									horizontal: "right",
+								}}>
+								<PestControlIcon
+									color={
+										_.findIndex(pestesStorage, (item) => item === data.id) ===
+										-1
+											? ""
+											: "secondary"
+									}
+								/>
+							</Badge>
+						</IconButton>
+					</Tooltip>
+					&nbsp;&nbsp;
+					<Tooltip title='Personas que lo han visto.' arrow>
+						<div>
+							<Badge
+								badgeContent={data.informacion?.vistas}
+								color='primary'
+								max={99}
+								anchorOrigin={{
+									vertical: "bottom",
+									horizontal: "right",
+								}}>
+								<AdsClickIcon />
+							</Badge>
+						</div>
+					</Tooltip>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					<Tooltip title='Total de comentarios.' arrow>
+						<div>
+							<Badge
+								badgeContent={data.informacion?.comentarios}
+								color='primary'
+								anchorOrigin={{
+									vertical: "bottom",
+									horizontal: "right",
+								}}>
+								<ReviewsIcon />
+							</Badge>
+						</div>
+					</Tooltip>
+				</Box>
 
-						<Stack spacing={40}>
-							<Typography variant='body1' color='secondary'>
-								{`Denunciado por ${data.autor} el ${moment(data.fechaix).format(
-									"DD/MM/YY"
-								)} en 
-								${data.estado}, ${data.ciudad}, 
-								${data.pais}
-								`}
-							</Typography>
+				<Stack direction='row' spacing={2}>
+					{data.categorys?.map((item) => {
+						return (
+							<Chip
+								key={item.id}
+								label={`${item.categoria}`}
+								variant='outlined'
+								color='secondary'
+								clickable={true}
+								onClick={() => chipFilter(item)}
+							/>
+						);
+					})}
+				</Stack>
+				<br />
+				<Stack direction='column' spacing={20}>
+					<TextField
+						id='comentario'
+						label='Agregar Comentario'
+						variant='outlined'
+						value={comentarioState}
+						onChange={(e) => {
+							setComentarioState(e.target.value);
+						}}
+						multiline
+						rows={3}
+						// maxRows={50}
+					/>
+					<Box>
+						<Button
+							variant='contained'
+							component='label'
+							onClick={handleSubmitComentario}
+							disabled={[...comentarioState].length > 0 ? false : true}>
+							Agregar Comentario
+						</Button>
+					</Box>
+					<Typography
+						variant='subtitle2'
+						color='text'
+						style={{ whiteSpace: "pre-line" }}>
+						{data.comentarios?.length === 0
+							? `Sea el primero en Comentar`
+							: `Comentarios`}
+					</Typography>
+					<br />
+				</Stack>
 
+				{comentariosArray?.map((item) => {
+					return (
+						<React.Fragment key={item.id}>
 							<Typography
 								variant='body1'
 								color='text'
 								style={{ whiteSpace: "pre-line" }}>
-								{caso.descripcion.replaceAll("\n", "\n\n")}
+								{item.comentario.replaceAll("<br/>", "\n")}
 							</Typography>
-						</Stack>
-						{/* Partir aqui */}
-						<DenunciaDynamicFooter
-							data={data}
-						/>
-					</Paper>
-				</Box>
+							<Typography variant='body1' color='secondary'>
+								{item.autor}
+							</Typography>
+							<br />
+						</React.Fragment>
+					);
+				})}
 			</React.Fragment>
 		);
 	}
 };
 
-export default Denuncia;
-
-export async function getStaticProps(context) {
-	const { params } = context;
-	const Denuncia = params.Denuncia;
-	// console.log("params", params);
-
-	const res = await fetch(
-		`${process.env.NEXT_PUBLIC_SPRING}/api/reportes/${Denuncia}`
-	);
-	const data = await res.json();
-
-	const res2 = await fetch(
-		`${process.env.NEXT_PUBLIC_SPRING}/api/caso-texts/${data.casoText.id}`
-	);
-	const caso = await res2.json();
-
-	if (!data || !caso) {
-		return {
-			notFound: true,
-		};
-	}
-	// console.log("data", data);
-
-	return {
-		props: { data: data, caso: caso },
-
-		// revalidate: 10,
-		// notFound: true, //regresa el 404
-		// redirect: { //redirecciona a la pagina
-		// 	destination: '/no-data'
-		// }
-	};
-}
-
-export async function getStaticPaths() {
-	const res = await fetch(
-		`${process.env.NEXT_PUBLIC_SPRING}/api/reportes?&page=0&size=100&sort=id,desc`
-	);
-	const data = await res.json();
-
-	const ids = data.map((item) => item.id + "");
-	const pathsWithParams = ids.map((id) => ({ params: { Denuncia: id + "" } }));
-
-	return {
-		paths: pathsWithParams,
-		fallback: "blocking",
-	};
-}
-
-// export async function getStaticProps() {
-// 	return {props:{
-
-// 	}}
-// }
-
-// export async function getStaticProps(context) { //no cambia con frecuencia pero no funciona con paginas dinamicas
-// debemos crear getStaticPaths() {...}
-// export async function getServerSideProps(context) { //cambia con frecuencia
-
-// const {params} = setContext
-// const denuncia = params.Denuncia
-
-// 	const res = await fetch(`${process.env.NEXT_PUBLIC_SPRING}/api/reportes`);
-// 	const data = await res.json();
-// 	if (!data) {
-// 		return {
-// 			notFound: true,
-// 		};
-// 	}
-// 	// console.log("data", data);
-// 	return {
-// 		props: { data: data },
-
-// 		// revalidate: 10,
-// 		// notFound: true, //regresa el 404
-// 		// redirect: { //redirecciona a la pagina
-// 		// 	destination: '/no-data'
-// 		// }
-// 	};
-// }
-
-// export async function getSaticPaths() {
-// 	return {
-// 		paths: [
-// 			{params: { Denuncia: 'denuncia1' }}
-// {params: { Denuncia: 'denuncia2 }}
-// {params: { Denuncia: 'denuncia3' }}
-// 		],
-// fallback: false|true|'blocking' //ojo ver notas abajo es un key word o el otro
-// si se pone fallback: 'blocking' no necesitamo hacer lo de abajo
-// 	}
-// }
-
-// Ver capitulo 104 nextjs
-// se debe agregar if(!props) {
-// 	return <p>loading ...</p>
-// }
+export default DenunciaDynamicFooter;

@@ -22,6 +22,7 @@ import gql from "graphql-tag";
 import { useLazyQuery, useQuery, useMutation } from "@apollo/react-hooks";
 import useLocalStorageState from "use-local-storage-state";
 import { FacebookShareButton } from "react-share";
+import { setContext } from "@apollo/client/link/context";
 
 export const PATCH_INFORMACION = gql`
 	mutation PatchInformacion($id: Int!, $input: InformacionRequest!) {

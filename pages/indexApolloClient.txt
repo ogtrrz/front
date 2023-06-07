@@ -37,10 +37,7 @@ const Pagina = gql`
 	}
 `;
 
-const Home = (props) => {
-	console.log("props", props);
-	const { data } = props;
-	console.log("data", data);
+const Home = () => {
 	// const [searchInput, setSearchInput] = useState("hola");
 
 	//TODO prefetch 5 paginas de manera silenciosa en cache
@@ -67,11 +64,11 @@ const Home = (props) => {
 	});
 
 	// const { loading, error, data, fetchMore } = useQuery(Pagina, {
-	// const { loading, error, data } = useQuery(Pagina, {
-	// 	variables: { paginaInput: page - 1 },
-	// 	// fetchPolicy: "cache-and-network",
-	// 	// nextFetchPolicy: "cache-first",
-	// });
+	const { loading, error, data } = useQuery(Pagina, {
+		variables: { paginaInput: page - 1 },
+		// fetchPolicy: "cache-and-network",
+		// nextFetchPolicy: "cache-first",
+	});
 
 	const handleChangePagination = (event, value) => {
 		setPage(value);
@@ -94,40 +91,15 @@ const Home = (props) => {
 	// }, [!loading]);
 	//TODO poner Page if loaded y no volver a corer el fetch
 
-	const descripcionMeta = data?.map((item) => `${item.titulo}`).join(", ");
+	const descripcionMeta = data?.show.map((item) => `${item.titulo}`).join(", ");
 
 	// console.log("descripcionMeta", descripcionMeta);
-
-	// const test = async () => {
-	// 	const res = await fetch(`${process.env.NEXT_PUBLIC_SPRING}/api/reportes`, {
-	// 		method: "GET",
-	// 		headers: {
-	// 			"x-total-count": "x-total-count",
-	// 		},
-	// 	});
-	// 	console.log("res", res);
-	// 	const data = await res.json();
-	// 	console.log("headers", res.headers["x-total-count"]);
-	// 	console.log("data", data);
-	// 	if (!data) {
-	// 		return {
-	// 			notFound: true,
-	// 		};
-	// 	}
-	// 	// console.log("data", data);
-	// 	return {
-	// 		props: { data: data },
-	// 	};
-	// };
-	// useEffect(() => {
-	// 	test();
-	// }, []);
 
 	useEffect(() => {
 		if (Page) {
 			setPage(parseInt(Page));
 		}
-		const pag = data[0]?.extra10 ? data[0]?.extra10 : 0;
+		const pag = data?.show[0]?.extra10 ? data?.show[0]?.extra10 : 0;
 		// TODO no sirbe paginacion???
 		console.log("Pagina0", pag);
 		console.log("paginaTotalMemoria", paginaTotalMemoria);
@@ -144,19 +116,19 @@ const Home = (props) => {
 	// 		? data.edges[data.edges.length - 1].cursor
 	// 		: null;
 
-	// if (error) {
-	// 	return <p>Error</p>;
-	// }
+	if (error) {
+		return <p>Error</p>;
+	}
 
-	// if (loading) {
-	// 	return (
-	// 		<Backdrop
-	// 			sx={{ color: "#000", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-	// 			open={loading}>
-	// 			<CircularProgress color='inherit' />
-	// 		</Backdrop>
-	// 	);
-	// }
+	if (loading) {
+		return (
+			<Backdrop
+				sx={{ color: "#000", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+				open={loading}>
+				<CircularProgress color='inherit' />
+			</Backdrop>
+		);
+	}
 
 	// console.log("data", data);
 
@@ -185,7 +157,7 @@ const Home = (props) => {
 						align='center'
 						spacing={{ xs: 2, sm: 3, md: 5 }}
 						columns={{ xs: 3, sm: 6, md: 9, lg: 12 }}>
-						{data?.map((item) => {
+						{data.show.map((item) => {
 							return (
 								<React.Fragment key={item.id}>
 									<Grid xs={3} item={true}>
@@ -223,24 +195,17 @@ const Home = (props) => {
 
 export default Home;
 
+// export async function getServerSideProps() {
+//     // console.log('context', context.query.page);
+//     const res = await fetch(`${process.env.NEXT_PUBLIC_API_REST}/api/reportes`);
+//     const data = await res.json();
+//     if (!data) {
+//         return {
+//             notFound: true
+//         };
+//     }
 
-// export async function getStaticProps()
-export async function getServerSideProps() {
-	const res = await fetch(`${process.env.NEXT_PUBLIC_SPRING}/api/reportes`);
-	const data = await res.json();
-	if (!data) {
-		return {
-			notFound: true,
-		};
-	}
-	// console.log("data", data);
-	return {
-		props: { data: data },
-
-		// revalidate: 10,
-		// notFound: true, //regresa el 404
-		// redirect: { //redirecciona a la pagina
-		// 	destination: '/no-data'
-		// }
-	};
-}
+//     return {
+//         props: { data: data }
+//     };
+// }
