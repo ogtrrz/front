@@ -55,10 +55,10 @@ const Home = ({ data, paginasTotales, paginaActual }) => {
 		setPage(pag);
 		router.push(
 			{
-				pathname: `?Pages=${pag}`,
+				pathname: `${pag}`,
 			},
-			`?Pages=${pag}`,
-			{ shallow: true }
+			`${pag}`,
+			{ shallow: false }
 		);
 	};
 
@@ -131,23 +131,13 @@ export default Home;
 //TODO validar Cache como sale natural de Nextjs
 //TODO ux poner footer haver pagina menos ancha ??? o dejarla reactiva???
 //TODO construir mapa SEO borrar serversite.xml si no se puede corregir
-export async function getServerSideProps(context) {
-	// res.setHeader(
-	// 	"Cache-Control",
-	// 	"max-age=86400, must-revalidate"
-	// );
-	console.log("resolvedUrl", context.resolvedUrl);
-	console.log("context.query", context.query);
-	console.log("context.query.Pages", context.query.Pages);
-	const paginaActual = context.query.Pages ? context.query.Pages : 1;
-	console.log("paginaActual", paginaActual);
+export async function getStaticProps(context) {
+	const { params } = context;
+	const paginaActual = params.paginaActual;
 	const resp = await fetch(
 		`${process.env.NEXT_PUBLIC_SPRING}/api/reportes?&page=${paginaActual}&size=12&sort=id,desc`
 	);
-
 	const contentType = resp.headers.get("X-Total-Count");
-	// console.log("contentType", contentType);
-
 	const data = await resp.json();
 	if (!data) {
 		return {
@@ -161,10 +151,21 @@ export async function getServerSideProps(context) {
 			paginaActual: paginaActual,
 		},
 
-		// revalidate: 10,
+		revalidate: 1800,
 		// notFound: true, //regresa el 404
 		// redirect: { //redirecciona a la pagina
 		// 	destination: '/no-data'
 		// }
+	};
+}
+
+export async function getStaticPaths() {
+	let pathsWithParams = [];
+	for (let i = 0; i < 77; i++) {
+		pathsWithParams.push({ params: { paginaActual: i + '' } });
+	}
+	return {
+		paths: pathsWithParams,
+		fallback: "blocking",
 	};
 }

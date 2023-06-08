@@ -48,7 +48,6 @@ import { useLazyQuery, useQuery, useMutation } from "@apollo/react-hooks";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import Tarjeta from "components/Tarjeta";
-import useSessionStorageState from "use-session-storage-state";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
@@ -142,7 +141,6 @@ const Comentarios = () => {
 	};
 
 	console.log("dataBusqueda", dataBusqueda);
-	//TODO agregar fecha del comentario
 	return (
 		<Box sx={{ p: 3, border: "1px dashed grey" }}>
 			<Stack direction='column' spacing={2}>

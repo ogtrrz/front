@@ -20,7 +20,7 @@ const nextConfig = {
   poweredByHeader: false,
   compress: false,
   images: {
-      domains: ['localhost', '34.122.102.32']
+      domains: ['localhost', '34.122.102.32', 'cdn-0.apestan.com']
   },
 
   async rewrites() {

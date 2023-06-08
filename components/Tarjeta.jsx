@@ -1,5 +1,6 @@
 import * as React from "react";
 import NextLink from "next/link";
+import Image from "next/image";
 import _ from "lodash";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
@@ -92,6 +93,11 @@ export default function Tarjeta({ item, Page }) {
 		}
 	);
 	//TODO actualizar cache con respuesta
+	// https://infinum.com/handbook/frontend/react/recipes/caching-nextjs-public-folder
+	//TODO no sirve cambio en el badge de pestes
+	//TODO no sirve el cote de visitas
+	//TODO imagenes en apesta no cargan
+	//TODO no sirve la paginacion no lo lee nuevamente
 	const handlePestes = () => {
 		// console.log("Pestes");
 		const findView = _.findIndex(pestesStorage, (it) => it === item.id + "");
@@ -121,16 +127,24 @@ export default function Tarjeta({ item, Page }) {
 	};
 
 	// console.log("data", data);
-	;
-
 	return (
 		<Card sx={{ maxWidth: 340 }}>
-			<NextLink  href={`/view/denuncia/${item?.id}?Page=${Page}&slug=${_.kebabCase(item?.titulo.replace(/[\W_]+/g, '-'))}`} passHref>
-				<CardMedia
-					sx={{ height: 140 }}
-					image={item?.img ? item.img : "/transotas.jpg"}
-					alt={`Transotas.org ${item?.titulo}`}
-				/>
+			<NextLink
+				href={`/view/denuncia/${item?.id}?Pages=${Page}&slug=${_.kebabCase(
+					item?.titulo.replace(/[\W_]+/g, "-")
+				)}`}
+				passHref>
+				<CardMedia sx={{ height: 140 }}>
+					<div style={{ position: "relative", overflow: "hidden" }}>
+						<Image
+							src={item?.img ? item.img : "/transotas.jpg"}
+							alt={`Transotas.org ${item?.titulo}`}
+							width={350}
+							height={135}
+							style={{ objectFit: "cover" }}
+						/>
+					</div>
+				</CardMedia>
 				<CardContent>
 					<div align='left'>
 						<Typography gutterBottom variant='h2' component='div'>

@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import NextLink from "next/link";
 import Head from "next/head";
+import Image from "next/image";
 import _ from "lodash";
 import moment from "moment";
 import { useRouter } from "next/router";
@@ -188,7 +189,7 @@ const Denuncia = (props) => {
 	console.log("props", props);
 
 	const router = useRouter();
-	const { Denuncia, Page } = router.query;
+	const { Denuncia, Pages } = router.query;
 	const { data: session } = useSession();
 
 	const [comentarioState, setComentarioState] = useState("");
@@ -305,7 +306,7 @@ const Denuncia = (props) => {
 	const chipFilter = (item) => {
 		// console.log(item.id);//categoria
 		router.push(
-			`/categorys?Query=categorysId.equals=${item.id}&Category=Categoría:%20${item.categoria}&Page=0`
+			`/categorys?Query=categorysId.equals=${item.id}&Category=Categoría:%20${item.categoria}&Pages=0`
 		);
 	};
 
@@ -419,10 +420,19 @@ const Denuncia = (props) => {
 						rel='canonical'
 						href={`${process.env.NEXT_PUBLIC_URL}${router.asPath}`}
 					/>
-					<meta name='description' content={`Transota, ${data.caso.substring(0, 159)}`} />
+					<meta
+						name='description'
+						content={`Transota, ${data.caso.substring(0, 159)}`}
+					/>
 					<meta property='og:type' content='website' />
-					<meta property='og:title' content={`Transota, ${data.titulo.substring(0, 48)}`} />
-					<meta property='og:description' content={`Transota, ${data.caso.substring(0, 159)}`} />
+					<meta
+						property='og:title'
+						content={`Transota, ${data.titulo.substring(0, 48)}`}
+					/>
+					<meta
+						property='og:description'
+						content={`Transota, ${data.caso.substring(0, 159)}`}
+					/>
 					<meta
 						property='og:image'
 						content={data.img ? data.img : "/transotas.jpg"}
@@ -441,7 +451,7 @@ const Denuncia = (props) => {
 						<Breadcrumbs
 							separator={<NavigateNextIcon fontSize='small' color='primary' />}
 							aria-label='Link al Inicio'>
-							<NextLink href={`/?Page=${Page}`} shallow={false}>
+							<NextLink href={`/?Pages=${Pages?Pages:1}`} shallow={false}>
 								<Typography
 									sx={{
 										"&:hover": {
@@ -449,7 +459,7 @@ const Denuncia = (props) => {
 										},
 									}}
 									color='primary.main'>
-									{`Inicio (${Page})`}
+									{`Inicio (${Pages})`}
 								</Typography>
 							</NextLink>
 
@@ -457,18 +467,26 @@ const Denuncia = (props) => {
 						</Breadcrumbs>
 
 						<Box
-							sx={{ position: "relative", mt: 40 }}
+							sx={{ position: "relative", mt: 40,  overflow: "hidden" }}
 							display='flex'
 							justifyContent='center'
 							alignItems='center'>
 							{data.img ? (
-								<img
+								<Image
 									src={data.img}
 									alt={`Transotas ${data.titulo}`}
-									height='250'
+									height={250}
+									width={250}
+									style={{ objectFit: "cover" }}
 								/>
 							) : (
-								<img src='/transotas.jpg' alt='Transotas' height='250' />
+								<Image
+									src='/transotas.jpg'
+									alt='Transotas'
+									height={250}
+									width={250}
+									style={{ objectFit: "cover" }}
+								/>
 							)}
 
 							<Box
@@ -506,9 +524,7 @@ const Denuncia = (props) => {
 							</Typography>
 						</Stack>
 						{/* Partir aqui */}
-						<DenunciaDynamicFooter
-							data={data}
-						/>
+						<DenunciaDynamicFooter data={data} />
 					</Paper>
 				</Box>
 			</React.Fragment>
@@ -519,14 +535,15 @@ const Denuncia = (props) => {
 export default Denuncia;
 
 export async function getStaticProps(context) {
+	// res.setHeader("Cache-Control", "max-age=31536000, immutable");
 	const { params } = context;
 	const Denuncia = params.Denuncia;
 	// console.log("params", params);
 
-	const res = await fetch(
+	const resp = await fetch(
 		`${process.env.NEXT_PUBLIC_SPRING}/api/reportes/${Denuncia}`
 	);
-	const data = await res.json();
+	const data = await resp.json();
 
 	const res2 = await fetch(
 		`${process.env.NEXT_PUBLIC_SPRING}/api/caso-texts/${data.casoText.id}`
@@ -542,8 +559,7 @@ export async function getStaticProps(context) {
 
 	return {
 		props: { data: data, caso: caso },
-
-		// revalidate: 10,
+		revalidate: 86400,
 		// notFound: true, //regresa el 404
 		// redirect: { //redirecciona a la pagina
 		// 	destination: '/no-data'
@@ -552,10 +568,10 @@ export async function getStaticProps(context) {
 }
 
 export async function getStaticPaths() {
-	const res = await fetch(
+	const resp = await fetch(
 		`${process.env.NEXT_PUBLIC_SPRING}/api/reportes?&page=0&size=100&sort=id,desc`
 	);
-	const data = await res.json();
+	const data = await resp.json();
 
 	const ids = data.map((item) => item.id + "");
 	const pathsWithParams = ids.map((id) => ({ params: { Denuncia: id + "" } }));

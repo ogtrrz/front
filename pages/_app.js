@@ -4,9 +4,9 @@ import { theme } from "../styles/theme";
 import createEmotionCache from "../styles/createEmotionCache";
 import { CacheProvider } from "@emotion/react";
 import { Stack } from "@mui/material";
-import ResponsiveAppBar from "pages/ui/ResponsiveAppBar";
+import ResponsiveAppBar from "components/ui/ResponsiveAppBar";
 import { SessionProvider } from "next-auth/react";
-import WithGraphQL from 'pages/with-graphql';
+import WithGraphQL from 'config/with-graphql';
 
 const clientSideEmotionCache = createEmotionCache();
 

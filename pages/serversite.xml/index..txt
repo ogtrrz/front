@@ -1,0 +1,25 @@
+import { ISitemapField, getServerSideSitemap } from "next-sitemap";
+import _ from "lodash";
+
+export default async function GET(request: Request) {
+	const siteUrl = "https://transotas.org";
+
+	const dat = await fetch("http://localhost:8080/api/reportes", {
+		method: "GET",
+	});
+
+	const res = await dat.json();
+	const data: any = await res;
+	// console.log("data", data);
+	const fields: ISitemapField[] = data?.map((data: any) => ({
+		loc: `${siteUrl}/view/denuncia/${data.id}?Page=1&slug=${_.kebabCase(
+			data.titulo.replace(/[\W_]+/g, "-")
+		)}`,
+		lastmod: data.fechaix,
+	}));
+	// console.log('fields', fields);
+	
+	return ''// getServerSideSitemap(fields);
+}
+
+

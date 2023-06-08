@@ -42,7 +42,7 @@ import { useLazyQuery, useQuery, useMutation } from "@apollo/react-hooks";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import Tarjeta from "components/Tarjeta";
-import useSessionStorageState from "use-session-storage-state";
+import useLocalStorageState from "use-local-storage-state";
 
 const Busqueda = gql`
 	query REPORTES_QUERY($queryInput: String!, $paginaInput: String!) {
@@ -86,7 +86,7 @@ const Home = () => {
 
 	// const [paginaTotal, setPaginaTotal] = useState(0);
 
-	const [paginaTotal, setPaginaTotal] = useSessionStorageState(
+	const [paginaTotal, setPaginaTotal] = useLocalStorageState(
 		"transas_page_total",
 		{
 			defaultValue: 0,
