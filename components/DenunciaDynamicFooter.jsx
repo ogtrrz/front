@@ -188,7 +188,7 @@ export const POST_COMENTARIO = gql`
 const DenunciaDynamicFooter = ({ data }) => {
 	// console.log("props", props);
 
-	// const router = useRouter();
+	const router = useRouter();
 	// const { Denuncia, Page } = router.query;
 	// const { data: session } = useSession();
 
@@ -350,6 +350,9 @@ const DenunciaDynamicFooter = ({ data }) => {
 	// 	}
 	// }, [data]);
 
+	const [comentariosData, setComentariosData] = useState(data.comentarios)
+
+
 	const handleSubmitComentario = (e) => {
 		// console.log("comentarioState", comentarioState);
 		if ([...comentarioState].length > 0) {
@@ -372,7 +375,8 @@ const DenunciaDynamicFooter = ({ data }) => {
 					input: variables,
 				},
 			}).then((req) => {
-				console.log("req", req);
+				console.log("req", req.data.patchReporte.comentarios);
+				setComentariosData(req.data.patchReporte.comentarios);
 			});
 
 			setComentarioState("");
@@ -409,7 +413,7 @@ const DenunciaDynamicFooter = ({ data }) => {
 	};
 
 	//ordenar comentarios por id
-	const comentariosArray = _.orderBy(data.comentarios, ["id"], ["desc"]);
+	const comentariosArray = _.orderBy(comentariosData, ["id"], ["desc"]);
 	// console.log("comentariosArray", comentariosArray);
 	// const informacionItem = data.informacion;
 	// console.log("dataReporte", dataReporte);

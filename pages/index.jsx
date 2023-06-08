@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import { Stack, Box, Typography, Pagination, Breadcrumbs } from "@mui/material";
 import Grid from "@mui/material/Grid";
-import gql from "graphql-tag";
-import { useQuery } from "@apollo/react-hooks";
-import Backdrop from "@mui/material/Backdrop";
-import CircularProgress from "@mui/material/CircularProgress";
+// import gql from "graphql-tag";
+// import { useQuery } from "@apollo/react-hooks";
+// import Backdrop from "@mui/material/Backdrop";
+// import CircularProgress from "@mui/material/CircularProgress";
 import Tarjeta from "components/Tarjeta";
 import useLocalStorageState from "use-local-storage-state";
 
 //TODO order by id o por fechaix el id si jala fechaix no jala tan bien
+/*
 const Pagina = gql`
 	query REPORTES_QUERY($paginaInput: String!) {
 		show(pagina: $paginaInput)
@@ -36,129 +37,31 @@ const Pagina = gql`
 		}
 	}
 `;
-
-const Home = (props) => {
-	console.log("props", props);
-	const { data } = props;
-	console.log("data", data);
-	// const [searchInput, setSearchInput] = useState("hola");
-
-	//TODO prefetch 5 paginas de manera silenciosa en cache
-	//TODO Skeleton
-	//reactivo
+*/
+const Home = ({ data, paginasTotales, paginaActual }) => {
 	const router = useRouter();
 
-	const { Page, Search } = router.query;
-
-	const [page, setPage] = useState(0);
-
-	const [paginaTotal, setPaginaTotal] = useState(0);
-
-	const [paginaTotalMemoria, setPaginaTotalMemoria] = useLocalStorageState(
-		"transas_total_paginas",
-		{
-			defaultValue: 0,
-		}
-	);
+	const [page, setPage] = useState(parseInt(paginaActual) || 1);
 
 	//TODO historia para el BreadCrumb
 	const [historia, setHistoria] = useLocalStorageState("transas_historia", {
 		defaultValue: [],
 	});
 
-	// const { loading, error, data, fetchMore } = useQuery(Pagina, {
-	// const { loading, error, data } = useQuery(Pagina, {
-	// 	variables: { paginaInput: page - 1 },
-	// 	// fetchPolicy: "cache-and-network",
-	// 	// nextFetchPolicy: "cache-first",
-	// });
-
 	const handleChangePagination = (event, value) => {
-		setPage(value);
+		const pag = value === 0 ? 1 : value;
+		console.log("value", pag);
+		setPage(pag);
 		router.push(
 			{
 				pathname: `/`,
 			},
-			`/?Pages=${value}`,
-			{ shallow: true }
+			`/?Pages=${pag}`,
+			{ shallow: false }
 		);
 	};
 
-	//TODO se me hace que no jala
-	// https://github.com/apollographql/apollo-client/issues/7131
-	// useEffect(() => {
-	// 	console.log(`fetch More Pagina ===================== ${page+1}`);
-	// 	fetchMore({
-	// 		variables: { paginaInput: page+1 },
-	// 	});
-	// }, [!loading]);
-	//TODO poner Page if loaded y no volver a corer el fetch
-
 	const descripcionMeta = data?.map((item) => `${item.titulo}`).join(", ");
-
-	// console.log("descripcionMeta", descripcionMeta);
-
-	// const test = async () => {
-	// 	const res = await fetch(`${process.env.NEXT_PUBLIC_SPRING}/api/reportes`, {
-	// 		method: "GET",
-	// 		headers: {
-	// 			"x-total-count": "x-total-count",
-	// 		},
-	// 	});
-	// 	console.log("res", res);
-	// 	const data = await res.json();
-	// 	console.log("headers", res.headers["x-total-count"]);
-	// 	console.log("data", data);
-	// 	if (!data) {
-	// 		return {
-	// 			notFound: true,
-	// 		};
-	// 	}
-	// 	// console.log("data", data);
-	// 	return {
-	// 		props: { data: data },
-	// 	};
-	// };
-	// useEffect(() => {
-	// 	test();
-	// }, []);
-
-	useEffect(() => {
-		if (Page) {
-			setPage(parseInt(Page));
-		}
-		const pag = data[0]?.extra10 ? data[0]?.extra10 : 0;
-		// TODO no sirbe paginacion???
-		console.log("Pagina0", pag);
-		console.log("paginaTotalMemoria", paginaTotalMemoria);
-		if (parseInt(paginaTotalMemoria) !== parseInt(pag)) {
-			//|| parseInt(pag) === 0) {
-			setPaginaTotal(parseInt(pag));
-			setPaginaTotalMemoria(pag);
-			console.log("Pagina", pag);
-		}
-	}, [data]);
-
-	// const getAfter = (data) =>
-	// 	data.edges && data.edges.length > 0
-	// 		? data.edges[data.edges.length - 1].cursor
-	// 		: null;
-
-	// if (error) {
-	// 	return <p>Error</p>;
-	// }
-
-	// if (loading) {
-	// 	return (
-	// 		<Backdrop
-	// 			sx={{ color: "#000", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-	// 			open={loading}>
-	// 			<CircularProgress color='inherit' />
-	// 		</Backdrop>
-	// 	);
-	// }
-
-	// console.log("data", data);
 
 	return (
 		<React.Fragment>
@@ -196,14 +99,14 @@ const Home = (props) => {
 						})}
 					</Grid>
 
-					{paginaTotal > 12 ? (
+					{paginasTotales > 12 ? (
 						<Box
 							display='flex'
 							justifyContent='center'
 							alignItems='center'
 							minHeight='10vh'>
 							<Pagination
-								count={Math.ceil(paginaTotal / 12)}
+								count={Math.ceil(paginasTotales / 12)}
 								page={page}
 								siblingCount={1}
 								boundaryCount={1}
@@ -223,19 +126,28 @@ const Home = (props) => {
 
 export default Home;
 
-
 // export async function getStaticProps()
-export async function getServerSideProps() {
-	const res = await fetch(`${process.env.NEXT_PUBLIC_SPRING}/api/reportes`);
+export async function getServerSideProps(context) {
+	const paginaActual = context.query.Page ? context.query.Page : 1;
+	const res = await fetch(
+		`${process.env.NEXT_PUBLIC_SPRING}/api/reportes?&page=${paginaActual}&size=12&sort=id,desc`
+	);
+
+	const contentType = res.headers.get("X-Total-Count");
+	console.log("contentType", contentType);
+
 	const data = await res.json();
 	if (!data) {
 		return {
 			notFound: true,
 		};
 	}
-	// console.log("data", data);
 	return {
-		props: { data: data },
+		props: {
+			data: data,
+			paginasTotales: contentType,
+			paginaActual: paginaActual,
+		},
 
 		// revalidate: 10,
 		// notFound: true, //regresa el 404

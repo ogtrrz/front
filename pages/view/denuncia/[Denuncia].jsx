@@ -413,16 +413,16 @@ const Denuncia = (props) => {
 		return (
 			<React.Fragment>
 				<Head>
-					<title>{`Transotas.org | ${data.titulo}`}</title>
+					<title>{`Transotas | ${data.titulo.substring(0, 48)}`}</title>
 					<meta name='robots' content='index, follow' />
 					<link
 						rel='canonical'
 						href={`${process.env.NEXT_PUBLIC_URL}${router.asPath}`}
 					/>
-					<meta name='description' content={`Transota, ${data.caso}`} />
+					<meta name='description' content={`Transota, ${data.caso.substring(0, 159)}`} />
 					<meta property='og:type' content='website' />
-					<meta property='og:title' content={`Transota, ${data.titulo}`} />
-					<meta property='og:description' content={`Transota, ${data.caso}`} />
+					<meta property='og:title' content={`Transota, ${data.titulo.substring(0, 48)}`} />
+					<meta property='og:description' content={`Transota, ${data.caso.substring(0, 159)}`} />
 					<meta
 						property='og:image'
 						content={data.img ? data.img : "/transotas.jpg"}
@@ -441,7 +441,7 @@ const Denuncia = (props) => {
 						<Breadcrumbs
 							separator={<NavigateNextIcon fontSize='small' color='primary' />}
 							aria-label='Link al Inicio'>
-							<NextLink href={`/?Page=${Page}`} shallow={true}>
+							<NextLink href={`/?Page=${Page}`} shallow={false}>
 								<Typography
 									sx={{
 										"&:hover": {
