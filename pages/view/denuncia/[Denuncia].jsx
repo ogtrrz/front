@@ -509,7 +509,7 @@ const Denuncia = (props) => {
 
 					<Stack spacing={40}>
 						<Typography variant='body1' color='secondary'>
-							{`Denunciado por ${data.autor} el ${moment(data.fechaix).format(
+							{`Denunciado el ${moment(data.fechaix).format(
 								"DD/MM/YY"
 							)} en 
 								${data.estado}, ${data.ciudad}, 

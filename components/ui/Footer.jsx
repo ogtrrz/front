@@ -16,7 +16,7 @@ const Footer = () => {
 						Transotas.org | Sitio de denuncias contra abusadores.
 					</Typography>
 					<Typography color={"text"} variant='body2'>
-						En contra de compañías, políticos, servidores público o personas en
+						Ya sean compañías, políticos, servidores público o personas para
 						toda América Latina
 					</Typography>
 				</Grid>

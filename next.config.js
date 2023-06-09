@@ -14,6 +14,11 @@
 // });
 
 
+//disable compress lo va a hacer nginx
+// module.exports = {
+//   compress: false,
+// }
+
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,

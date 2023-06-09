@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
-// import axios from "axios";
 import { useRouter } from "next/router";
 import NextLink from "next/link";
 
-import FlagCircleIcon from "@mui/icons-material/FlagCircle";
 import {
 	Button,
 	LinearProgress,
@@ -20,25 +18,9 @@ import {
 	Select,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
-
-// import Table from "@mui/material/Table";
-// import TableBody from "@mui/material/TableBody";
-
-// import TableCell from "@mui/material/TableCell";
-// import TableContainer from "@mui/material/TableContainer";
-// import TableHead from "@mui/material/TableHead";
-// import TableRow from "@mui/material/TableRow";
-import { DataGrid, esES } from "@mui/x-data-grid";
-import RefreshIcon from "@mui/icons-material/Refresh";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
-
-// import { useDemoData } from '@mui/x-data-grid-generator';
-
-import { useSession } from "next-auth/react";
-import { graphql } from "@apollo/client/react/hoc";
 import gql from "graphql-tag";
-import { useLazyQuery, useQuery, useMutation } from "@apollo/react-hooks";
+import {  useQuery } from "@apollo/react-hooks";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import Tarjeta from "components/Tarjeta";

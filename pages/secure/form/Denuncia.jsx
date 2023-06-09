@@ -1,20 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
 import moment from "moment";
 import _ from "lodash";
 import gql from "graphql-tag";
-import { useLazyQuery, useQuery, useMutation } from "@apollo/react-hooks";
-import dayjs from "dayjs";
-import "dayjs/locale/es-mx";
+import { useMutation } from "@apollo/react-hooks";
+
 import * as yup from "yup";
-import { Formik, Form, Field, FormikProvider } from "formik";
-import { Autocomplete, TextField, Switch, ToggleButtonGroup } from "formik-mui";
-import {
-	TimePicker,
-	DatePicker,
-	DateTimePicker,
-} from "formik-mui-x-date-pickers";
+import { Formik, Form, Field } from "formik";
+import { TextField } from "formik-mui";
 import {
 	Button,
 	LinearProgress,
@@ -29,16 +23,13 @@ import {
 	Label,
 	HelperText,
 } from "@mui/material";
-import CircularProgress from "@mui/material/CircularProgress";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+
 
 import OutlinedInput from "@mui/material/OutlinedInput";
 import InputLabel from "@mui/material/InputLabel";
 
 import ListItemText from "@mui/material/ListItemText";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
+import Select from "@mui/material/Select";
 import Checkbox from "@mui/material/Checkbox";
 import { Categorias } from "data/categorias";
 import { useSession } from "next-auth/react";
