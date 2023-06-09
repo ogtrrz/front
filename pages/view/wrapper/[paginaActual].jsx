@@ -145,7 +145,7 @@ export async function getStaticProps(context) {
 			paginaActual: paginaActual,
 		},
 
-		revalidate: 1800,
+		revalidate: 86400,
 		// notFound: true, //regresa el 404
 		// redirect: { //redirecciona a la pagina
 		// 	destination: '/no-data'

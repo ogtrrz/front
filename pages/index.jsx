@@ -10,7 +10,6 @@ import Grid from "@mui/material/Grid";
 import Tarjeta from "components/Tarjeta";
 import useLocalStorageState from "use-local-storage-state";
 
-
 /*
 const Pagina = gql`
 	query REPORTES_QUERY($paginaInput: String!) {
@@ -87,13 +86,13 @@ const Home = ({ data, paginasTotales, paginaActual }) => {
 					<Grid
 						container
 						align='center'
-						alignItems="stretch"
+						alignItems='stretch'
 						spacing={{ xs: 2, sm: 3, md: 5 }}
 						columns={{ xs: 3, sm: 6, md: 9, lg: 12 }}>
 						{data?.map((item) => {
 							return (
 								<React.Fragment key={item.id}>
-									<Grid xs={3} item={true} style={{display: 'flex'}}>
+									<Grid xs={3} item={true} style={{ display: "flex" }}>
 										<Tarjeta item={item} Page={page === 0 ? 1 : page} />
 									</Grid>
 								</React.Fragment>
@@ -136,10 +135,13 @@ export default Home;
 //TODO google analytics o WebVitals
 //TODO social Facebook y twitter
 export async function getServerSideProps(context) {
-	// res.setHeader(
-	// 	"Cache-Control",
+
+	context.res.setHeader(
+		"Cache-Control",
+		"public, s-maxage=600, stale-while-revalidate=3600"
+	);
 	// 	"max-age=86400, must-revalidate"
-	// );
+
 	console.log("resolvedUrl", context.resolvedUrl);
 	console.log("context.query", context.query);
 	console.log("context.query.Pages", context.query.Pages);
