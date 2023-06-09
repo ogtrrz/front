@@ -157,7 +157,7 @@ const ResponsiveAppBar = (props) => {
 			event.target.innerText == "Inicio" ||
 			event.target.innerText == "INICIO"
 		) {
-			router.push(`/`);
+			router.push(`/view/wrapper/1`);
 		} else {
 			router.push("/secure/form/Denuncia");
 		}
@@ -171,11 +171,13 @@ const ResponsiveAppBar = (props) => {
 		const { opcionMenu } = event.currentTarget.dataset;
 		// console.log('opcionMenu', opcionMenu);
 		if (opcionMenu === "Mis Denuncias") {
-			router.push(`/categorys?Query=autor.equals=${session?.username}&Category=Usuario:%20${session?.username}&Page=0`)
+			router.push(
+				`/categorys?Query=autor.equals=${session?.username}&Category=Usuario:%20${session?.username}&Page=0`
+			);
 		}
 		//http://localhost:8080/api/reportes?autor.equals=user&page=0&size=20
 		if (opcionMenu === "Mis Comentarios") {
-			router.push(`/secure/Comentarios?Autor=${session?.username}&Page=0`)
+			router.push(`/secure/Comentarios?Autor=${session?.username}&Page=0`);
 		}
 		//http://localhost:8080/api/comentarios?autor.equals=user&page=0&size=20
 		if (opcionMenu === "Cerrar") return signOut();
@@ -186,7 +188,7 @@ const ResponsiveAppBar = (props) => {
 			if ([...searchText].length > 0) {
 				// console.log("busqueda", searchText);
 				router.push(`/search?SearchCode=${searchText}`);
-			} 
+			}
 			setSearchText("");
 		}
 	};
@@ -222,7 +224,6 @@ const ResponsiveAppBar = (props) => {
 								<IconButton
 									size='large'
 									aria-label='account of current user'
-									
 									aria-haspopup='true'
 									onClick={handleOpenNavMenu}
 									color='inherit'>
@@ -272,7 +273,7 @@ const ResponsiveAppBar = (props) => {
 								""
 							) : (
 								<Typography
-									variant='h6'
+									variant='h1'
 									sx={{
 										mr: 2,
 										display: { xs: "none", md: "flex" },
@@ -282,7 +283,8 @@ const ResponsiveAppBar = (props) => {
 										color: "#fff",
 										textDecoration: "none",
 									}}>
-									{`Hola, ${session?.username}`}
+									Transotas.org
+									{/* {`Hola, ${session?.username}`} */}
 								</Typography>
 							)}
 
@@ -332,7 +334,7 @@ const ResponsiveAppBar = (props) => {
 												onClick={handleCloseUserMenu}>
 												<ManageAccountsIcon />
 												&nbsp;&nbsp;
-												<Typography textAlign='center'>Mi cuenta</Typography>
+												<Typography textAlign='center'>{`Hola, ${session?.username}`}</Typography>
 											</MenuItem>
 											<MenuItem
 												key='Mis Denuncias'

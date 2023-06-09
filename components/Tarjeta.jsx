@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState } from "react";
 import NextLink from "next/link";
 import Image from "next/image";
 import _ from "lodash";
@@ -30,7 +30,7 @@ export const PATCH_INFORMACION = gql`
 		patchInformacion(id: $id, input: $input)
 			@rest(
 				type: "Informacion"
-				path: "/informacions/:id"
+				path: "/informacions/{args.id}"
 				method: "PATCH"
 				bodyKey: "input"
 			) {
@@ -92,14 +92,13 @@ export default function Tarjeta({ item, Page }) {
 			},
 		}
 	);
+
+	const [pestesBadge, setPestesBadge] = useState(item?.informacion?.rating);
+
 	//TODO actualizar cache con respuesta
 	// https://infinum.com/handbook/frontend/react/recipes/caching-nextjs-public-folder
-	//TODO no sirve cambio en el badge de pestes
-	//TODO no sirve el cote de visitas
-	//TODO imagenes en apesta no cargan
-	//TODO no sirve la paginacion no lo lee nuevamente
 	const handlePestes = () => {
-		// console.log("Pestes");
+		console.log("Pestes");
 		const findView = _.findIndex(pestesStorage, (it) => it === item.id + "");
 
 		let info = _.cloneDeep(item?.informacion);
@@ -115,8 +114,10 @@ export default function Tarjeta({ item, Page }) {
 			_.remove(pestesArray, (it) => it === item.id + "");
 			// console.log("entro remove2", pestesArray);
 			setPestesStorage(pestesArray);
-			info.rating = item?.informacion?.rating - 1;
+			info.rating = item?.informacion?.rating;
 		}
+
+		setPestesBadge(info.rating);
 
 		patchInformacion({
 			variables: {
@@ -126,9 +127,28 @@ export default function Tarjeta({ item, Page }) {
 		});
 	};
 
+	// const handleAddVista = (e, item) => {
+	// 	console.log("click en id", item.informacion.id);
+	// 	console.log("click en vistas", item.informacion.vistas);
+	// 	let infoVistas = _.cloneDeep(item.informacion);
+	// 	infoVistas.vistas = item.informacion.vistas + 1;
+	// 	patchInformacion({
+	// 		variables: {
+	// 			id: infoVistas.id,
+	// 			input: infoVistas,
+	// 		},
+	// 	});
+	// };
+
 	// console.log("data", data);
 	return (
-		<Card sx={{ maxWidth: 340 }}>
+		<Card
+			sx={{ maxWidth: 340 }}
+			style={{
+				display: "flex",
+				justifyContent: "space-between",
+				flexDirection: "column",
+			}}>
 			<NextLink
 				href={`/view/denuncia/${item?.id}?Pages=${Page}&slug=${_.kebabCase(
 					item?.titulo.replace(/[\W_]+/g, "-")
@@ -191,9 +211,7 @@ export default function Tarjeta({ item, Page }) {
 						aria-label='vota Control de Pestes'
 						onClick={handlePestes}>
 						<Badge
-							badgeContent={
-								item?.informacion?.rating ? item?.informacion?.rating : 0
-							}
+							badgeContent={pestesBadge}
 							color='primary'
 							anchorOrigin={{
 								vertical: "bottom",

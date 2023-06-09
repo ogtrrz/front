@@ -10,7 +10,7 @@ import Grid from "@mui/material/Grid";
 import Tarjeta from "components/Tarjeta";
 import useLocalStorageState from "use-local-storage-state";
 
-//TODO order by id o por fechaix el id si jala fechaix no jala tan bien
+
 /*
 const Pagina = gql`
 	query REPORTES_QUERY($paginaInput: String!) {
@@ -43,8 +43,6 @@ const Home = ({ data, paginasTotales, paginaActual }) => {
 
 	const [page, setPage] = useState(parseInt(paginaActual) || 1);
 
-	//TODO paginacion no esta cambiando los items
-	//TODO historia para el BreadCrumb
 	const [historia, setHistoria] = useLocalStorageState("transas_historia", {
 		defaultValue: [],
 	});
@@ -81,18 +79,21 @@ const Home = ({ data, paginasTotales, paginaActual }) => {
 				justifyContent='center'
 				alignItems='center'>
 				<Stack direction='column' spacing={2}>
+					<br />
 					<Breadcrumbs aria-label='breadcrumb'>
-						<Typography color='text'>Inicio</Typography>
+						<Typography color='text'>&nbsp;&nbsp;&nbsp;Inicio</Typography>
 					</Breadcrumbs>
+					<br />
 					<Grid
 						container
 						align='center'
+						alignItems="stretch"
 						spacing={{ xs: 2, sm: 3, md: 5 }}
 						columns={{ xs: 3, sm: 6, md: 9, lg: 12 }}>
 						{data?.map((item) => {
 							return (
 								<React.Fragment key={item.id}>
-									<Grid xs={3} item={true}>
+									<Grid xs={3} item={true} style={{display: 'flex'}}>
 										<Tarjeta item={item} Page={page === 0 ? 1 : page} />
 									</Grid>
 								</React.Fragment>
@@ -129,8 +130,11 @@ export default Home;
 
 // export async function getStaticProps()
 //TODO validar Cache como sale natural de Nextjs
-//TODO ux poner footer haver pagina menos ancha ??? o dejarla reactiva???
-//TODO construir mapa SEO borrar serversite.xml si no se puede corregir
+//TODO poner el tema de login
+//TODO verificar la forma de renuncia al 100$
+//TODOnextjs check list https://nextjs.org/docs/pages/building-your-application/deploying/production-checklist
+//TODO google analytics o WebVitals
+//TODO social Facebook y twitter
 export async function getServerSideProps(context) {
 	// res.setHeader(
 	// 	"Cache-Control",

@@ -43,6 +43,7 @@ import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import Tarjeta from "components/Tarjeta";
 import useLocalStorageState from "use-local-storage-state";
+import NotFoundPage from "components/NotFoundPage";
 
 const Busqueda = gql`
 	query ($searchInput: String!) {
@@ -70,7 +71,7 @@ const Busqueda = gql`
 `;
 //path: "_search/reportes?query={args.search}&page=0&size=32"
 
-//TODO order by id o por fechaix el id si jala fechaix no jala tan bien
+
 const Pagina = gql`
 	query REPORTES_QUERY($paginaInput: String!) {
 		show(pagina: $paginaInput)
@@ -99,8 +100,6 @@ const Pagina = gql`
 const Home = () => {
 	// const [searchInput, setSearchInput] = useState("hola");
 
-	//TODO prefetch 5 paginas de manera silenciosa en cache
-	//TODO Skeleton
 	//reactivo
 	const router = useRouter();
 
@@ -135,7 +134,6 @@ const Home = () => {
 	// 	);
 	// };
 
-	//TODO se me hace que no jala
 	// https://github.com/apollographql/apollo-client/issues/7131
 	// useEffect(() => {
 	// 	console.log(`fetch More Pagina ===================== ${page+1}`);
@@ -143,7 +141,6 @@ const Home = () => {
 	// 		variables: { paginaInput: page+1 },
 	// 	});
 	// }, [!loading]);
-	//TODO poner Page if loaded y no volver a corer el fetch
 	// useEffect(() => {
 	// 	if (Page) {
 	// 		setPage(Page);
@@ -163,8 +160,7 @@ const Home = () => {
 	// 	}
 	// }, []);
 
-
-	const [dataArray, setDataArray] = useState([])
+	const [dataArray, setDataArray] = useState([]);
 	// let dataArray = []
 	useEffect(() => {
 		if (data?.show) {
@@ -174,9 +170,8 @@ const Home = () => {
 	}, [data]);
 
 	if (error) {
-		return <p>Error</p>;
+		return <NotFoundPage />;
 	}
-
 
 	// useEffect(() => {
 	// 	if (SearchCode) {
@@ -189,9 +184,6 @@ const Home = () => {
 	// 		? data.edges[data.edges.length - 1].cursor
 	// 		: null;
 
-	if (error) {
-		return <p>Error</p>;
-	}
 
 	if (loading) {
 		return (
@@ -208,6 +200,7 @@ const Home = () => {
 	return (
 		<Box sx={{ p: 3, border: "1px dashed grey" }}>
 			<Stack direction='column' spacing={2}>
+				<br />
 				<Breadcrumbs
 					separator={<NavigateNextIcon fontSize='small' color='primary' />}
 					aria-label='Link al Inicio'>
@@ -219,12 +212,13 @@ const Home = () => {
 								},
 							}}
 							color='primary.main'>
-							{`Inicio`}
+							&nbsp;&nbsp;&nbsp;Inicio
 						</Typography>
 					</NextLink>
 
 					<Typography color='text'>{`Resultados de:  ${SearchCode}`}</Typography>
 				</Breadcrumbs>
+				<br />
 				<Grid
 					container
 					spacing={{ xs: 2, sm: 3, md: 5 }}

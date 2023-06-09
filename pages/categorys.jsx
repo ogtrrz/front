@@ -43,6 +43,7 @@ import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import Tarjeta from "components/Tarjeta";
 import useLocalStorageState from "use-local-storage-state";
+import NotFoundPage from "components/NotFoundPage";
 
 const Busqueda = gql`
 	query REPORTES_QUERY($queryInput: String!, $paginaInput: String!) {
@@ -73,11 +74,6 @@ const Busqueda = gql`
 `;
 
 const Home = () => {
-	// const [searchInput, setSearchInput] = useState("hola");
-
-	//TODO prefetch 5 paginas de manera silenciosa en cache
-	//TODO Skeleton
-	//reactivo
 	const router = useRouter();
 
 	const { Page, CategoryCode, Category, Query } = router.query;
@@ -114,7 +110,6 @@ const Home = () => {
 		);
 	};
 
-	//TODO quitar fetch
 	useEffect(() => {
 		if (Page) {
 			setPage(Page);
@@ -140,7 +135,7 @@ const Home = () => {
 	}, [data]);
 
 	if (error) {
-		return <p>Error</p>;
+		return <NotFoundPage />;
 	}
 
 	if (loading) {
@@ -158,6 +153,7 @@ const Home = () => {
 	return (
 		<Box sx={{ p: 3, border: "1px dashed grey" }}>
 			<Stack direction='column' spacing={2}>
+				<br />
 				<Breadcrumbs
 					separator={<NavigateNextIcon fontSize='small' color='primary' />}
 					aria-label='Link al Inicio'>
@@ -169,12 +165,13 @@ const Home = () => {
 								},
 							}}
 							color='primary.main'>
-							{`Inicio`}
+							&nbsp;&nbsp;&nbsp;Inicio
 						</Typography>
 					</NextLink>
 
 					<Typography color='text'>{`${Category}`}</Typography>
 				</Breadcrumbs>
+				<br />
 				<Grid
 					container
 					spacing={{ xs: 2, sm: 3, md: 5 }}

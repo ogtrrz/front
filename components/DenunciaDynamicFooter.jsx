@@ -38,7 +38,6 @@ import { useSession } from "next-auth/react";
 // import Image from "../img/main.jpg"; // Import using relative path
 // <Paper sx={{ backgroundImage: `url(${Image})` }}></Paper>;
 
-//TODO read from cache if exist o el manejo es automatico???
 const ReporteQuery = gql`
 	query REPORTE_QUERY($idReporte: String!) {
 		show(id: $idReporte) @rest(type: "Reporte", path: "reportes/{args.id}") {
@@ -313,28 +312,27 @@ const DenunciaDynamicFooter = ({ data }) => {
 		);
 	};
 
-	//TODO incrementa el badge de los vistos
-	const handleView = () => {
-		// console.log("View", viewStorage);
-		const findView = _.findIndex(viewStorage, (item) => item === data.id);
-		// console.log("findView", findView);
-		if (findView === -1) {
-			setViewStorage([...viewStorage, data.id]);
-			// console.log("findView Entro0");
-			// console.log("findView Entro", data.informacion);
-			let info = {};
-			info = _.cloneDeep(data.informacion);
-			// console.log("info", info);
-			info.vistas = 0;
-			info.vistas = data.informacion?.vistas ? data.informacion?.vistas + 1 : 1;
-			patchInformacion({
-				variables: {
-					id: info.id,
-					input: info,
-				},
-			});
-		}
-	};
+	// const handleView = () => {
+	// 	// console.log("View", viewStorage);
+	// 	const findView = _.findIndex(viewStorage, (item) => item === data.id);
+	// 	// console.log("findView", findView);
+	// 	if (findView === -1) {
+	// 		setViewStorage([...viewStorage, data.id]);
+	// 		// console.log("findView Entro0");
+	// 		// console.log("findView Entro", data.informacion);
+	// 		let info = {};
+	// 		info = _.cloneDeep(data.informacion);
+	// 		// console.log("info", info);
+	// 		info.vistas = 0;
+	// 		info.vistas = data.informacion?.vistas ? data.informacion?.vistas + 1 : 1;
+	// 		patchInformacion({
+	// 			variables: {
+	// 				id: info.id,
+	// 				input: info,
+	// 			},
+	// 		});
+	// 	}
+	// };
 
 	// useEffect(() => {
 	// 	if (Denuncia) {
@@ -419,7 +417,6 @@ const DenunciaDynamicFooter = ({ data }) => {
 	// console.log("dataReporte", dataReporte);
 
 	// console.log("dataCaso", dataCaso);
-	//TODO el Breadcrumbs debe traer la pagina de la que llega y el page debe estar en url por si gurdan en favoritos
 	// if (!loadingReporte && !loadingCaso && dataCaso && dataReporte)
 	if (true) {
 		return (

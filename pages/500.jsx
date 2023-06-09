@@ -32,33 +32,23 @@ import { FacebookShareButton } from "react-share";
 import { useSession } from "next-auth/react";
 import DenunciaDynamicFooter from "components/DenunciaDynamicFooter";
 
-const E404 = () => {
+const E500 = () => {
 	return (
 		<React.Fragment>
 			<Box sx={{ p: 165, border: "1px dashed grey" }} />
 			<Typography variant='h4' style={{ textAlign: "center" }}>
-				<strong>Error: 404</strong>
+				<strong>Error: 500</strong>
 			</Typography>
 			<Typography variant='h4' style={{ textAlign: "center" }}>
-				<strong>No se encontró la pagina buscada</strong>
+				<strong>Transotas.org esta fuera de servicio temporalmente</strong>
 			</Typography>
-			<br/>
-			<NextLink href={`/`} shallow={true}>
-				<Typography
-					variant='h4'
-          style={{ textAlign: "center" }}
-					sx={{
-						"&:hover": {
-							textDecoration: "underline",
-						},
-					}}
-					color='primary.main'>
-					<strong>Ir al Inicio</strong>
-				</Typography>
-			</NextLink>
+			<Typography variant='h4' style={{ textAlign: "center" }}>
+				<strong>Estamos trabajando duro para restablecerlo</strong>
+			</Typography>
+			
 			<Box sx={{ p: 165, border: "1px dashed grey" }} />
 		</React.Fragment>
 	);
 };
 
-export default E404;
+export default E500;

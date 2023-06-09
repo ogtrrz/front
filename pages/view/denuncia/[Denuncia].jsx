@@ -40,7 +40,6 @@ import DenunciaDynamicFooter from "components/DenunciaDynamicFooter";
 // import Image from "../img/main.jpg"; // Import using relative path
 // <Paper sx={{ backgroundImage: `url(${Image})` }}></Paper>;
 
-//TODO read from cache if exist o el manejo es automatico???
 const ReporteQuery = gql`
 	query REPORTE_QUERY($idReporte: String!) {
 		show(id: $idReporte) @rest(type: "Reporte", path: "reportes/{args.id}") {
@@ -310,7 +309,6 @@ const Denuncia = (props) => {
 		);
 	};
 
-	//TODO incrementa el badge de los vistos
 	const handleView = () => {
 		// console.log("View", viewStorage);
 		const findView = _.findIndex(viewStorage, (item) => item === Denuncia);
@@ -339,13 +337,14 @@ const Denuncia = (props) => {
 	// 	}
 	// }, [Denuncia]);
 
-	// useEffect(() => {
-	// 	if (!loadingReporte && dataReporte) {
-	// 		// console.log("idCaso", data.casoText?.id);
-	// 		getCaso({ variables: { idCaso: data.casoText?.id } });
-	// 		handleView();
-	// 	}
-	// }, [loadingReporte]);
+	const [vista, setVista] = useState(true);
+
+	useEffect(() => {
+		if (vista) {
+			handleView();
+			setVista(false);
+		}
+	}, []);
 
 	const handleSubmitComentario = (e) => {
 		// console.log("comentarioState", comentarioState);
@@ -408,128 +407,129 @@ const Denuncia = (props) => {
 	// console.log("dataReporte", dataReporte);
 
 	// console.log("dataCaso", dataCaso);
-	//TODO el Breadcrumbs debe traer la pagina de la que llega y el page debe estar en url por si gurdan en favoritos
 	// if (!loadingReporte && !loadingCaso && dataCaso && dataReporte)
-	if (true) {
-		return (
-			<React.Fragment>
-				<Head>
-					<title>{`Transotas | ${data.titulo.substring(0, 48)}`}</title>
-					<meta name='robots' content='index, follow' />
-					<link
-						rel='canonical'
-						href={`${process.env.NEXT_PUBLIC_URL}${router.asPath}`}
-					/>
-					<meta
-						name='description'
-						content={`Transota, ${data.caso.substring(0, 159)}`}
-					/>
-					<meta property='og:type' content='website' />
-					<meta
-						property='og:title'
-						content={`Transota, ${data.titulo.substring(0, 48)}`}
-					/>
-					<meta
-						property='og:description'
-						content={`Transota, ${data.caso.substring(0, 159)}`}
-					/>
-					<meta
-						property='og:image'
-						content={data.img ? data.img : "/transotas.jpg"}
-					/>
-					<meta
-						property='og:url'
-						content={`${process.env.NEXT_PUBLIC_URL}${router.asPath}`}
-					/>
-				</Head>
-				<Box sx={{ p: 3, border: "1px dashed grey" }}>
-					<Paper
-						elevation={6}
-						style={{
-							padding: 24,
-						}}>
-						<Breadcrumbs
-							separator={<NavigateNextIcon fontSize='small' color='primary' />}
-							aria-label='Link al Inicio'>
-							<NextLink href={`/?Pages=${Pages?Pages:1}`} shallow={false}>
-								<Typography
-									sx={{
-										"&:hover": {
-											textDecoration: "underline",
-										},
-									}}
-									color='primary.main'>
-									{`Inicio (${Pages})`}
-								</Typography>
-							</NextLink>
 
-							<Typography color='text.primary'>{`Transota,  ${data.titulo}`}</Typography>
-						</Breadcrumbs>
+	return (
+		<React.Fragment>
+			<Head>
+				<title>{`Transotas | ${data.titulo.substring(0, 48)}`}</title>
+				<meta name='robots' content='index, follow' />
+				<link
+					rel='canonical'
+					href={`${process.env.NEXT_PUBLIC_URL}${router.asPath}`}
+				/>
+				<meta
+					name='description'
+					content={`Transota, ${data.caso.substring(0, 159)}`}
+				/>
+				<meta property='og:type' content='website' />
+				<meta
+					property='og:title'
+					content={`Transota, ${data.titulo.substring(0, 48)}`}
+				/>
+				<meta
+					property='og:description'
+					content={`Transota, ${data.caso.substring(0, 159)}`}
+				/>
+				<meta
+					property='og:image'
+					content={data.img ? data.img : "/transotas.jpg"}
+				/>
+				<meta
+					property='og:url'
+					content={`${process.env.NEXT_PUBLIC_URL}${router.asPath}`}
+				/>
+			</Head>
+			<Box sx={{ p: 3, border: "1px dashed grey" }}>
+				<Paper
+					elevation={6}
+					style={{
+						padding: 24,
+					}}>
+					<br />
+					<Breadcrumbs
+						separator={<NavigateNextIcon fontSize='small' color='primary' />}
+						aria-label='Link al Inicio'>
+						<NextLink
+							href={`/view/wrapper/${Pages ? Pages : 1}`}
+							shallow={false}>
+							<Typography
+								sx={{
+									"&:hover": {
+										textDecoration: "underline",
+									},
+								}}
+								color='primary.main'>
+								{`Inicio (${Pages})`}
+							</Typography>
+						</NextLink>
+
+						<Typography color='text.primary'>{`Transota,  ${data.titulo}`}</Typography>
+					</Breadcrumbs>
+					<br />
+					<Box
+						sx={{ position: "relative", mt: 40, overflow: "hidden" }}
+						display='flex'
+						justifyContent='center'
+						alignItems='center'>
+						{data.img ? (
+							<Image
+								src={data.img}
+								alt={`Transotas ${data.titulo}`}
+								height={250}
+								width={250}
+								style={{ objectFit: "cover" }}
+							/>
+						) : (
+							<Image
+								src='/transotas.jpg'
+								alt='Transotas'
+								height={250}
+								width={250}
+								style={{ objectFit: "cover" }}
+							/>
+						)}
 
 						<Box
-							sx={{ position: "relative", mt: 40,  overflow: "hidden" }}
 							display='flex'
-							justifyContent='center'
-							alignItems='center'>
-							{data.img ? (
-								<Image
-									src={data.img}
-									alt={`Transotas ${data.titulo}`}
-									height={250}
-									width={250}
-									style={{ objectFit: "cover" }}
-								/>
-							) : (
-								<Image
-									src='/transotas.jpg'
-									alt='Transotas'
-									height={250}
-									width={250}
-									style={{ objectFit: "cover" }}
-								/>
-							)}
-
-							<Box
-								display='flex'
-								sx={{
-									position: "absolute",
-									bottom: 0,
-									left: 0,
-									width: "100%",
-									bgcolor: "rgba(142, 3, 45, 0.85)",
-									color: "white",
-									padding: "10px",
-								}}>
-								<Typography variant='h1' color='white'>
-									{`Transota, ${data.titulo}`}
-								</Typography>
-							</Box>
+							sx={{
+								position: "absolute",
+								bottom: 0,
+								left: 0,
+								width: "100%",
+								bgcolor: "rgba(142, 3, 45, 0.85)",
+								color: "white",
+								padding: "10px",
+							}}>
+							<Typography variant='h1' color='white'>
+								{`Transota, ${data.titulo}`}
+							</Typography>
 						</Box>
+					</Box>
 
-						<Stack spacing={40}>
-							<Typography variant='body1' color='secondary'>
-								{`Denunciado por ${data.autor} el ${moment(data.fechaix).format(
-									"DD/MM/YY"
-								)} en 
+					<Stack spacing={40}>
+						<Typography variant='body1' color='secondary'>
+							{`Denunciado por ${data.autor} el ${moment(data.fechaix).format(
+								"DD/MM/YY"
+							)} en 
 								${data.estado}, ${data.ciudad}, 
 								${data.pais}
 								`}
-							</Typography>
+						</Typography>
 
-							<Typography
-								variant='body1'
-								color='text'
-								style={{ whiteSpace: "pre-line" }}>
-								{caso.descripcion.replaceAll("\n", "\n\n")}
-							</Typography>
-						</Stack>
-						{/* Partir aqui */}
-						<DenunciaDynamicFooter data={data} />
-					</Paper>
-				</Box>
-			</React.Fragment>
-		);
-	}
+						<Typography
+							variant='body1'
+							color='text'
+							style={{ whiteSpace: "pre-line" }}>
+							{caso.descripcion.replaceAll("\n", "\n\n")}
+						</Typography>
+					</Stack>
+					{/* Partir aqui */}
+					<DenunciaDynamicFooter data={data} />
+				</Paper>
+			</Box>
+		</React.Fragment>
+	);
 };
 
 export default Denuncia;

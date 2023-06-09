@@ -138,7 +138,7 @@ export const POST_REPORTE = gql`
 		}
 	}
 `;
-
+//TODO finalizar forma de denuncia
 const Denuncia = () => {
 	const router = useRouter();
 	const { data: session } = useSession();

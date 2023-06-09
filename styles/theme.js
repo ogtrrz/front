@@ -33,11 +33,11 @@ export const theme = createTheme({
 	typography: {
 		fontFamily: poppins.style.fontFamily,
 		h1: { fontSize: 28 },
-		h2: { fontSize: 23 },
+		h2: { fontSize: 27 },
 		h3: { fontSize: 26 },
 		h4: { fontSize: 25 },
 		h5: { fontSize: 24 },
-		h6: { fontSize: 28 },
+		h6: { fontSize: 23 },
 		subtitle1: { fontSize: 22 },
 		subtitle2: { fontSize: 19 },
 		body1: { fontSize: 16 },

@@ -32,15 +32,15 @@ import { FacebookShareButton } from "react-share";
 import { useSession } from "next-auth/react";
 import DenunciaDynamicFooter from "components/DenunciaDynamicFooter";
 
-const E404 = () => {
+const NotFoundPage = () => {
 	return (
 		<React.Fragment>
 			<Box sx={{ p: 165, border: "1px dashed grey" }} />
 			<Typography variant='h4' style={{ textAlign: "center" }}>
-				<strong>Error: 404</strong>
+				<strong>Sin Resultados</strong>
 			</Typography>
 			<Typography variant='h4' style={{ textAlign: "center" }}>
-				<strong>No se encontró la pagina buscada</strong>
+				<strong>Intentelo nuevamente</strong>
 			</Typography>
 			<br/>
 			<NextLink href={`/`} shallow={true}>
@@ -61,4 +61,4 @@ const E404 = () => {
 	);
 };
 
-export default E404;
+export default NotFoundPage;

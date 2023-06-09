@@ -5,8 +5,10 @@ import createEmotionCache from "../styles/createEmotionCache";
 import { CacheProvider } from "@emotion/react";
 import { Stack } from "@mui/material";
 import ResponsiveAppBar from "components/ui/ResponsiveAppBar";
+import Footer from "../components/ui/Footer";
 import { SessionProvider } from "next-auth/react";
 import WithGraphQL from 'config/with-graphql';
+// import Script from 'next/script'
 
 const clientSideEmotionCache = createEmotionCache();
 
@@ -23,6 +25,7 @@ function MyApp({
 						<Stack>
 							<ResponsiveAppBar {...pageProps}/>
 							<Component {...pageProps} />
+							<Footer />
 						</Stack>
 					</WithGraphQL>
 				</SessionProvider>

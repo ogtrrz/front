@@ -10,7 +10,6 @@ import Grid from "@mui/material/Grid";
 import Tarjeta from "components/Tarjeta";
 import useLocalStorageState from "use-local-storage-state";
 
-//TODO order by id o por fechaix el id si jala fechaix no jala tan bien
 /*
 const Pagina = gql`
 	query REPORTES_QUERY($paginaInput: String!) {
@@ -43,8 +42,6 @@ const Home = ({ data, paginasTotales, paginaActual }) => {
 
 	const [page, setPage] = useState(parseInt(paginaActual) || 1);
 
-	//TODO paginacion no esta cambiando los items
-	//TODO historia para el BreadCrumb
 	const [historia, setHistoria] = useLocalStorageState("transas_historia", {
 		defaultValue: [],
 	});
@@ -76,23 +73,23 @@ const Home = ({ data, paginasTotales, paginaActual }) => {
 				<meta name='description' content={`Transotas de ${descripcionMeta}`} />
 			</Head>
 
-			<Box
-				sx={{ border: "1px dashed grey", display: "flex" }}
-				justifyContent='center'
-				alignItems='center'>
+			<Box sx={{ border: "1px dashed grey", display: "flex", pl: 10 }}>
 				<Stack direction='column' spacing={2}>
+					<br />
 					<Breadcrumbs aria-label='breadcrumb'>
-						<Typography color='text'>Inicio</Typography>
+						<Typography color='text'>&nbsp;&nbsp;&nbsp;Inicio</Typography>
 					</Breadcrumbs>
+					<br />
 					<Grid
 						container
 						align='center'
+						alignItems='stretch'
 						spacing={{ xs: 2, sm: 3, md: 5 }}
 						columns={{ xs: 3, sm: 6, md: 9, lg: 12 }}>
 						{data?.map((item) => {
 							return (
 								<React.Fragment key={item.id}>
-									<Grid xs={3} item={true}>
+									<Grid xs={3} item={true} style={{ display: "flex" }}>
 										<Tarjeta item={item} Page={page === 0 ? 1 : page} />
 									</Grid>
 								</React.Fragment>
@@ -128,9 +125,6 @@ const Home = ({ data, paginasTotales, paginaActual }) => {
 export default Home;
 
 // export async function getStaticProps()
-//TODO validar Cache como sale natural de Nextjs
-//TODO ux poner footer haver pagina menos ancha ??? o dejarla reactiva???
-//TODO construir mapa SEO borrar serversite.xml si no se puede corregir
 export async function getStaticProps(context) {
 	const { params } = context;
 	const paginaActual = params.paginaActual;
@@ -162,7 +156,7 @@ export async function getStaticProps(context) {
 export async function getStaticPaths() {
 	let pathsWithParams = [];
 	for (let i = 0; i < 77; i++) {
-		pathsWithParams.push({ params: { paginaActual: i + '' } });
+		pathsWithParams.push({ params: { paginaActual: i + "" } });
 	}
 	return {
 		paths: pathsWithParams,
