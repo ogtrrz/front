@@ -32,8 +32,7 @@ import Grid from "@mui/material/Grid";
 // import TableContainer from "@mui/material/TableContainer";
 // import TableHead from "@mui/material/TableHead";
 // import TableRow from "@mui/material/TableRow";
-import { DataGrid, esES } from "@mui/x-data-grid";
-import RefreshIcon from "@mui/icons-material/Refresh";
+
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import ReviewsIcon from "@mui/icons-material/Reviews";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -42,22 +41,11 @@ import SendIcon from "@mui/icons-material/Send";
 // import { useDemoData } from '@mui/x-data-grid-generator';
 
 import { useSession } from "next-auth/react";
-import { graphql } from "@apollo/client/react/hoc";
 import gql from "graphql-tag";
-import { useLazyQuery, useQuery, useMutation } from "@apollo/react-hooks";
-import Backdrop from "@mui/material/Backdrop";
-import CircularProgress from "@mui/material/CircularProgress";
-import Tarjeta from "components/Tarjeta";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import Divider from "@mui/material/Divider";
+import { useQuery, useMutation } from "@apollo/react-hooks";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
-import CardMedia from "@mui/material/CardMedia";
 import CardHeader from "@mui/material/CardHeader";
 
 const Busqueda = gql`

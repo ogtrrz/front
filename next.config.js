@@ -19,6 +19,9 @@
 //   compress: false,
 // }
 
+
+// const {PHASE_DEVELOPMENT_SERVER} = requiere('next/constants')
+
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,

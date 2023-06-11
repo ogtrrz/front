@@ -128,9 +128,9 @@ const Home = ({ data, paginasTotales, paginaActual }) => {
 export default Home;
 
 // export async function getStaticProps()
-//TODO validar Cache como sale natural de Nextjs
-//TODO poner el tema de login
-//TODO verificar la forma de renuncia al 100$
+//TODO resolver login
+//TODO verificar la forma de renuncia al 100% quitar anxios ???
+//TODO ligthening libraries mui lodash etc, borrar las que no se usan
 //TODOnextjs check list https://nextjs.org/docs/pages/building-your-application/deploying/production-checklist
 //TODO google analytics o WebVitals
 //TODO social Facebook y twitter

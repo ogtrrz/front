@@ -479,6 +479,7 @@ const Denuncia = (props) => {
 								height={250}
 								width={250}
 								style={{ objectFit: "cover" }}
+								priority={true}
 							/>
 						) : (
 							<Image
@@ -509,9 +510,7 @@ const Denuncia = (props) => {
 
 					<Stack spacing={40}>
 						<Typography variant='body1' color='secondary'>
-							{`Denunciado el ${moment(data.fechaix).format(
-								"DD/MM/YY"
-							)} en 
+							{`Denunciado el ${moment(data.fechaix).format("DD/MM/YY")} en 
 								${data.estado}, ${data.ciudad}, 
 								${data.pais}
 								`}
@@ -535,11 +534,9 @@ const Denuncia = (props) => {
 export default Denuncia;
 
 export async function getStaticProps(context) {
-	// res.setHeader("Cache-Control", "max-age=31536000, immutable");
+
 	const { params } = context;
 	const Denuncia = params.Denuncia;
-	// console.log("params", params);
-
 	const resp = await fetch(
 		`${process.env.NEXT_PUBLIC_SPRING}/api/reportes/${Denuncia}`
 	);
@@ -555,11 +552,9 @@ export async function getStaticProps(context) {
 			notFound: true,
 		};
 	}
-	// console.log("data", data);
-
 	return {
 		props: { data: data, caso: caso },
-		revalidate: 86400,
+		// revalidate: 86400,
 		// notFound: true, //regresa el 404
 		// redirect: { //redirecciona a la pagina
 		// 	destination: '/no-data'

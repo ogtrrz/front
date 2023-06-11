@@ -32,7 +32,7 @@ import ListItemText from "@mui/material/ListItemText";
 import Select from "@mui/material/Select";
 import Checkbox from "@mui/material/Checkbox";
 import { Categorias } from "data/categorias";
-import { useSession } from "next-auth/react";
+import { useSession, getSession } from "next-auth/react";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -133,6 +133,15 @@ export const POST_REPORTE = gql`
 const Denuncia = () => {
 	const router = useRouter();
 	const { data: session } = useSession();
+	console.log('session', session);
+
+
+	const se = async () => {
+		const sess = await getSession();
+		console.log("sess", sess);
+	}
+	
+	se()
 
 	const [selectedFile, setSelectedFile] = useState(null);
 	const [categoryState, setCategoryState] = useState([]);

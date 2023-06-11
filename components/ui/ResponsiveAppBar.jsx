@@ -25,7 +25,7 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 // import { blueGrey } from '@mui/material/colors';
 import theme from "styles/theme";
-import { useSession, signIn, signOut, getSession } from "next-auth/react";
+import { useSession, signIn, signOut } from "next-auth/react";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 // import AccountCircleIcon from '@mui/icons-material/AccountCircle';
