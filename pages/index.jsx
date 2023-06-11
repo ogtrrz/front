@@ -1,50 +1,24 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
-import { Stack, Box, Typography, Pagination, Breadcrumbs } from "@mui/material";
+import Stack from "@mui/material/Stack";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Pagination from "@mui/material/Pagination";
+import Breadcrumbs from "@mui/material/Breadcrumbs";
 import Grid from "@mui/material/Grid";
-// import gql from "graphql-tag";
-// import { useQuery } from "@apollo/react-hooks";
-// import Backdrop from "@mui/material/Backdrop";
-// import CircularProgress from "@mui/material/CircularProgress";
 import Tarjeta from "components/Tarjeta";
-import useLocalStorageState from "use-local-storage-state";
+// import useLocalStorageState from "use-local-storage-state";
 
-/*
-const Pagina = gql`
-	query REPORTES_QUERY($paginaInput: String!) {
-		show(pagina: $paginaInput)
-			@rest(
-				type: "Reporte"
-				path: "reportes?page={args.pagina}&size=12&sort=id,desc"
-			) {
-			id @export(as: "showId")
-			titulo
-			caso
-			img
-			fechaix
-			ciudad
-			estado
-			pais
-			extra10
-			informacion {
-				id
-				comentarios
-				vistas
-				rating
-			}
-		}
-	}
-`;
-*/
+
 const Home = ({ data, paginasTotales, paginaActual }) => {
 	const router = useRouter();
 
 	const [page, setPage] = useState(parseInt(paginaActual) || 1);
 
-	const [historia, setHistoria] = useLocalStorageState("transas_historia", {
-		defaultValue: [],
-	});
+	// const [historia, setHistoria] = useLocalStorageState("transas_historia", {
+	// 	defaultValue: [],
+	// });
 
 	const handleChangePagination = (event, value) => {
 		const pag = value === 0 ? 1 : value;

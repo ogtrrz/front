@@ -1,9 +1,9 @@
 import "../styles/globals.css";
-import { ThemeProvider } from "@mui/material";
+import { ThemeProvider } from "@mui/material/styles";
 import { theme } from "../styles/theme";
 import createEmotionCache from "../styles/createEmotionCache";
 import { CacheProvider } from "@emotion/react";
-import { Stack } from "@mui/material";
+import Stack from "@mui/material/Stack";
 import ResponsiveAppBar from "components/ui/ResponsiveAppBar";
 import Footer from "../components/ui/Footer";
 import { SessionProvider } from "next-auth/react";

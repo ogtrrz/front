@@ -6,24 +6,24 @@ import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
-import Button from "@mui/material/Button";
+// import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import Badge from "@mui/material/Badge";
 import moment from "moment";
 import FacebookIcon from "@mui/icons-material/Facebook";
-import TwitterIcon from "@mui/icons-material/Twitter";
+// import TwitterIcon from "@mui/icons-material/Twitter";
 import PestControlIcon from "@mui/icons-material/PestControl";
 import ReviewsIcon from "@mui/icons-material/Reviews";
 //import VisibilityIcon from '@mui/icons-material/Visibility';
 import AdsClickIcon from "@mui/icons-material/AdsClick";
-import { graphql } from "@apollo/client/react/hoc";
+// import { graphql } from "@apollo/client/react/hoc";
 import gql from "graphql-tag";
-import { useLazyQuery, useQuery, useMutation } from "@apollo/react-hooks";
+import { useMutation } from "@apollo/react-hooks";
 import useLocalStorageState from "use-local-storage-state";
 import { FacebookShareButton } from "react-share";
-import { setContext } from "@apollo/client/link/context";
+// import { setContext } from "@apollo/client/link/context";
 
 export const PATCH_INFORMACION = gql`
 	mutation PatchInformacion($id: Int!, $input: InformacionRequest!) {

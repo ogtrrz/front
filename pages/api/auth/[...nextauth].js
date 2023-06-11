@@ -68,17 +68,19 @@ export default NextAuth({
 
 	// database: process.env.NEXT_PUBLIC_DATABASE_URL,
 	session: {
-		jwt: true,
-		// strategy: "jwt",
+		// jwt: true,
+		strategy: "jwt",
 		//maxAge: 60 * 60 * 24 * 30
 	},
 	callbacks: {
-		jwt: async ({ token, user }) => {
+		jwt: async ({ token, user, account }) => {
 			//console.log('user 63', user);
 			if (user) {
 				token.username = user.username;
 				token.id_token = user.id_token;
+				token.provider = account.provider;
 			}
+			console.log('token', token);
 			return token;
 		},
 		session: ({ session, token }) => {
@@ -86,6 +88,7 @@ export default NextAuth({
 			if (token) {
 				session.username = token.username;
 				session.id_token = token.id_token;
+				session.provider = token.provider;
 			}
 			return session;
 		},

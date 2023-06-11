@@ -1,35 +1,38 @@
 /* eslint-disable @next/next/no-img-element */
-import React, { useEffect, useState } from "react";
-import NextLink from "next/link";
-import Head from "next/head";
-import _ from "lodash";
-import moment from "moment";
+import React, { useState } from "react";
+// import NextLink from "next/link";
+// import Head from "next/head";
+// import _ from "lodash";
+import cloneDeep from "lodash/cloneDeep";
+import findIndex from "lodash/findIndex";
+import remove from "lodash/remove";
+import orderBy from "lodash/orderBy";
+// remove, orderBy
+// import moment from "moment";
 import { useRouter } from "next/router";
-import {
-	Paper,
-	Box,
-	Typography,
-	Chip,
-	Stack,
-	Breadcrumbs,
-	TextField,
-	Button,
-} from "@mui/material";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+import Chip from "@mui/material/Chip";
+import Stack from "@mui/material/Stack";
+
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+
+
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
-import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import Badge from "@mui/material/Badge";
 import FacebookIcon from "@mui/icons-material/Facebook";
-import TwitterIcon from "@mui/icons-material/Twitter";
+// import TwitterIcon from "@mui/icons-material/Twitter";
 import PestControlIcon from "@mui/icons-material/PestControl";
 import ReviewsIcon from "@mui/icons-material/Reviews";
 //import VisibilityIcon from '@mui/icons-material/Visibility';
 import AdsClickIcon from "@mui/icons-material/AdsClick";
 import gql from "graphql-tag";
-import { useLazyQuery, useQuery, useMutation } from "@apollo/react-hooks";
+import { useMutation } from "@apollo/react-hooks";
 import useLocalStorageState from "use-local-storage-state";
 import { FacebookShareButton } from "react-share";
-import { useSession } from "next-auth/react";
+// import { useSession } from "next-auth/react";
 // import { useLocalStorage, useEffectOnce } from "usehooks-ts";
 
 // import IconButton from "material-ui/IconButton";
@@ -38,40 +41,40 @@ import { useSession } from "next-auth/react";
 // import Image from "../img/main.jpg"; // Import using relative path
 // <Paper sx={{ backgroundImage: `url(${Image})` }}></Paper>;
 
-const ReporteQuery = gql`
-	query REPORTE_QUERY($idReporte: String!) {
-		show(id: $idReporte) @rest(type: "Reporte", path: "reportes/{args.id}") {
-			id @export(as: "showId")
-			titulo
-			caso
-			img
-			fechaix
-			ciudad
-			estado
-			pais
-			autor
-			autorix
-			informacion {
-				id
-				comentarios
-				vistas
-				rating
-			}
-			categorys {
-				id
-				categoria
-			}
-			casoText {
-				id
-			}
-			comentarios {
-				id
-				autor
-				comentario
-			}
-		}
-	}
-`;
+// const ReporteQuery = gql`
+// 	query REPORTE_QUERY($idReporte: String!) {
+// 		show(id: $idReporte) @rest(type: "Reporte", path: "reportes/{args.id}") {
+// 			id @export(as: "showId")
+// 			titulo
+// 			caso
+// 			img
+// 			fechaix
+// 			ciudad
+// 			estado
+// 			pais
+// 			autor
+// 			autorix
+// 			informacion {
+// 				id
+// 				comentarios
+// 				vistas
+// 				rating
+// 			}
+// 			categorys {
+// 				id
+// 				categoria
+// 			}
+// 			casoText {
+// 				id
+// 			}
+// 			comentarios {
+// 				id
+// 				autor
+// 				comentario
+// 			}
+// 		}
+// 	}
+// `;
 
 const PATCH_REPORTE = gql`
 	mutation PatchReporte($id: Int!, $input: ReporteRequest!) {
@@ -115,14 +118,14 @@ const PATCH_REPORTE = gql`
 	}
 `;
 
-const CasoQuery = gql`
-	query CASO_QUERY($idCaso: String!) {
-		show(id: $idCaso) @rest(type: "Caso", path: "caso-texts/{args.id}") {
-			id @export(as: "showId")
-			descripcion
-		}
-	}
-`;
+// const CasoQuery = gql`
+// 	query CASO_QUERY($idCaso: String!) {
+// 		show(id: $idCaso) @rest(type: "Caso", path: "caso-texts/{args.id}") {
+// 			id @export(as: "showId")
+// 			descripcion
+// 		}
+// 	}
+// `;
 
 export const PATCH_INFORMACION = gql`
 	mutation PatchInformacion($id: Int!, $input: InformacionRequest!) {
@@ -241,60 +244,60 @@ const DenunciaDynamicFooter = ({ data }) => {
 		},
 	});
 
-	const [
-		postComentario,
-		// {
-		// 	loading: lodingComentario,
-		// 	error: errorComentario,
-		// 	data: dataComentarios,
-		// },
-	] = useMutation(POST_COMENTARIO, {
-		update(cache, { data: { postComentario } }) {
-			// const cacheId = cache.identify(item);
-			// console.log("postComentario", postComentario);
+	// const [
+	// 	postComentario,
+	// 	// {
+	// 	// 	loading: lodingComentario,
+	// 	// 	error: errorComentario,
+	// 	// 	data: dataComentarios,
+	// 	// },
+	// ] = useMutation(POST_COMENTARIO, {
+	// 	update(cache, { data: { postComentario } }) {
+	// 		// const cacheId = cache.identify(item);
+	// 		// console.log("postComentario", postComentario);
 
-			cache.writeQuery({
-				query: gql`
-					query WriteComentario($id: Int!) {
-						Comentario(id: $id) {
-							id
-							comentarios {
-								id
-								autor
-								comentario
-								extra1
-								extra2
-								extra3
-							}
-						}
-					}
-				`,
-				data: {
-					Reporte: {
-						__typename: "Reporte",
-						id: item.id,
-						comentarios: {
-							id: postComentario.id,
-							autor: postComentario.autor,
-							comentario: postComentario.comentario,
-							extra1: postComentario.extra1,
-							extra2: postComentario.extra2,
-							extra3: postComentario.extra3,
-						},
-					},
-				},
-				variables: {
-					idComentario: postComentario.id,
-				},
-			});
-		},
-	});
+	// 		cache.writeQuery({
+	// 			query: gql`
+	// 				query WriteComentario($id: Int!) {
+	// 					Comentario(id: $id) {
+	// 						id
+	// 						comentarios {
+	// 							id
+	// 							autor
+	// 							comentario
+	// 							extra1
+	// 							extra2
+	// 							extra3
+	// 						}
+	// 					}
+	// 				}
+	// 			`,
+	// 			data: {
+	// 				Reporte: {
+	// 					__typename: "Reporte",
+	// 					id: item.id,
+	// 					comentarios: {
+	// 						id: postComentario.id,
+	// 						autor: postComentario.autor,
+	// 						comentario: postComentario.comentario,
+	// 						extra1: postComentario.extra1,
+	// 						extra2: postComentario.extra2,
+	// 						extra3: postComentario.extra3,
+	// 					},
+	// 				},
+	// 			},
+	// 			variables: {
+	// 				idComentario: postComentario.id,
+	// 			},
+	// 		});
+	// 	},
+	// });
 
 	const [patchReporte] = useMutation(PATCH_REPORTE);
 
-	const [viewStorage, setViewStorage] = useLocalStorageState("transas_view", {
-		defaultValue: [],
-	});
+	// const [viewStorage, setViewStorage] = useLocalStorageState("transas_view", {
+	// 	defaultValue: [],
+	// });
 
 	const [pestesStorage, setPestesStorage] = useLocalStorageState(
 		"transas_pestes",
@@ -382,8 +385,8 @@ const DenunciaDynamicFooter = ({ data }) => {
 	};
 
 	const handlePestes = () => {
-		const findView = _.findIndex(pestesStorage, (item) => item === data.id);
-		let info = _.cloneDeep(data.informacion);
+		const findView = findIndex(pestesStorage, (item) => item === data.id);
+		let info = cloneDeep(data.informacion);
 		if (findView === -1) {
 			// console.log("entro agregar");
 			setPestesStorage([...pestesStorage, data.id]);
@@ -391,9 +394,9 @@ const DenunciaDynamicFooter = ({ data }) => {
 			// console.log("info", info);
 		} else {
 			// console.log("entro remove");
-			let pestesArray = _.cloneDeep(pestesStorage);
+			let pestesArray = cloneDeep(pestesStorage);
 			// console.log("entro remove1", pestesArray);
-			_.remove(pestesArray, (item) => item === data.id);
+			remove(pestesArray, (item) => item === data.id);
 			// console.log("entro remove2", pestesArray);
 			setPestesStorage(pestesArray);
 			info.rating = pestesBadge.rating - 1;
@@ -411,7 +414,7 @@ const DenunciaDynamicFooter = ({ data }) => {
 	};
 
 	//ordenar comentarios por id
-	const comentariosArray = _.orderBy(comentariosData, ["id"], ["desc"]);
+	const comentariosArray = orderBy(comentariosData, ["id"], ["desc"]);
 	// console.log("comentariosArray", comentariosArray);
 	// const informacionItem = data.informacion;
 	// console.log("dataReporte", dataReporte);
@@ -458,7 +461,7 @@ const DenunciaDynamicFooter = ({ data }) => {
 								}}>
 								<PestControlIcon
 									color={
-										_.findIndex(pestesStorage, (item) => item === data.id) ===
+										findIndex(pestesStorage, (item) => item === data.id) ===
 										-1
 											? ""
 											: "secondary"

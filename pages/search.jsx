@@ -3,36 +3,21 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import NextLink from "next/link";
 
-import FlagCircleIcon from "@mui/icons-material/FlagCircle";
-import {
-	Button,
-	LinearProgress,
-	Stack,
-	Box,
-	Paper,
-	Typography,
-	MenuItem,
-	Link,
-	Pagination,
-	Breadcrumbs,
-	FormControl,
-	InputLabel,
-	Select,
-} from "@mui/material";
+import Stack from "@mui/material/Stack";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Breadcrumbs from "@mui/material/Breadcrumbs";
+
 import Grid from "@mui/material/Grid";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
 
 // import { useDemoData } from '@mui/x-data-grid-generator';
 
-import { useSession } from "next-auth/react";
-import { graphql } from "@apollo/client/react/hoc";
 import gql from "graphql-tag";
-import { useLazyQuery, useQuery, useMutation } from "@apollo/react-hooks";
+import { useQuery } from "@apollo/react-hooks";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import Tarjeta from "components/Tarjeta";
-import useLocalStorageState from "use-local-storage-state";
 import NotFoundPage from "components/NotFoundPage";
 
 const Busqueda = gql`
@@ -60,7 +45,6 @@ const Busqueda = gql`
 	}
 `;
 //path: "_search/reportes?query={args.search}&page=0&size=32"
-
 
 const Pagina = gql`
 	query REPORTES_QUERY($paginaInput: String!) {
@@ -173,7 +157,6 @@ const Home = () => {
 	// 	data.edges && data.edges.length > 0
 	// 		? data.edges[data.edges.length - 1].cursor
 	// 		: null;
-
 
 	if (loading) {
 		return (

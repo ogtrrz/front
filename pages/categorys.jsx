@@ -2,21 +2,12 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import NextLink from "next/link";
 
-import {
-	Button,
-	LinearProgress,
-	Stack,
-	Box,
-	Paper,
-	Typography,
-	MenuItem,
-	Link,
-	Pagination,
-	Breadcrumbs,
-	FormControl,
-	InputLabel,
-	Select,
-} from "@mui/material";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Pagination from "@mui/material/Pagination";
+import Breadcrumbs from "@mui/material/Breadcrumbs";
+import Stack  from "@mui/material/Stack";
+
 import Grid from "@mui/material/Grid";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import gql from "graphql-tag";

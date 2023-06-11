@@ -26,7 +26,7 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   poweredByHeader: false,
-  compress: false,
+  compress: true,
   images: {
       domains: ['localhost', '34.122.102.32', 'cdn-0.apestan.com']
   },
