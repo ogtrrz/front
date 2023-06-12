@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
 import moment from "moment";
-import _ from "lodash";
+import cloneDeep from "lodash/cloneDeep";
 import gql from "graphql-tag";
 import { useMutation } from "@apollo/react-hooks";
 
@@ -242,7 +242,7 @@ const Denuncia = () => {
 		});
 		// console.log("Upload Response", responseFile.data);
 
-		let reqLet = _.cloneDeep(values);
+		let reqLet = cloneDeep(values);
 
 		reqLet.caso = reqLet.caso.substring(0, 250);
 		reqLet.tituloix = reqLet.titulo;

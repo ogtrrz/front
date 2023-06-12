@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 // import axios from "axios";
 import { useRouter } from "next/router";
 import NextLink from "next/link";
-import _ from "lodash";
+import orderBy from "lodash/orderBy";
 import moment from "moment";
 
 import FlagCircleIcon from "@mui/icons-material/FlagCircle";
@@ -99,7 +99,7 @@ const Comentarios = () => {
 
 	useEffect(() => {
 		if (dataBusqueda?.show) {
-			setDataArray(_.orderBy(dataBusqueda.show, ["id"], ["desc"]));
+			setDataArray(orderBy(dataBusqueda.show, ["id"], ["desc"]));
 			// console.log("dataArray", dataArray);
 		}
 	}, [dataBusqueda]);

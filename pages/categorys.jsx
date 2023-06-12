@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import NextLink from "next/link";
 
+import orderBy from "lodash/orderBy"
+
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Pagination from "@mui/material/Pagination";
@@ -101,7 +103,7 @@ const Home = () => {
 			setPage(Page);
 		}
 		if (data?.show) {
-			setDataArray(_.orderBy(data.show, ["id"], ["desc"]));
+			setDataArray(orderBy(data.show, ["id"], ["desc"]));
 			const pag = data?.show[0]?.extra10 ? data?.show[0]?.extra10 : 0;
 			setPaginaTotal(pag);
 			// console.log("dataArray", dataArray);

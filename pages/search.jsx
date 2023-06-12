@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import NextLink from "next/link";
 
+import orderBy from "lodash/orderBy";
+
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -138,7 +140,7 @@ const Home = () => {
 	// let dataArray = []
 	useEffect(() => {
 		if (data?.show) {
-			setDataArray(_.orderBy(data.show, ["id"], ["desc"]));
+			setDataArray(orderBy(data.show, ["id"], ["desc"]));
 			// console.log("dataArray", dataArray);
 		}
 	}, [data]);

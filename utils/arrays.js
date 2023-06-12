@@ -1,10 +1,11 @@
-import _ from "lodash";
+import find from "lodash/find";
+import indexOf from "lodash/indexOf";
 
 //recuerda que es una array: ejemplo training.evidences
 export const updateArray = (array, elemento) => {
-    const index = _.indexOf(
+    const index = indexOf(
         array,
-        _.find(array, (array) => array.id === elemento.id)
+        find(array, (array) => array.id === elemento.id)
     );
     array.splice(index, 1, elemento);
 };
