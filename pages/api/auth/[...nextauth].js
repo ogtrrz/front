@@ -64,6 +64,25 @@ export default NextAuth({
 			clientId: process.env.GOOGLE_CLIENT_ID,
 			clientSecret: process.env.GOOGLE_CLIENT_SECRET,
 		}),
+
+		// FacebookProvider({
+		// 	clientId: process.env.FACEBOOK_CLIENT_ID,
+		// 	clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+		// }),
+		// TwitterProvider({
+		// 	clientId: process.env.TWITTER_CLIENT_ID,
+		// 	clientSecret: process.env.TWITTER_CLIENT_SECRET
+		//   }),
+
+		// InstagramProvider({
+		// 	clientId: process.env.INSTAGRAM_CLIENT_ID,
+		// 	clientSecret: process.env.INSTAGRAM_CLIENT_SECRET,
+		// }),
+		// AzureADProvider({
+		// 	clientId: process.env.AZURE_AD_CLIENT_ID,
+		// 	clientSecret: process.env.AZURE_AD_CLIENT_SECRET,
+		// 	tenantId: process.env.AZURE_AD_TENANT_ID,
+		// }),
 	],
 
 	// database: process.env.NEXT_PUBLIC_DATABASE_URL,
@@ -80,7 +99,7 @@ export default NextAuth({
 				token.id_token = user.id_token;
 				token.provider = account.provider;
 			}
-			console.log('token', token);
+			console.log("token", token);
 			return token;
 		},
 		session: ({ session, token }) => {

@@ -174,7 +174,7 @@ export const POST_COMENTARIO = gql`
 
 const Denuncia = (props) => {
 	const { data, caso } = props;
-	console.log("props", props);
+	// console.log("props", props);
 
 	const router = useRouter();
 	const { Denuncia, Pages } = router.query;

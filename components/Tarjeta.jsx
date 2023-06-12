@@ -1,7 +1,14 @@
 import React, { useState } from "react";
 import NextLink from "next/link";
 import Image from "next/image";
-import _ from "lodash";
+
+
+import findIndex from "lodash/findIndex";
+import cloneDeep from "lodash/cloneDeep";
+import remove from "lodash/remove";
+import kebabCase from "lodash/kebabCase";
+
+
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
@@ -98,23 +105,24 @@ export default function Tarjeta({ item, Page }) {
 	//TODO actualizar cache con respuesta
 	// https://infinum.com/handbook/frontend/react/recipes/caching-nextjs-public-folder
 	const handlePestes = () => {
-		console.log("Pestes");
-		const findView = _.findIndex(pestesStorage, (it) => it === item.id + "");
+		// console.log("Pestes");
+		const findView = findIndex(pestesStorage, (it) => it === item.id );
 
-		let info = _.cloneDeep(item?.informacion);
+		let info = cloneDeep(item?.informacion);
 		if (findView === -1) {
 			// console.log("entro agregar");
-			setPestesStorage([...pestesStorage, item.id + ""]);
+			setPestesStorage([...pestesStorage, item.id ]);
 			info.rating = item?.informacion?.rating + 1;
-			// console.log("info", info);
+			console.log("if info", info);
 		} else {
 			// console.log("entro remove");
-			let pestesArray = _.cloneDeep(pestesStorage);
-			// console.log("entro remove1", pestesArray);
-			_.remove(pestesArray, (it) => it === item.id + "");
+			let pestesArray = cloneDeep(pestesStorage);
+			 console.log("else entro remove1", pestesArray);
+			remove(pestesArray, (it) => it === item.id );
 			// console.log("entro remove2", pestesArray);
 			setPestesStorage(pestesArray);
-			info.rating = item?.informacion?.rating;
+			console.log('item?.informacion?.rating', item?.informacion?.rating);
+			info.rating = item?.informacion?.rating -1;
 		}
 
 		setPestesBadge(info.rating);
@@ -130,7 +138,7 @@ export default function Tarjeta({ item, Page }) {
 	// const handleAddVista = (e, item) => {
 	// 	console.log("click en id", item.informacion.id);
 	// 	console.log("click en vistas", item.informacion.vistas);
-	// 	let infoVistas = _.cloneDeep(item.informacion);
+	// 	let infoVistas = cloneDeep(item.informacion);
 	// 	infoVistas.vistas = item.informacion.vistas + 1;
 	// 	patchInformacion({
 	// 		variables: {
@@ -150,7 +158,7 @@ export default function Tarjeta({ item, Page }) {
 				flexDirection: "column",
 			}}>
 			<NextLink
-				href={`/view/denuncia/${item?.id}?Pages=${Page}&slug=${_.kebabCase(
+				href={`/view/denuncia/${item?.id}?Pages=${Page}&slug=${kebabCase(
 					item?.titulo.replace(/[\W_]+/g, "-")
 				)}`}
 				passHref>
@@ -219,7 +227,7 @@ export default function Tarjeta({ item, Page }) {
 							}}>
 							<PestControlIcon
 								color={
-									_.findIndex(pestesStorage, (it) => it === item.id + "") === -1
+									findIndex(pestesStorage, (it) => it === item.id ) === -1
 										? ""
 										: "secondary"
 								}

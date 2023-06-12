@@ -46,30 +46,30 @@ const Busqueda = gql`
 `;
 //path: "_search/reportes?query={args.search}&page=0&size=32"
 
-const Pagina = gql`
-	query REPORTES_QUERY($paginaInput: String!) {
-		show(pagina: $paginaInput)
-			@rest(
-				type: "Reporte"
-				path: "reportes?page={args.pagina}&size=32&sort=id,desc"
-			) {
-			id @export(as: "showId")
-			titulo
-			caso
-			img
-			fechaix
-			ciudad
-			estado
-			pais
-			informacion {
-				id
-				comentarios
-				vistas
-				rating
-			}
-		}
-	}
-`;
+// const Pagina = gql`
+// 	query REPORTES_QUERY($paginaInput: String!) {
+// 		show(pagina: $paginaInput)
+// 			@rest(
+// 				type: "Reporte"
+// 				path: "reportes?page={args.pagina}&size=32&sort=id,desc"
+// 			) {
+// 			id @export(as: "showId")
+// 			titulo
+// 			caso
+// 			img
+// 			fechaix
+// 			ciudad
+// 			estado
+// 			pais
+// 			informacion {
+// 				id
+// 				comentarios
+// 				vistas
+// 				rating
+// 			}
+// 		}
+// 	}
+// `;
 
 const Home = () => {
 	// const [searchInput, setSearchInput] = useState("hola");
@@ -194,12 +194,14 @@ const Home = () => {
 				<br />
 				<Grid
 					container
+					align='center'
+					alignItems='stretch'
 					spacing={{ xs: 2, sm: 3, md: 5 }}
 					columns={{ xs: 3, sm: 6, md: 9, lg: 12 }}>
 					{dataArray.map((item) => {
 						return (
 							<React.Fragment key={item.id}>
-								<Grid xs={3} item={true}>
+								<Grid xs={3} item={true} style={{ display: "flex" }}>
 									<Tarjeta item={item} Page={1} />
 								</Grid>
 							</React.Fragment>

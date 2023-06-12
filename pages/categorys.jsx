@@ -6,12 +6,12 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Pagination from "@mui/material/Pagination";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
-import Stack  from "@mui/material/Stack";
+import Stack from "@mui/material/Stack";
 
 import Grid from "@mui/material/Grid";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import gql from "graphql-tag";
-import {  useQuery } from "@apollo/react-hooks";
+import { useQuery } from "@apollo/react-hooks";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import Tarjeta from "components/Tarjeta";
@@ -62,6 +62,7 @@ const Home = () => {
 		}
 	);
 
+	// console.log("Query", Query);
 	// const { loading, error, data, fetchMore } = useQuery(Pagina, {
 	const { loading, error, data } = useQuery(Busqueda, {
 		variables: {
@@ -147,13 +148,15 @@ const Home = () => {
 				<br />
 				<Grid
 					container
+					align='center'
+					alignItems='stretch'
 					spacing={{ xs: 2, sm: 3, md: 5 }}
 					columns={{ xs: 3, sm: 6, md: 9, lg: 12 }}>
-					{dataArray?.map((item) => {
+					{dataArray.map((item) => {
 						return (
 							<React.Fragment key={item.id}>
-								<Grid xs={3} item={true}>
-									<Tarjeta item={item} Page={page === 0 ? 1 : page} />
+								<Grid xs={3} item={true} style={{ display: "flex" }}>
+									<Tarjeta item={item} Page={1} />
 								</Grid>
 							</React.Fragment>
 						);

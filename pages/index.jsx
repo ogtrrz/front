@@ -104,9 +104,8 @@ export default Home;
 // export async function getStaticProps()
 //TODO resolver login
 //TODO verificar la forma de renuncia al 100% quitar anxios ???
-//TODO ligthening libraries mui lodash etc, borrar las que no se usan
-//TODOnextjs check list https://nextjs.org/docs/pages/building-your-application/deploying/production-checklist
-//TODO google analytics o WebVitals
+//TODO nextjs check list https://nextjs.org/docs/pages/building-your-application/deploying/production-checklist
+//TODO google analytics y WebVitals https://blog.appsignal.com/2020/09/02/getting-started-wit-web-vitals-in-nextjs.html
 //TODO social Facebook y twitter
 export async function getServerSideProps(context) {
 
