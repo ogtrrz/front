@@ -182,10 +182,13 @@ export default NextAuth({
 			// console.log("session71", session);
 			// console.log("tokenAuth", tokenAuth);
 			if (tokenAuth) {
-				session.user = tokenAuth
+				session.user = tokenAuth;
 			}
 			// console.log("session72", session);
 			return session;
+		},
+		async redirect({ url, baseUrl }) {
+			return "/view/wrapper/1";
 		},
 	},
 	jwt: {
