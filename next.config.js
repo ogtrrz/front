@@ -46,5 +46,14 @@ const nextConfig = {
   },
 }
 
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+});
+module.exports = withBundleAnalyzer(nextConfig);
 
-module.exports = nextConfig
+module.exports = withBundleAnalyzer(nextConfig)
+
+
+// https://www.charlievuong.com/using-the-next-js-bundle-analyzer/
+// yarn add @next/bundle-analyzer --dev --save
+// ANALYZE=true yarn build

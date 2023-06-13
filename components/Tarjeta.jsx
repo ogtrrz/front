@@ -49,7 +49,7 @@ export const PATCH_INFORMACION = gql`
 	}
 `;
 
-export default function Tarjeta({ item, Page }) {
+function Tarjeta({ item, Page }) {
 	//TODO actualizar cache con respuesta
 	// https://thinkster.io/tutorials/boost-your-react-apps-with-apollo-beyond-the-basics/updating-the-cache-after-adding-a-habit
 
@@ -274,3 +274,5 @@ export default function Tarjeta({ item, Page }) {
 		</Card>
 	);
 }
+
+export default React.memo(Tarjeta);

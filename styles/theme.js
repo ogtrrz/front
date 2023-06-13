@@ -44,16 +44,20 @@ export const theme = createTheme({
 		body2: { fontSize: 14 },
 	},
 	spacing: 1,
-	"overrides": {
+	overrides: {
 		MuiSvgIcon: {
-		  colorPrimary: {
-			color: ["#FFF", "!important"],
-		  },
-		  colorSecondary: {
-			color: ["#FFF", "!important"],
-		  },
+			colorPrimary: {
+				color: ["#FFF", "!important"],
+			},
+			colorSecondary: {
+				color: ["#FFF", "!important"],
+			},
 		},
-	}
+	},
+	colorScheme: "auto",
+	brandColor: "#000000",
+	logo: "/transotas.svg",
+	buttonText: "#FFF",
 	// overrides: {
 	// 	datagrid: {
 	// 		header: {

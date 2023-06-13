@@ -49,7 +49,7 @@ import HowToRegIcon from "@mui/icons-material/HowToReg";
 
 // import { useCart } from 'react-use-cart';
 
-const pages = ["Inicio", "Denunciar"];
+const pages = ["Inicio", "Nueva denuncia"];
 // const settings = [
 //     ['Mi Cuenta', AccountCircleIcon],
 //     ['Mis Pedidos', PedalBikeIcon],
@@ -119,6 +119,7 @@ function ElevationScroll(props) {
 const ResponsiveAppBar = (props) => {
 	const router = useRouter();
 	const { data: session } = useSession();
+	console.log('session', session);
 	const [anchorElNav, setAnchorElNav] = React.useState(null);
 	const [anchorElUser, setAnchorElUser] = React.useState(null);
 

@@ -121,7 +121,7 @@ const Home = ({ data, paginasTotales, paginaActual }) => {
 	);
 };
 
-export default Home;
+export default React.memo(Home);
 
 // export async function getStaticProps()
 export async function getStaticProps(context) {

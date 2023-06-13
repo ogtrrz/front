@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
 import CredentialProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
+import _ from "lodash";
 // import axios from 'axios';
 // import { PrismaAdapter } from '@next-auth/prisma-adapter';
 // import { PrismaClient } from '@prisma/client';
@@ -8,6 +9,9 @@ import GoogleProvider from "next-auth/providers/google";
 // import { useGet, useMutate } from "restful-react";
 
 // const options = {
+
+let tokenAuth = {};
+
 export default NextAuth({
 	secret: process.env.NEXTAUTH_SECRET,
 	// site: process.env.NEXTAUTH_URL,
@@ -93,22 +97,94 @@ export default NextAuth({
 	},
 	callbacks: {
 		jwt: async ({ token, user, account }) => {
-			//console.log('user 63', user);
+			// console.log("user 63", user);
+			// console.log("token 63", token);
+			// console.log("account 63", account);
 			if (user) {
-				token.username = user.username;
-				token.id_token = user.id_token;
-				token.provider = account.provider;
+				if (account.provider === "google") {
+					// console.log("entramos google");
+					// console.log("account", account);
+					// console.log("user", user);
+					// console.log("token", token);
+
+					let myHeaders = new Headers();
+					myHeaders.append("Content-Type", "application/json");
+
+					let raw = JSON.stringify({
+						username: "admin",
+						password: "admin",
+						rememberMe: true,
+					});
+
+					let requestOptions = {
+						method: "POST",
+						headers: myHeaders,
+						body: raw,
+						redirect: "follow",
+					};
+
+					fetch("http://localhost:8080/api/authenticate", requestOptions)
+						.then((response) => response.text())
+						.then((result) => {
+							// console.log("result", result);
+
+							let myHeaders = new Headers();
+							myHeaders.append(
+								"Authorization",
+								`Bearer ${JSON.parse(result).id_token}`
+							);
+							myHeaders.append("Content-Type", "application/json");
+
+							let raw = JSON.stringify({
+								login: user.email,
+								lastName: user.name,
+								email: user.email,
+								imageUrl: user.image,
+								activated: true,
+								langKey: "es",
+								authorities: ["ROLE_USER"],
+							});
+
+							let requestOptions = {
+								method: "POST",
+								headers: myHeaders,
+								body: raw,
+								redirect: "follow",
+							};
+
+							fetch("http://localhost:8080/api/admin/users2", requestOptions)
+								.then((response) => response.text())
+								.then((result) => {
+									// console.log("result 2 ========", result);
+									// console.log("token 2 ========", token);
+									// token.username = user.name;
+									token.id_token = `Bearer ${JSON.parse(result).id_token}`;
+									// token.provider = account.provider;
+									console.log("token +++++++++++++ ", token);
+									tokenAuth = _.cloneDeep(token);
+									return token;
+								})
+								.catch((error) => {
+									console.log("error", error);
+									return null;
+								});
+						})
+						.catch((error) => {
+							console.log("error", error);
+							return null;
+						});
+				}
 			}
-			console.log("token", token);
-			return token;
+			// return null
 		},
 		session: ({ session, token }) => {
-			//console.log('token71', token);
-			if (token) {
-				session.username = token.username;
-				session.id_token = token.id_token;
-				session.provider = token.provider;
+			// console.log("token71", token);
+			// console.log("session71", session);
+			// console.log("tokenAuth", tokenAuth);
+			if (tokenAuth) {
+				session.user = tokenAuth
 			}
+			// console.log("session72", session);
 			return session;
 		},
 	},
@@ -117,7 +193,7 @@ export default NextAuth({
 		encryption: true,
 	},
 	pages: {
-		signIn: "/auth/session", //Need to define custom login page (if using)
+		signIn: "/auth/signinsocial", //Need to define custom login page (if using)
 	},
 });
 

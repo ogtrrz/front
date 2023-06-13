@@ -520,7 +520,7 @@ const Denuncia = (props) => {
 	);
 };
 
-export default Denuncia;
+export default React.memo(Denuncia);
 
 export async function getStaticProps(context) {
 	const { params } = context;

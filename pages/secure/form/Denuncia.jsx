@@ -24,11 +24,12 @@ import {
 	HelperText,
 } from "@mui/material";
 
-
 import OutlinedInput from "@mui/material/OutlinedInput";
 import InputLabel from "@mui/material/InputLabel";
 
 import ListItemText from "@mui/material/ListItemText";
+import Head from "next/head";
+
 import Select from "@mui/material/Select";
 import Checkbox from "@mui/material/Checkbox";
 import { Categorias } from "data/categorias";
@@ -133,15 +134,14 @@ export const POST_REPORTE = gql`
 const Denuncia = () => {
 	const router = useRouter();
 	const { data: session } = useSession();
-	console.log('session', session);
-
+	console.log("session", session);
 
 	const se = async () => {
 		const sess = await getSession();
 		console.log("sess", sess);
-	}
-	
-	se()
+	};
+
+	se();
 
 	const [selectedFile, setSelectedFile] = useState(null);
 	const [categoryState, setCategoryState] = useState([]);
@@ -222,7 +222,7 @@ const Denuncia = () => {
 						casoText: {
 							id: postReporte.casoText.id,
 						},
-						categorys: postReporte.categorys 
+						categorys: postReporte.categorys,
 					},
 				},
 				variables: {
@@ -273,135 +273,150 @@ const Denuncia = () => {
 	};
 
 	return (
-		<Box
-			sx={{
-				p: 3,
-				border: "1px dashed grey",
-				flexDirection: "column",
-				mt: 40,
-				mb: 40,
-			}}>
-			<Typography variant='subtitle1'>{`Agregar su denuncia.`}</Typography>
-			<br />
-			<Formik
-				enableReinitialize
-				initialValues={{
-					titulo: "",
-
-					ciudad: "",
-					estado: "",
-					pais: "",
-					img: "",
-				}}
-				validationSchema={yup.object({
-					titulo: yup
-						.string("Ingresar el título de su denuncia")
-						.required("Es requerido"),
-					caso: yup.string("Describa su denuncia").required("Es requerido"),
-					ciudad: yup
-						.string("En que ciudad se encuentra")
-						.required("Es requerido"),
-					estado: yup
-						.string("En que estado se encuentra")
-						.required("Es requerido"),
-					pais: yup.string("En que pais se encuentra").required("Es requerido"),
-				})}
-				onSubmit={(values, { setSubmitting }) => {
-					setSubmitting(false);
-					post1(values);
+		<React.Fragment>
+			<Head>
+				<title>{`Transotas nueva denuncia}.`}</title>
+				<meta name='robots' content='index, follow' />
+				<link
+					rel='canonical'
+					href={`${process.env.NEXT_PUBLIC_URL}/secure/form/Denuncia`}
+				/>
+				<meta name='description' content={`Transotas nueva denuncia}`} />
+			</Head>
+			<Box
+				sx={{
+					p: 3,
+					border: "1px dashed grey",
+					flexDirection: "column",
+					mt: 40,
+					mb: 40,
 				}}>
-				{({ submitForm, isSubmitting }) => (
-					<Form>
-						<Stack spacing={20} alignItems='left' justifyContent='left'>
-							<Field
-								component={TextField}
-								type='text'
-								label='Título'
-								name='titulo'
-							/>
+				<Typography variant='subtitle1'>{`Agregar su denuncia.`}</Typography>
+				<br />
+				<Formik
+					enableReinitialize
+					initialValues={{
+						titulo: "",
 
-							<Field
-								component={TextField}
-								type='text'
-								label='Denuncia'
-								name='caso'
-								multiline
-								rows={8}
-								// maxRows={50}
-								placeholder='Descripción de la Denuncia'
-							/>
+						ciudad: "",
+						estado: "",
+						pais: "",
+						img: "",
+					}}
+					validationSchema={yup.object({
+						titulo: yup
+							.string("Ingresar el título de su denuncia")
+							.required("Es requerido"),
+						caso: yup.string("Describa su denuncia").required("Es requerido"),
+						ciudad: yup
+							.string("En que ciudad se encuentra")
+							.required("Es requerido"),
+						estado: yup
+							.string("En que estado se encuentra")
+							.required("Es requerido"),
+						pais: yup
+							.string("En que pais se encuentra")
+							.required("Es requerido"),
+					})}
+					onSubmit={(values, { setSubmitting }) => {
+						setSubmitting(false);
+						post1(values);
+					}}>
+					{({ submitForm, isSubmitting }) => (
+						<Form>
+							<Stack spacing={20} alignItems='left' justifyContent='left'>
+								<Field
+									component={TextField}
+									type='text'
+									label='Título'
+									name='titulo'
+								/>
 
-							<Field
-								component={TextField}
-								type='text'
-								label='Ciudad'
-								name='ciudad'
-							/>
-							<Field
-								component={TextField}
-								type='text'
-								label='Estado'
-								name='estado'
-							/>
-							<Field
-								component={TextField}
-								type='text'
-								label='País'
-								name='pais'
-							/>
+								<Field
+									component={TextField}
+									type='text'
+									label='Denuncia'
+									name='caso'
+									multiline
+									rows={8}
+									// maxRows={50}
+									placeholder='Descripción de la Denuncia'
+								/>
 
-							<FormControl sx={{ m: 1, width: 300 }}>
-								<InputLabel id='demo-multiple-checkbox-label'>
-									Categorias
-								</InputLabel>
-								<Select
-									labelId='demo-multiple-checkbox-label'
-									id='demo-multiple-checkbox'
-									multiple
-									value={categoryState}
-									onChange={handleChangeCategory}
-									input={<OutlinedInput label='Categorias' />}
-									renderValue={(selected) => selected.join(", ")}
-									MenuProps={MenuProps}>
-									{Categorias.map((name) => (
-										<MenuItem key={name} value={name}>
-											<Checkbox checked={categoryState.indexOf(name) > -1} />
-											<ListItemText primary={name} />
-										</MenuItem>
-									))}
-								</Select>
-							</FormControl>
+								<Field
+									component={TextField}
+									type='text'
+									label='Ciudad'
+									name='ciudad'
+								/>
+								<Field
+									component={TextField}
+									type='text'
+									label='Estado'
+									name='estado'
+								/>
+								<Field
+									component={TextField}
+									type='text'
+									label='País'
+									name='pais'
+								/>
 
-							<Typography variant='body1'>
-								{selectedFile ? "Nombre del archivo: " + selectedFile.name : ""}
-							</Typography>
-							<Box sx={{ mt: 80, mb: 80 }}>
-								<Button variant='contained' component='label'>
-									Agregar Imagen
-									<input
-										hidden
-										accept='image/*'
+								<FormControl sx={{ m: 1, width: 300 }}>
+									<InputLabel id='demo-multiple-checkbox-label'>
+										Categorias
+									</InputLabel>
+									<Select
+										labelId='demo-multiple-checkbox-label'
+										id='demo-multiple-checkbox'
 										multiple
-										type='file'
-										// value={selectedFile}
-										onChange={(e) => setSelectedFile(e.target.files[0])}
-									/>
-								</Button>
-							</Box>
-							<Box sx={{ mt: 80, mb: 80 }}>
-								<Button
-									variant='contained'
-									color='primary'
-									disabled={isSubmitting}
-									onClick={submitForm}>
-									Enviar
-								</Button>
-							</Box>
-						</Stack>
-					</Form>
-				)}
-			</Formik>
-		</Box>
+										value={categoryState}
+										onChange={handleChangeCategory}
+										input={<OutlinedInput label='Categorias' />}
+										renderValue={(selected) => selected.join(", ")}
+										MenuProps={MenuProps}>
+										{Categorias.map((name) => (
+											<MenuItem key={name} value={name}>
+												<Checkbox checked={categoryState.indexOf(name) > -1} />
+												<ListItemText primary={name} />
+											</MenuItem>
+										))}
+									</Select>
+								</FormControl>
+
+								<Typography variant='body1'>
+									{selectedFile
+										? "Nombre del archivo: " + selectedFile.name
+										: ""}
+								</Typography>
+								<Box sx={{ mt: 80, mb: 80 }}>
+									<Button variant='contained' component='label'>
+										Agregar Imagen
+										<input
+											hidden
+											accept='image/*'
+											multiple
+											type='file'
+											// value={selectedFile}
+											onChange={(e) => setSelectedFile(e.target.files[0])}
+										/>
+									</Button>
+								</Box>
+								<Box sx={{ mt: 80, mb: 80 }}>
+									<Button
+										variant='contained'
+										color='primary'
+										disabled={isSubmitting}
+										onClick={submitForm}>
+										Enviar
+									</Button>
+								</Box>
+							</Stack>
+						</Form>
+					)}
+				</Formik>
+			</Box>
+		</React.Fragment>
 	);
 };
 

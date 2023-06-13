@@ -570,4 +570,4 @@ const DenunciaDynamicFooter = ({ data }) => {
 	}
 };
 
-export default DenunciaDynamicFooter;
+export default React.memo(DenunciaDynamicFooter);
