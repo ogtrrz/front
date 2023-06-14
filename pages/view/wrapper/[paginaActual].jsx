@@ -72,7 +72,10 @@ const Home = ({ data, paginasTotales, paginaActual }) => {
 				<meta name='description' content={`Transotas de ${descripcionMeta}`} />
 			</Head>
 
-			<Box sx={{ border: "1px dashed grey", display: "flex", pl: 10 }}>
+			<Box
+				sx={{ display: "flex", pt: { xs: 0, md: 25 }, pl: { xs: 25, md: 50 } }}
+				justifyContent='center'
+				alignItems='center'>
 				<Stack direction='column' spacing={2}>
 					<br />
 					<Breadcrumbs aria-label='breadcrumb'>

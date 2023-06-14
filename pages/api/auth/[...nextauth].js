@@ -93,7 +93,7 @@ export default NextAuth({
 	session: {
 		// jwt: true,
 		strategy: "jwt",
-		//maxAge: 60 * 60 * 24 * 30
+		maxAge: 60 * 60 * 24 * 30
 	},
 	callbacks: {
 		jwt: async ({ token, user, account }) => {
@@ -126,7 +126,7 @@ export default NextAuth({
 					fetch("http://localhost:8080/api/authenticate", requestOptions)
 						.then((response) => response.text())
 						.then((result) => {
-							// console.log("result", result);
+							console.log("result", result);
 
 							let myHeaders = new Headers();
 							myHeaders.append(
@@ -155,8 +155,8 @@ export default NextAuth({
 							fetch("http://localhost:8080/api/admin/users2", requestOptions)
 								.then((response) => response.text())
 								.then((result) => {
-									// console.log("result 2 ========", result);
-									// console.log("token 2 ========", token);
+									console.log("result 2 ========", result);
+									console.log("token 2 ========", token);
 									// token.username = user.name;
 									token.id_token = `Bearer ${JSON.parse(result).id_token}`;
 									// token.provider = account.provider;

@@ -2,12 +2,10 @@ import React, { useState } from "react";
 import NextLink from "next/link";
 import Image from "next/image";
 
-
 import findIndex from "lodash/findIndex";
 import cloneDeep from "lodash/cloneDeep";
 import remove from "lodash/remove";
 import kebabCase from "lodash/kebabCase";
-
 
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
@@ -106,32 +104,37 @@ function Tarjeta({ item, Page }) {
 	// https://infinum.com/handbook/frontend/react/recipes/caching-nextjs-public-folder
 	const handlePestes = () => {
 		// console.log("Pestes");
-		const findView = findIndex(pestesStorage, (it) => it === item.id );
+		const findView = findIndex(pestesStorage, (it) => it === item.id);
 
 		let info = cloneDeep(item?.informacion);
 		if (findView === -1) {
 			// console.log("entro agregar");
-			setPestesStorage([...pestesStorage, item.id ]);
+			setPestesStorage([...pestesStorage, item.id]);
 			info.rating = item?.informacion?.rating + 1;
-			console.log("if info", info);
+			// console.log("if info", info);
 		} else {
 			// console.log("entro remove");
 			let pestesArray = cloneDeep(pestesStorage);
-			 console.log("else entro remove1", pestesArray);
-			remove(pestesArray, (it) => it === item.id );
+			//  console.log("else entro remove1", pestesArray);
+			remove(pestesArray, (it) => it === item.id);
 			// console.log("entro remove2", pestesArray);
 			setPestesStorage(pestesArray);
-			console.log('item?.informacion?.rating', item?.informacion?.rating);
-			info.rating = item?.informacion?.rating -1;
+			// console.log('item?.informacion?.rating', item?.informacion?.rating);
+			info.rating = item?.informacion?.rating ;
 		}
 
-		setPestesBadge(info.rating);
+		// setPestesBadge(info.rating);
 
 		patchInformacion({
 			variables: {
 				id: info.id,
 				input: info,
 			},
+		})
+		.then((res) => {
+			console.log("res", res);
+			console.log("res.data.patchInformacion", res);
+			setPestesBadge(res.data.patchInformacion.rating);
 		});
 	};
 
@@ -227,7 +230,7 @@ function Tarjeta({ item, Page }) {
 							}}>
 							<PestControlIcon
 								color={
-									findIndex(pestesStorage, (it) => it === item.id ) === -1
+									findIndex(pestesStorage, (it) => it === item.id) === -1
 										? ""
 										: "secondary"
 								}

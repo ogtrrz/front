@@ -43,6 +43,7 @@ import PestControlOutlinedIcon from "@mui/icons-material/PestControlOutlined";
 import PestControlRodentIcon from "@mui/icons-material/PestControlRodent";
 import ReviewsIcon from "@mui/icons-material/Reviews";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import Avatar from "@mui/material/Avatar";
 import HowToRegIcon from "@mui/icons-material/HowToReg";
 
 // import { wishlist2 } from '../../store/ecommerce/action';
@@ -119,7 +120,7 @@ function ElevationScroll(props) {
 const ResponsiveAppBar = (props) => {
 	const router = useRouter();
 	const { data: session } = useSession();
-	console.log('session', session);
+	console.log("session", session);
 	const [anchorElNav, setAnchorElNav] = React.useState(null);
 	const [anchorElUser, setAnchorElUser] = React.useState(null);
 
@@ -173,12 +174,12 @@ const ResponsiveAppBar = (props) => {
 		// console.log('opcionMenu', opcionMenu);
 		if (opcionMenu === "Mis Denuncias") {
 			router.push(
-				`/categorys?Query=autor.equals=${session?.username}&Category=Usuario:%20${session?.username}&Page=0`
+				`/categorys?Query=autor.equals=${session?.user?.name}&Category=Usuario:%20${session?.user?.name}&Page=0`
 			);
 		}
 		//http://localhost:8080/api/reportes?autor.equals=user&page=0&size=20
 		if (opcionMenu === "Mis Comentarios") {
-			router.push(`/secure/Comentarios?Autor=${session?.username}&Page=0`);
+			router.push(`/secure/Comentarios?Autor=${session?.user?.name}&Page=0`);
 		}
 		//http://localhost:8080/api/comentarios?autor.equals=user&page=0&size=20
 		if (opcionMenu === "Cerrar") return signOut();
@@ -301,15 +302,15 @@ const ResponsiveAppBar = (props) => {
 									onKeyUp={handleKeyUp}
 								/>
 							</Search>
-							{!(session === null || session === undefined) ? (
+							{!(session === null || session === undefined || session?.user?.name === undefined) ? (
 								<React.Fragment>
 									<Box sx={{ flexGrow: 0 }}>
 										<TooltipWrapper>
 											<Tooltip title='Administar mi cuenta' arrow>
 												<IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-													<AccountCircleIcon
-														sx={{ color: "#ffffff" }}
-														fontSize='large'
+													<Avatar
+														alt='Avatar'
+														src={session?.user?.picture}
 													/>
 												</IconButton>
 											</Tooltip>
@@ -335,7 +336,7 @@ const ResponsiveAppBar = (props) => {
 												onClick={handleCloseUserMenu}>
 												<ManageAccountsIcon />
 												&nbsp;&nbsp;
-												<Typography textAlign='center'>{`Hola, ${session?.username}`}</Typography>
+												<Typography textAlign='center'>{`Hola, ${session?.user?.name}`}</Typography>
 											</MenuItem>
 											<MenuItem
 												key='Mis Denuncias'
@@ -373,12 +374,7 @@ const ResponsiveAppBar = (props) => {
 								</React.Fragment>
 							) : (
 								<React.Fragment>
-									<Button
-										onClick={() => signIn()}
-										sx={{ color: "white" }}
-										startIcon={<HowToRegIcon />}>
-										Registro
-									</Button>
+									
 									<Button
 										onClick={() => signIn()}
 										sx={{ color: "white" }}

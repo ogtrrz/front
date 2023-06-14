@@ -134,7 +134,7 @@ export const POST_REPORTE = gql`
 const Denuncia = () => {
 	const router = useRouter();
 	const { data: session } = useSession();
-	console.log("session", session);
+	// console.log("session", session);
 
 	const se = async () => {
 		const sess = await getSession();
@@ -248,10 +248,10 @@ const Denuncia = () => {
 		reqLet.tituloix = reqLet.titulo;
 		reqLet.fechaix = moment().format("YYYY-MM-DD[T00:00:00.000Z]");
 		reqLet.autor =
-			session === null || session === undefined ? "Anonimo" : session?.username;
+			session === null || session === undefined ? "Anonimo" : session?.user?.name;
 
 		reqLet.autorix =
-			session === null || session === undefined ? "Anonimo" : session?.username;
+			session === null || session === undefined ? "Anonimo" : session?.user?.name;
 		reqLet.img = `${process.env.NEXT_PUBLIC_API_IMAGES}${responseFile.data[0].url}?format=webp&height=250&q=80`;
 		reqLet.imgix = `${process.env.NEXT_PUBLIC_API_IMAGES}${responseFile.data[0].url}?format=webp&height=250&q=80`;
 

@@ -52,8 +52,7 @@ const restLink = new RestLink({
 	headers: {
 		"Content-Type": "application/json",
 		mode: "cors",
-		credentials: 'same-origin',
-		
+		credentials: "same-origin",
 	},
 	// preserveHeaderCase: true,
 	// response,
@@ -92,10 +91,11 @@ const restLink = new RestLink({
 
 const authLink = setContext(async (_, { headers }) => {
 	const session = await getSession();
+	console.log("getSession with graphql", session);
 	const modifiedHeader = {
 		headers: {
 			...headers,
-			Authorization: session?.id_token ? `Bearer ${session.id_token}` : "",
+			Authorization: session?.user?.id_token ? session.user?.id_token : "",
 		},
 	};
 	return modifiedHeader;

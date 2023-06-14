@@ -5,24 +5,12 @@ import NextLink from "next/link";
 import orderBy from "lodash/orderBy";
 import moment from "moment";
 
-import FlagCircleIcon from "@mui/icons-material/FlagCircle";
-import {
-	Button,
-	LinearProgress,
-	Stack,
-	Box,
-	Paper,
-	Typography,
-	MenuItem,
-	Link,
-	Pagination,
-	Breadcrumbs,
-	FormControl,
-	InputLabel,
-	Select,
-	Avatar,
-	IconButton,
-} from "@mui/material";
+import Button from "@mui/material/Button";
+import Stack from "@mui/material/Stack";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Breadcrumbs from "@mui/material/Breadcrumbs";
+
 import Grid from "@mui/material/Grid";
 
 // import Table from "@mui/material/Table";
@@ -40,7 +28,6 @@ import SendIcon from "@mui/icons-material/Send";
 
 // import { useDemoData } from '@mui/x-data-grid-generator';
 
-import { useSession } from "next-auth/react";
 import gql from "graphql-tag";
 import { useQuery, useMutation } from "@apollo/react-hooks";
 import Card from "@mui/material/Card";

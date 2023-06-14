@@ -173,7 +173,10 @@ const Home = () => {
 	// console.log("data", data.show);
 
 	return (
-		<Box sx={{ p: 3, border: "1px dashed grey" }}>
+		<Box
+			sx={{ display: "flex", pt: { xs: 0, md: 25 }, pl: { xs: 25, md: 50 } }}
+			justifyContent='center'
+			alignItems='center'>
 			<Stack direction='column' spacing={2}>
 				<br />
 				<Breadcrumbs

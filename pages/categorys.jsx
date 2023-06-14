@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import NextLink from "next/link";
 
-import orderBy from "lodash/orderBy"
+import orderBy from "lodash/orderBy";
 
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -127,7 +127,10 @@ const Home = () => {
 	// console.log("data", data.show);
 
 	return (
-		<Box sx={{ p: 3, border: "1px dashed grey" }}>
+		<Box
+			sx={{ display: "flex", pt: { xs: 0, md: 25 }, pl: { xs: 25, md: 50 } }}
+			justifyContent='center'
+			alignItems='center'>
 			<Stack direction='column' spacing={2}>
 				<br />
 				<Breadcrumbs

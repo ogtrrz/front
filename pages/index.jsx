@@ -48,7 +48,7 @@ const Home = ({ data, paginasTotales, paginaActual }) => {
 			</Head>
 
 			<Box
-				sx={{ border: "1px dashed grey", display: "flex" }}
+				sx={{ display: "flex",  pt: { xs: 0, md: 25 }, pl: {xs: 25, md: 50} }}
 				justifyContent='center'
 				alignItems='center'>
 				<Stack direction='column' spacing={2}>
@@ -102,12 +102,14 @@ const Home = ({ data, paginasTotales, paginaActual }) => {
 export default Home;
 
 // export async function getStaticProps()
-//TODO en index contar imagenes y ponerle priority true a la Imagen
-//TODO Lodash ponerlo en los props en el SSR de hecho poner todo el js que se pueda en el props
+//TODO checar mis categorias y mis denuncias
+//TODO pestes badge trae diferentes datos entre tarjeta y denuncia es 1 menos
+// TODO verificar login en movil
 //TODO resolver login
+//TODO social Facebook y twitter
+//TODO en index contar imagenes y ponerle priority true a la Imagen
 //TODO nextjs check list https://nextjs.org/docs/pages/building-your-application/deploying/production-checklist
 //TODO google analytics y WebVitals https://blog.appsignal.com/2020/09/02/getting-started-wit-web-vitals-in-nextjs.html
-//TODO social Facebook y twitter
 export async function getServerSideProps(context) {
 
 	context.res.setHeader(

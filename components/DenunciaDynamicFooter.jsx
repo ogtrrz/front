@@ -18,7 +18,6 @@ import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 
-
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import Badge from "@mui/material/Badge";
@@ -110,9 +109,9 @@ const PATCH_REPORTE = gql`
 				id
 				autor
 				comentario
-                extra1
-                extra2
-                extra3
+				extra1
+				extra2
+				extra3
 			}
 		}
 	}
@@ -191,9 +190,8 @@ const DenunciaDynamicFooter = ({ data }) => {
 	// console.log("props", props);
 
 	const router = useRouter();
-	// const { Denuncia, Page } = router.query;
 	// const { data: session } = useSession();
-
+	// const { Denuncia, Page } = router.query;
 	const [comentarioState, setComentarioState] = useState("");
 
 	// const [
@@ -351,8 +349,7 @@ const DenunciaDynamicFooter = ({ data }) => {
 	// 	}
 	// }, [data]);
 
-	const [comentariosData, setComentariosData] = useState(data.comentarios)
-
+	const [comentariosData, setComentariosData] = useState(data.comentarios);
 
 	const handleSubmitComentario = (e) => {
 		// console.log("comentarioState", comentarioState);
@@ -361,7 +358,7 @@ const DenunciaDynamicFooter = ({ data }) => {
 				// autor:
 				// 	session === null || session === undefined
 				// 		? "Anonimo"
-				// 		: session?.username,
+				// 		: session?.user?.name,
 				comentario: comentarioState,
 				extra1: data.id,
 				extra3: data.titulo,
@@ -399,7 +396,7 @@ const DenunciaDynamicFooter = ({ data }) => {
 			remove(pestesArray, (item) => item === data.id);
 			// console.log("entro remove2", pestesArray);
 			setPestesStorage(pestesArray);
-			info.rating = pestesBadge.rating - 1;
+			info.rating = pestesBadge.rating ;
 		}
 		patchInformacion({
 			variables: {
@@ -408,7 +405,7 @@ const DenunciaDynamicFooter = ({ data }) => {
 			},
 		}).then((res) => {
 			console.log("res", res);
-            console.log("res.data.patchInformacion", res.data.patchInformacion);
+			console.log("res.data.patchInformacion", res.data.patchInformacion);
 			setPestesBadge(res.data.patchInformacion);
 		});
 	};
@@ -461,8 +458,7 @@ const DenunciaDynamicFooter = ({ data }) => {
 								}}>
 								<PestControlIcon
 									color={
-										findIndex(pestesStorage, (item) => item === data.id) ===
-										-1
+										findIndex(pestesStorage, (item) => item === data.id) === -1
 											? ""
 											: "secondary"
 									}
