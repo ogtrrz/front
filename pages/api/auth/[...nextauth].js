@@ -123,7 +123,7 @@ export default NextAuth({
 						redirect: "follow",
 					};
 
-					fetch("http://localhost:8080/api/authenticate", requestOptions)
+					fetch(`${process.env.NEXT_PUBLIC_SPRING}/api/authenticate`, requestOptions)
 						.then((response) => response.text())
 						.then((result) => {
 							console.log("result", result);
@@ -152,7 +152,7 @@ export default NextAuth({
 								redirect: "follow",
 							};
 
-							fetch("http://localhost:8080/api/admin/users2", requestOptions)
+							fetch(`${process.env.NEXT_PUBLIC_API_REST}/api/admin/users2`, requestOptions)
 								.then((response) => response.text())
 								.then((result) => {
 									console.log("result 2 ========", result);

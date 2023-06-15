@@ -28,7 +28,7 @@ const nextConfig = {
   poweredByHeader: false,
   compress: true,
   images: {
-      domains: ['localhost', '34.122.102.32', 'cdn-0.apestan.com']
+      domains: ['localhost', '34.125.92.102', 'cdn-0.apestan.com']
   },
 
   async rewrites() {
@@ -45,6 +45,22 @@ const nextConfig = {
       ];
   },
 }
+/*
+async rewrites() {
+  return [
+      
+      {
+          source: "/appi/:path*",
+          destination: `http://34.125.92.102:8080/api/:path*`
+      },
+      {
+        source: "/files/:path*",
+        destination: `http://34.125.92.102:1337/:path*`
+    }
+  ];
+},
+}
+*/
 
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
