@@ -51,7 +51,7 @@ const Busqueda = gql`
 const Home = () => {
 	const router = useRouter();
 
-	const { Page, CategoryCode, Category, Query } = router.query;
+	const { Page, Category, Query } = router.query;
 
 	const [page, setPage] = useState(0);
 

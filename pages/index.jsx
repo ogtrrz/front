@@ -102,6 +102,7 @@ const Home = ({ data, paginasTotales, paginaActual }) => {
 export default Home;
 
 // export async function getStaticProps()
+//Crud en categorias solo para usuario y search general click autor
 //TODO checar mis categorias y mis denuncias
 //TODO pestes badge trae diferentes datos entre tarjeta y denuncia es 1 menos
 // TODO verificar login en movil
@@ -114,7 +115,7 @@ export async function getServerSideProps(context) {
 
 	context.res.setHeader(
 		"Cache-Control",
-		"public, s-maxage=600, stale-while-revalidate=3600"
+		"public, s-maxage=10, stale-while-revalidate=59"
 	);
 	// 	"max-age=86400, must-revalidate"
 

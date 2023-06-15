@@ -449,7 +449,7 @@ const Denuncia = (props) => {
 									},
 								}}
 								color='primary.main'>
-								{`Inicio (${Pages})`}
+								{`Inicio (${Pages?Pages:"1"})`}
 							</Typography>
 						</NextLink>
 

@@ -174,12 +174,12 @@ const ResponsiveAppBar = (props) => {
 		// console.log('opcionMenu', opcionMenu);
 		if (opcionMenu === "Mis Denuncias") {
 			router.push(
-				`/categorys?Query=autor.equals=${session?.user?.name}&Category=Usuario:%20${session?.user?.name}&Page=0`
+				`/categorys?Query=autor.equals=${session?.user?.email.substring(0, session?.user?.email.indexOf('@'))}&Category=Usuario:%20${session?.user?.email.substring(0, session?.user?.email.indexOf('@'))}&Page=0`
 			);
 		}
 		//http://localhost:8080/api/reportes?autor.equals=user&page=0&size=20
 		if (opcionMenu === "Mis Comentarios") {
-			router.push(`/secure/Comentarios?Autor=${session?.user?.name}&Page=0`);
+			router.push(`/secure/Comentarios?Autor=${session?.user?.email.substring(0, session?.user?.email.indexOf('@'))}&Page=0`);
 		}
 		//http://localhost:8080/api/comentarios?autor.equals=user&page=0&size=20
 		if (opcionMenu === "Cerrar") return signOut();

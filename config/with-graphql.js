@@ -96,6 +96,8 @@ const authLink = setContext(async (_, { headers }) => {
 		headers: {
 			...headers,
 			Authorization: session?.user?.id_token ? session.user?.id_token : "",
+			
+			// 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJvbWFyLmd1dGllcnJlei5lQGdtYWlsLmNvbSIsImF1dGgiOiJST0xFX1VTRVIiLCJleHAiOjE2ODkzNjUwMzl9.E7sRGFuFry7iEbCvjGHDTKK2dblhLqFb31ERDBwk0tvbJ1vUW257ZHwXx94jZ0jbdz1M_FKuLS8nsHcWghHIXw'
 		},
 	};
 	return modifiedHeader;

@@ -93,7 +93,7 @@ export default NextAuth({
 	session: {
 		// jwt: true,
 		strategy: "jwt",
-		maxAge: 60 * 60 * 24 * 30
+		maxAge: 60 * 60 * 24 * 30,
 	},
 	callbacks: {
 		jwt: async ({ token, user, account }) => {
@@ -178,10 +178,11 @@ export default NextAuth({
 			// return null
 		},
 		session: ({ session, token }) => {
-			// console.log("token71", token);
-			// console.log("session71", session);
-			// console.log("tokenAuth", tokenAuth);
+			console.log("token71", token);
+			console.log("session71", session);
+			console.log("tokenAuth", tokenAuth);
 			if (tokenAuth) {
+				// session = tokenAuth
 				session.user = tokenAuth;
 			}
 			// console.log("session72", session);
