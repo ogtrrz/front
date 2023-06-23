@@ -96,7 +96,7 @@ const authLink = setContext(async (_, { headers }) => {
 		headers: {
 			...headers,
 			Authorization: session?.user?.id_token ? session.user?.id_token : "",
-			
+
 			// 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJvbWFyLmd1dGllcnJlei5lQGdtYWlsLmNvbSIsImF1dGgiOiJST0xFX1VTRVIiLCJleHAiOjE2ODkzNjUwMzl9.E7sRGFuFry7iEbCvjGHDTKK2dblhLqFb31ERDBwk0tvbJ1vUW257ZHwXx94jZ0jbdz1M_FKuLS8nsHcWghHIXw'
 		},
 	};
@@ -111,6 +111,10 @@ const client = new ApolloClient({
 	// link: paginationLink.concat(authLink).concat(restLink),
 	// link: ApolloLink.from([authLink, restLink]),
 	link: authLink.concat(restLink),
+	onError: ({ networkError, graphQLErrors }) => {
+		console.log("graphQLErrors", graphQLErrors);
+		console.log("networkError", networkError);
+	},
 });
 
 const WithGraphQL = ({ children }) => {

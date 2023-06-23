@@ -130,6 +130,7 @@ export default React.memo(Home);
 export async function getStaticProps(context) {
 	const { params } = context;
 	const paginaActual = params.paginaActual;
+	console.log('pagina avcyual =======================', paginaActual);
 	const resp = await fetch(
 		`${process.env.NEXT_PUBLIC_SPRING}/api/reportes?&page=${paginaActual}&size=12&sort=id,desc`
 	);
@@ -160,6 +161,7 @@ export async function getStaticPaths() {
 	for (let i = 0; i < 77; i++) {
 		pathsWithParams.push({ params: { paginaActual: i + "" } });
 	}
+	console.log('pathsWithParams===================', pathsWithParams);
 	return {
 		paths: pathsWithParams,
 		fallback: "blocking",

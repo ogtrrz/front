@@ -526,12 +526,12 @@ export async function getStaticProps(context) {
 	const { params } = context;
 	const Denuncia = params.Denuncia;
 	const resp = await fetch(
-		`${process.env.NEXT_PUBLIC_SPRING}/api/reportes/${Denuncia}`
+		`${process.env.NEXT_PUBLIC_SPRING}api/reportes/${Denuncia}`
 	);
 	const data = await resp.json();
 
 	const res2 = await fetch(
-		`${process.env.NEXT_PUBLIC_SPRING}/api/caso-texts/${data.casoText.id}`
+		`${process.env.NEXT_PUBLIC_SPRING}api/caso-texts/${data.casoText.id}`
 	);
 	const caso = await res2.json();
 
@@ -552,7 +552,7 @@ export async function getStaticProps(context) {
 
 export async function getStaticPaths() {
 	const resp = await fetch(
-		`${process.env.NEXT_PUBLIC_SPRING}/api/reportes?&page=0&size=100&sort=id,desc`
+		`${process.env.NEXT_PUBLIC_SPRING}api/reportes?&page=0&size=100&sort=id,desc`
 	);
 	const data = await resp.json();
 

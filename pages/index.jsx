@@ -101,14 +101,14 @@ const Home = ({ data, paginasTotales, paginaActual }) => {
 
 export default Home;
 
-// export async function getStaticProps()
-//Crud en categorias solo para usuario y search general click autor
-//TODO checar mis categorias y mis denuncias
+//TODO Crud en categorias solo para usuario y search general click autor
+//TODO no sirve categorias ni pagina wrapp
+//TODO badge de pestes solo suma
 //TODO pestes badge trae diferentes datos entre tarjeta y denuncia es 1 menos
-// TODO verificar login en movil
-//TODO resolver login
+//TODO checar mis categorias y mis denuncias
 //TODO social Facebook y twitter
 //TODO en index contar imagenes y ponerle priority true a la Imagen
+
 //TODO nextjs check list https://nextjs.org/docs/pages/building-your-application/deploying/production-checklist
 //TODO google analytics y WebVitals https://blog.appsignal.com/2020/09/02/getting-started-wit-web-vitals-in-nextjs.html
 export async function getServerSideProps(context) {
@@ -122,10 +122,10 @@ export async function getServerSideProps(context) {
 	console.log("resolvedUrl", context.resolvedUrl);
 	console.log("context.query", context.query);
 	console.log("context.query.Pages", context.query.Pages);
-	const paginaActual = context.query.Pages ? context.query.Pages : 1;
+	const paginaActual = context.query.Pages ? context.query.Pages : 0;
 	console.log("paginaActual", paginaActual);
 	const resp = await fetch(
-		`${process.env.NEXT_PUBLIC_SPRING}/api/reportes?&page=${paginaActual}&size=12&sort=id,desc`
+		`${process.env.NEXT_PUBLIC_SPRING}api/reportes?&page=${paginaActual}&size=12&sort=id,desc`
 	);
 
 	const contentType = resp.headers.get("X-Total-Count");

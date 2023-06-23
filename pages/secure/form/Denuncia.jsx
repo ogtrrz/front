@@ -9,18 +9,18 @@ import { useMutation } from "@apollo/react-hooks";
 import * as yup from "yup";
 import { Formik, Form, Field } from "formik";
 import { TextField } from "formik-mui";
-import {
-	Button,
-	Stack,
-	Box,
-	Typography,
-	MenuItem,
-	Breadcrumbs,
-	Link,
-	FormControl,
-	Label,
-	HelperText,
-} from "@mui/material";
+import NextLink from "next/link";
+import Button from "@mui/material/Button";
+import Stack from "@mui/material/Stack";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import MenuItem from "@mui/material/MenuItem";
+import Breadcrumbs from "@mui/material/Breadcrumbs";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import FormControl from "@mui/material/FormControl";
+
+import Backdrop from "@mui/material/Backdrop";
+import CircularProgress from "@mui/material/CircularProgress";
 
 import OutlinedInput from "@mui/material/OutlinedInput";
 import InputLabel from "@mui/material/InputLabel";
@@ -132,6 +132,7 @@ export const POST_REPORTE = gql`
 const Denuncia = () => {
 	const router = useRouter();
 	const { data: session } = useSession();
+	const [isSubmit, setIsSubmit] = useState(false);
 	// console.log("session", session);
 
 	const se = async () => {
@@ -233,11 +234,15 @@ const Denuncia = () => {
 	const post1 = async (values) => {
 		let formData = new FormData();
 		formData.append("files", selectedFile);
-		const responseFile = await axios({
-			method: "post",
-			url: `${process.env.NEXT_PUBLIC_API_IMAGES}api/upload`,
-			data: formData,
-		});
+		console.log("selectedFile", selectedFile);
+		let responseFile = "";
+		if (selectedFile) {
+			responseFile = await axios({
+				method: "post",
+				url: `${process.env.NEXT_PUBLIC_API_IMAGES}api/upload`,
+				data: formData,
+			});
+		}
 		// console.log("Upload Response", responseFile.data);
 
 		let reqLet = cloneDeep(values);
@@ -254,8 +259,14 @@ const Denuncia = () => {
 			session === null || session === undefined
 				? "Anonimo"
 				: session?.user?.email;
-		reqLet.img = `${process.env.NEXT_PUBLIC_API_IMAGES}${responseFile.data[0].url}?format=webp&height=250&q=80`;
-		reqLet.imgix = `${process.env.NEXT_PUBLIC_API_IMAGES}${responseFile.data[0].url}?format=webp&height=250&q=80`;
+		reqLet.img =
+			responseFile !== ""
+				? `${process.env.NEXT_PUBLIC_API_IMAGES}${responseFile.data[0].url}?format=webp&height=250&q=80`
+				: "";
+		reqLet.imgix =
+			responseFile !== ""
+				? `${process.env.NEXT_PUBLIC_API_IMAGES}${responseFile.data[0].url}?format=webp&height=250&q=80`
+				: "";
 
 		reqLet.casoText = {
 			descripcion: values.caso,
@@ -275,8 +286,17 @@ const Denuncia = () => {
 			console.log("req", req);
 			router.push(`/view/denuncia/${req.data.postReporte.id}`);
 		});
-		
 	};
+
+	if (isSubmit) {
+		return (
+			<Backdrop
+				sx={{ color: "#000", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+				open={isSubmit}>
+				<CircularProgress color='inherit' />
+			</Backdrop>
+		);
+	}
 
 	return (
 		<React.Fragment>
@@ -291,9 +311,28 @@ const Denuncia = () => {
 			</Head>
 			<Stack
 				sx={{ display: "flex", pt: { xs: 0, md: 25 }, px: { xs: 25, md: 50 } }}>
+				<br />
+				<Breadcrumbs
+					separator={<NavigateNextIcon fontSize='small' color='primary' />}
+					aria-label='Link al Inicio'>
+					<NextLink href={`/`} shallow={false}>
+						<Typography
+							sx={{
+								"&:hover": {
+									textDecoration: "underline",
+								},
+							}}
+							color='primary.main'>
+							{`Inicio`}
+						</Typography>
+					</NextLink>
+
+					<Typography color='text.primary'>{`Nueva denuncia`}</Typography>
+				</Breadcrumbs>
+				<br />
 				<Typography
 					color='primary'
-					variant='subtitle1'>{`Agregar su denuncia.`}</Typography>
+					variant='subtitle1'>{`Nueva denuncia.`}</Typography>
 				<br />
 				<Formik
 					enableReinitialize
@@ -321,6 +360,7 @@ const Denuncia = () => {
 							.required("Es requerido"),
 					})}
 					onSubmit={(values, { setSubmitting }) => {
+						setIsSubmit(true);
 						setSubmitting(false);
 						post1(values);
 					}}>

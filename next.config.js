@@ -28,21 +28,21 @@ const nextConfig = {
   poweredByHeader: false,
   compress: true,
   images: {
-      domains: ['localhost', '34.125.92.102', 'cdn-0.apestan.com']
+      domains: ['mexicana.mx', 'localhost', '34.125.92.102', 'cdn-0.apestan.com']
   },
 
   async rewrites() {
-      return [
-          
-          {
-              source: "/appi/:path*",
-              destination: `http://localhost:8080/api/:path*`
-          },
-          {
-            source: "/files/:path*",
-            destination: `http://localhost:1337/:path*`
-        }
-      ];
+    return [
+        
+      // {
+      //   source: "/appi/:path*",
+      //   destination: `http://localhost:8080/api/:path*`
+      // },
+      // {
+      //   source: "/files/:path*",
+      //   destination: `http://localhost:1337/:path*`
+      // }
+    ];
   },
 }
 /*
@@ -51,11 +51,11 @@ async rewrites() {
       
       {
           source: "/appi/:path*",
-          destination: `http://34.125.92.102:8080/api/:path*`
+          destination: `http://10.182.0.3:8080/api/:path*`
       },
       {
         source: "/files/:path*",
-        destination: `http://34.125.92.102:1337/:path*`
+        destination: `http://10.182.0.3:1337/:path*`
     }
   ];
 },

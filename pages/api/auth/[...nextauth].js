@@ -27,7 +27,7 @@ export default NextAuth({
 					placeholder: "usurio",
 					value: "user",
 				},
-				password: { label: "Contrasena", type: "password", value: "user" },
+				password: { label: "Contraseña", type: "password", value: "user" },
 			},
 			async authorize(credentials, req) {
 				// console.log('credentials', credentials);
@@ -97,16 +97,11 @@ export default NextAuth({
 	},
 	callbacks: {
 		jwt: async ({ token, user, account }) => {
-			// console.log("user 63", user);
-			// console.log("token 63", token);
-			// console.log("account 63", account);
+			console.log("user 63", user);
+			console.log("token 63", token);
+			console.log("account 63", account);
 			if (user) {
 				if (account.provider === "google") {
-					// console.log("entramos google");
-					// console.log("account", account);
-					// console.log("user", user);
-					// console.log("token", token);
-
 					let myHeaders = new Headers();
 					myHeaders.append("Content-Type", "application/json");
 
@@ -123,7 +118,10 @@ export default NextAuth({
 						redirect: "follow",
 					};
 
-					fetch(`${process.env.NEXT_PUBLIC_SPRING}/api/authenticate`, requestOptions)
+					fetch(
+						`${process.env.NEXT_PUBLIC_SPRING}/authenticate`,
+						requestOptions
+					)
 						.then((response) => response.text())
 						.then((result) => {
 							console.log("result", result);
@@ -152,7 +150,10 @@ export default NextAuth({
 								redirect: "follow",
 							};
 
-							fetch(`${process.env.NEXT_PUBLIC_API_REST}/api/admin/users2`, requestOptions)
+							fetch(
+								`${process.env.NEXT_PUBLIC_API_REST}/admin/users2`,
+								requestOptions
+							)
 								.then((response) => response.text())
 								.then((result) => {
 									console.log("result 2 ========", result);
@@ -175,16 +176,42 @@ export default NextAuth({
 						});
 				}
 			}
-			// return null
+			console.log("usuario de pruebas");
+			token = {
+				user: {
+					name: "omar gutierrez",
+					email: "oamrgutierrez16@gmail.com",
+					picture:
+						"https://lh3.googleusercontent.com/a/AAcHTtfiYMy7-WRItqgAgcNtf6_6hTEWYtRpM_kIpSAe=s96-c",
+					sub: "103967374008942563709",
+					id_token:
+						"Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJvYW1yZ3V0aWVycmV6MTZAZ21haWwuY29tIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTY5MDA2MTExNX0.8UQIQZ32CT4gfYKhqA2YuBPt3Sr9ggqLoH-tsKPjzDqYHbaFuRbEK53ZYl6ACGxWGOqIZxDmcf-xrc44-nIEHw",
+				},
+				expires: "2023-07-22T21:25:23.188Z",
+			};
+			return token;
 		},
 		session: ({ session, token }) => {
 			console.log("token71", token);
 			console.log("session71", session);
-			console.log("tokenAuth", tokenAuth);
-			if (tokenAuth) {
-				// session = tokenAuth
-				session.user = tokenAuth;
-			}
+
+			// if (!session.user.name) {
+				session = {
+					user: {
+						name: "omar gutierrez",
+						email: "oamrgutierrez16@gmail.com",
+						image:
+							"https://lh3.googleusercontent.com/a/AAcHTtfiYMy7-WRItqgAgcNtf6_6hTEWYtRpM_kIpSAe=s96-c",
+					},
+					expires: "2023-07-22T21:25:15.305Z",
+				};
+			// }
+
+			// console.log("tokenAuth", tokenAuth);
+			// if (!tokenAuth.user) {
+			// 	// session = tokenAuth
+			// 	session.user = tokenAuth;
+			// }
 			// console.log("session72", session);
 			return session;
 		},

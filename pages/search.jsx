@@ -27,7 +27,7 @@ const Busqueda = gql`
 		show(search: $searchInput)
 			@rest(
 				type: "Reporte"
-				path: "_search2/caso-texts?query={args.search}&sort=id,desc"
+				path: "/_search2/caso-texts?query={args.search}&sort=id,desc"
 			) {
 			id @export(as: "showId")
 			titulo

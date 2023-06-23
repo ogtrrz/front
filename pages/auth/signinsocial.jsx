@@ -143,7 +143,7 @@ const signinsocial = ({ csrfToken, providers }) => {
 								},
 							},
 						}}>
-						<ListItemButton>
+						<ListItemButton onClick={() => signIn("tester")}>
 							<ListItemIcon>
 								<SvgIcon>
 									<svg
