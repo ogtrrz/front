@@ -126,13 +126,13 @@ const Home = ({ data, paginasTotales, paginaActual }) => {
 
 export default React.memo(Home);
 
-// export async function getStaticProps()
+//export async function getStaticProps(context) {
 export async function getStaticProps(context) {
 	const { params } = context;
 	const paginaActual = params.paginaActual;
 	console.log('pagina avcyual =======================', paginaActual);
 	const resp = await fetch(
-		`${process.env.NEXT_PUBLIC_SPRING}/api/reportes?&page=${paginaActual}&size=12&sort=id,desc`
+		`${process.env.NEXT_PUBLIC_SPRING}api/reportes?&page=${paginaActual}&size=12&sort=id,desc`
 	);
 	const contentType = resp.headers.get("X-Total-Count");
 	const data = await resp.json();
@@ -166,4 +166,5 @@ export async function getStaticPaths() {
 		paths: pathsWithParams,
 		fallback: "blocking",
 	};
+	
 }

@@ -381,6 +381,7 @@ const DenunciaDynamicFooter = ({ data }) => {
 		}
 	};
 
+	
 	const handlePestes = () => {
 		const findView = findIndex(pestesStorage, (item) => item === data.id);
 		let info = cloneDeep(data.informacion);
@@ -396,7 +397,7 @@ const DenunciaDynamicFooter = ({ data }) => {
 			remove(pestesArray, (item) => item === data.id);
 			// console.log("entro remove2", pestesArray);
 			setPestesStorage(pestesArray);
-			info.rating = pestesBadge.rating ;
+			info.rating = pestesBadge.rating -1;
 		}
 		patchInformacion({
 			variables: {
