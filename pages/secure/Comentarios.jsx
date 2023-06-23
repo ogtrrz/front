@@ -41,7 +41,7 @@ const Busqueda = gql`
 		show(autor: $autorInput, page: $paginaInput)
 			@rest(
 				type: "Comentario"
-				path: "comentarios?autor.equals={args.autor}&{args.page}=0&size=32"
+				path: "/comentarios?autor.equals={args.autor}&{args.page}=0&size=32"
 			) {
 			id
 			autor
@@ -58,7 +58,7 @@ const Edit = gql`
 		show(id: $comentarioId, input: $input)
 			@rest(
 				type: "Comentario"
-				path: "comentarios2/{args.id}"
+				path: "/comentarios2/{args.id}"
 				method: "PATCH"
 				bodyKey: "input"
 			) {
@@ -77,7 +77,7 @@ const Delete = gql`
 		show(idComentario: $idComentario, idReporte: $idReporte)
 			@rest(
 				type: "Comentario"
-				path: "comentarios2/{args.idComentario}/{args.idReporte}"
+				path: "/comentarios2/{args.idComentario}/{args.idReporte}"
 				method: "DELETE"
 			) {
 			idComentario
@@ -91,7 +91,9 @@ const Comentarios = () => {
 	const [editId, setEditId] = useState(0);
 	const [comentarioState, setComentarioState] = useState("");
 
-	const { Autor, Page } = router.query;
+	//const { Autor, Page } = router.query;
+	const Autor = "omar.gutierrez.e"
+	const Page = "0"
 
 	const {
 		loading: lodingBusqueda,
